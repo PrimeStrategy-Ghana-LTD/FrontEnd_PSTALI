@@ -1,9 +1,16 @@
-import React from 'react'
+
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
+import LoginPage from './pages/LoginPage'
 import AddUser from './components/AddUser'
 
-
+function App() {
+const router = createBrowserRouter([
+  {
+    path:"/",
+    element: <LoginPage />
+  },
+])
 
 
 
@@ -18,7 +25,11 @@ import AddUser from './components/AddUser'
   ])
 function App() {
   return (
-  <RouterProvider router={router}/>
+
+    <>
+    <RouterProvider router={router} />
+    </>
+
   )
 }
 
