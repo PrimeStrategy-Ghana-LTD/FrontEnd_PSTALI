@@ -5,39 +5,53 @@ import { apiAddUser } from "../Services/auth";
 
 const AddUser = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    userName: "",
     password: "",
     storeLocation: "",
     role: "",
     email: "",
+    phone:"",
+       profile_picture:"",
+
   });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate;
+  const navigate = useNavigate();
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const [profileImage, setProfileImage] = useState(null)
+  const [profile_picture, setProfile_picture] = useState(null)
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      const payload = { ...formData };
-      const response = await apiAddUser(payload);
-      console.log(response.data);
+  e.preventDefault();
+  setLoading(true);
 
-      toast.success("User Added Successful");
-      navigate("/login");
-    } catch (error) {
-      toast.error("Adding Up Failed, Please try again");
-      console.log(error);
-    } finally {
-      setLoading(false);
+  try {
+    const formDataToSend = new FormData();
+    formDataToSend.append("userName", formData.userName);
+    formDataToSend.append("password", formData.password);
+    formDataToSend.append("storeLocation", formData.storeLocation);
+    formDataToSend.append("role", formData.role);
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("phone", formData.phone);
+    if (profile_picture) {
+      formDataToSend.append("profile_picture", profile_picture);
     }
 
-    console.log("Form submitted:", formData);
-    // Add form submit logic here
-  };
+    const response = await apiAddUser(formDataToSend);
+    console.log(response.data);
+
+    toast.success("User Added Successfully");
+    navigate("/");
+  } catch (error) {
+    console.log("Error:", error);
+    if(error.response)
+    console.log("Backend resonse:", error.response.data)
+    toast.error(error.response.data.message || "Adding user failed.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="fixed inset-0 bg-white bg-opacity-40 flex items-center justify-center z-50">
@@ -46,8 +60,8 @@ const AddUser = () => {
 
         <div className="flex flex-row items-center justify-center mb-4">
           <div className="w-20 h-20 border-3 border-dashed border-gray-300 rounded-full flex items-center justify-center text-gray-500 text-4xl">
-          {profileImage? (<img
-            src={URL.createObjectURL(profileImage)}
+          {profile_picture? (<img
+            src={URL.createObjectURL(profile_picture)}
             alt="Prpfile Preview"
             className="w-full h-full object-cover border-1 border-dashed border-gray-300 rounded-full flex items-center justify-center text-gray-500 text-4xl"
           />) :(<span>👤</span>)}
@@ -60,8 +74,9 @@ const AddUser = () => {
             </span>
             <label className="text-blue-500 cursor-pointer">Browse image <input
             type="file"
+            name="profile_picture"
             accept="image/*"
-            onChange={(e) => setProfileImage(e.target.files[0])} className="hidden"/></label>
+            onChange={(e) => setProfile_picture(e.target.files[0])} className="hidden"/></label>
           </div>
         </div>
 
@@ -70,9 +85,9 @@ const AddUser = () => {
             <label className="w-60 text-lg font-semibold">User Name</label>
             <input
               type="text"
-              name="fullName"
+              name="userName"
               placeholder="Enter supplier name"
-              value={formData.fullName}
+              value={formData.userName}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-2"
               required
@@ -81,7 +96,7 @@ const AddUser = () => {
           <div className="flex items-center mb-3">
   <label className="w-60 text-lg font-semibold">Password</label>
             <input
-              type="password"
+              type="text"
               name="password"
               placeholder="Enter password"
               value={formData.password}
@@ -93,6 +108,7 @@ const AddUser = () => {
           <div className="flex items-center mb-3">
   <label className="w-60 text-lg font-semibold">Store Location</label>
             <select
+            type ="text"
               name="storeLocation"
               value={formData.storeLocation}
               onChange={handleChange}
@@ -109,24 +125,37 @@ const AddUser = () => {
   <label className="w-60 text-lg font-semibold ">User Role</label>
             <select
               name="role"
-              value={formData.userRole}
+              type="text"
+              value={formData.role}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-2"
               required
             >
               <option value="">Choose user role</option>
-              <option value="Admin">Admin</option>
-              <option value="Manager">Asset Manager</option>
-              <option value="Staff">Viewer</option>
+              <option value="adminstrator">Admin</option>
+              <option value="asset manager">Asset Manager</option>
+              {/* <option value="Staff">Viewer</option> */}
             </select>
           </div>
 <div className="flex items-center mb-3">
   <label className="w-60 text-lg font-semibold">Email</label>
             <input
-              type="email"
+              type="text"
               name="email"
               placeholder="Enter user email"
               value={formData.email}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+              required
+            />
+          </div>
+          <div className="flex items-center mb-3">
+  <label className="w-60 text-lg font-semibold">Contact Number</label>
+            <input
+              type="text"
+              name="phone"
+              placeholder="Enter user email"
+              value={formData.phone}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-2"
               required
@@ -137,25 +166,29 @@ const AddUser = () => {
             <button
               type="button"
               className="px-4 py-2 rounded-lg border border-gray-400"
-              onClick={() =>
+              onClick={() =>{
                 setFormData({
-                  fullName: "",
+                  userName: "",
                   password: "",
                   storeLocation: "",
                   role: "",
                   email: "",
+                  phone: "",
+                  profile_picture: "",
                 })
-              }
+                  setProfile_picture(null);
+
+              }}
             >
               Discard
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`bg-blue-600 text-white px-4 py-2 rounded-lg${
-                loading ? "bg-gray-400" : "bg-blue-950 hover:bg-blue-600"
-              } text-white text-lg font-semibold rounded-lg shadow-md transition duration-300 ease-in-out`}
-            >
+            className={`px-4 py-2 text-white text-lg font-semibold rounded-lg shadow-md transition duration-300 ease-in-out ${
+  loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-950 hover:bg-blue-600"
+}`}
+>
               {loading ? "Loading..." : "Add User"}
               {/* Add User */}
             </button>
