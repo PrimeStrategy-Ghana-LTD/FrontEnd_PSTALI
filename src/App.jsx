@@ -6,6 +6,8 @@ import './App.css'
 import LoginPage from './pages/LoginPage'
 import SearchPage from './pages/SearchPage'
 import AddUser from './components/AddUser'
+import AssetOverview from './pages/AssetOverview'
+
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -20,6 +22,10 @@ const router = createBrowserRouter([
   {
     path: '/add-user',
     element: <AddUser />,
+  },
+  {
+    path: '/overview',
+    element: <AssetOverview />,
   },
 ])
 
