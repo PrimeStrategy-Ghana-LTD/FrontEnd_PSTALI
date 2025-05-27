@@ -39,6 +39,7 @@ const AddUser = () => {
 
     const response = await apiAddUser(formDataToSend);
     console.log(response.data);
+    console.log(formDataToSend)
 
     toast.success("User Added Successfully");
     navigate("/");
@@ -196,6 +197,8 @@ const AddUser = () => {
         </form>
       </div>
     </div>
+
+
   );
 };
 
