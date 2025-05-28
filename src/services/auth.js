@@ -13,3 +13,4 @@ export const apiAddUser = async (payload) => {
     }
   });
 };
+console.log("Auth service loaded");
