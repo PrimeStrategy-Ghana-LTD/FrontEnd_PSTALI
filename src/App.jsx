@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage'
 import SearchPage from './pages/SearchPage'
 import AddUser from './components/AddUser'
 import AssetOverview from './pages/AssetOverview'
+import SearchResult from './pages/SearchResult'
 
 
 // Define all your routes here
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: '/search',
     element: <SearchPage />,
+  },
+  {
+    path: '/search-result',
+    element: <SearchResult />,
   },
   {
     path: '/add-user',

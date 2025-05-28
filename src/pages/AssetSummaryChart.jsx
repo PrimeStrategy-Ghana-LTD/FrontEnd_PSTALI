@@ -174,12 +174,12 @@ const AssetSummaryChart = () => {
   }, []);
 
   return (
-    <div className='border-2 w-[40%] bg-white border-white p-4 rounded-md shadow-sm'>
+    <div className='border-2 bg-white border-white p-4 rounded-md shadow-sm'>
       <div className="flex flex-row justify-between items-center mb-4">
         <p className='font-semibold'>Asset Summary Chart</p>
       </div>
       
-      <div className="relative h-72">
+      <div className="relative h-64">
         <canvas 
           ref={chartRef}
           className="w-full h-full"
