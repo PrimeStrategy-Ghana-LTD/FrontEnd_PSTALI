@@ -36,15 +36,10 @@ const router = createBrowserRouter([
     path: '/overview',
     element: <AssetOverview />,
   },
-
-
-{
-  path: "/dashboard",
-  element: <DashboardLayout/>
-
-
-
-}
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
+  }
 ])
 
 function App() {
