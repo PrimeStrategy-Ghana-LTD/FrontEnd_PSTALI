@@ -7,7 +7,11 @@ import LoginPage from './pages/LoginPage'
 import SearchPage from './pages/SearchPage'
 import AddUser from './components/AddUser'
 import AssetOverview from './pages/AssetOverview'
+
 import SearchResult from './pages/SearchResult'
+
+import DashboardLayout from './Layouts/DashboardLayout'
+
 
 
 // Define all your routes here
@@ -32,6 +36,15 @@ const router = createBrowserRouter([
     path: '/overview',
     element: <AssetOverview />,
   },
+
+
+{
+  path: "/dashboard",
+  element: <DashboardLayout/>
+
+
+
+}
 ])
 
 function App() {
