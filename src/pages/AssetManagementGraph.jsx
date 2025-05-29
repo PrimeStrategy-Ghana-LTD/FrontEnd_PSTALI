@@ -54,36 +54,32 @@ const AssetManagementGraph = () => {
         data: dataPoints.assigned,
         borderColor: '#3b82f6',
         backgroundColor: '#3b82f633',
-        tension: 0.5, // adds waviness
+        tension: 0.6, // increased waviness
         pointRadius: 0,
+        borderWidth: 1.5,
       },
       {
         label: 'Asset Added',
         data: dataPoints.added,
         borderColor: '#ef4444',
         backgroundColor: '#ef444433',
-        tension: 0.5,
+        tension: 0.9, // increased waviness
         pointRadius: 0,
+        borderWidth: 1.5,
       },
     ],
   };
 
   const options = {
     responsive: true,
+    maintainAspectRation: false,
     plugins: {
       legend: {
-        position: 'top',
-        labels: {
-          font: {
-            size: 12,
-          },
-        },
+        display: false,
       },
       tooltip: {
         callbacks: {
-          label: (context) => {
-            return `${context.dataset.label}: ${context.formattedValue}`;
-          },
+          label: (context) => `${context.dataset.label}: ${context.formattedValue}`,
         },
       },
     },
@@ -114,12 +110,25 @@ const AssetManagementGraph = () => {
 
   return (
     <div className="border-2 bg-white border-white p-4 rounded-md shadow-sm">
-      <div className="flex flex-row justify-between">
-        <p className="font-semibold mb-4">Location</p>
-        <p className="border-[0.05px] py-1 px-3 rounded-md">Weekly</p>
+      <div className="flex flex-row justify-between mb-2">
+        <p className="font-semibold">Location</p>
+        <p className="border-[0.05px] border-gray-400 py-1 px-5 rounded-sm text-[14px] text-gray-600">Weekly</p>
       </div>
-      <div className="h-64 w-full">
+      {/* Reduced height */}
+      <div className="h-48 w-full">
         <Line data={chartData} options={options} />
+      </div>
+
+      {/* Custom legend below the chart */}
+      <div className="flex gap-6 mt-3 px-4">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+          <span className="text-sm">Asset Assigned</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+          <span className="text-sm">Asset Added</span>
+        </div>
       </div>
     </div>
   );

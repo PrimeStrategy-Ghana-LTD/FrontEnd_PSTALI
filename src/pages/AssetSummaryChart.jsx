@@ -25,37 +25,30 @@ const AssetSummaryChart = () => {
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
 
-  // Sample data - monthly only
   const chartData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
     datasets: [
       {
-        label: 'Stocks',
+        label: 'In Store',
         data: [45000, 48000, 52000, 49000, 55000, 58000, 60000, 57000, 62000, 65000],
         backgroundColor: 'rgba(59, 130, 246, 0.8)',
         borderColor: 'rgb(59, 130, 246)',
-        borderWidth: 2,
-        // barThickness: 10,
+        borderWidth: 1.5,
         borderRadius: {
           topLeft: 10,
           topRight: 10,
-          bottomLeft: 0,
-          bottomRight: 0
         },
         borderSkipped: false,
       },
       {
-        label: 'Bonds',
+        label: 'Shipped',
         data: [32000, 33000, 31500, 34000, 35000, 36000, 37000, 35500, 38000, 39000],
         backgroundColor: 'rgba(16, 185, 129, 0.8)',
         borderColor: 'rgb(16, 185, 129)',
-        borderWidth: 2,
-        // barThickness: 10,
+        borderWidth: 1.5,
         borderRadius: {
           topLeft: 10,
           topRight: 10,
-          bottomLeft: 0,
-          bottomRight: 0
         },
         borderSkipped: false,
       },
@@ -63,27 +56,13 @@ const AssetSummaryChart = () => {
   };
 
   useEffect(() => {
-    // Register Chart.js components
-    // Chart.Chart.register(
-    //   Chart.CategoryScale,
-    //   Chart.LinearScale,
-    //   Chart.BarElement,
-    //   Chart.LineElement,
-    //   Chart.PointElement,
-    //   Chart.Title,
-    //   Chart.Tooltip,
-    //   Chart.Legend
-    // );
-
     const ctx = chartRef.current?.getContext('2d');
-    
+
     if (ctx) {
-      // Destroy existing chart if it exists
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
       }
 
-      // Create new chart
       chartInstanceRef.current = new Chart.Chart(ctx, {
         type: 'bar',
         data: chartData,
@@ -97,8 +76,11 @@ const AssetSummaryChart = () => {
             legend: {
               position: 'bottom',
               labels: {
-                padding: 20,
+                padding: 10,
                 usePointStyle: true,
+                pointStyle: 'circle', // circle dot
+                boxWidth: 6,
+                boxHeight: 6, // smaller dot size
                 font: {
                   size: 12
                 }
@@ -126,31 +108,13 @@ const AssetSummaryChart = () => {
           },
           scales: {
             x: {
-              display: true,
-              title: {
-                display: true,
-                text: '',
-                font: {
-                  size: 12,
-                  weight: 'bold'
-                }
-              },
               grid: {
                 display: false
               },
-              categoryPercentage: 0.6,
-              barPercentage: 0.15
+              categoryPercentage: 0.5, // more spacing between groups
+              barPercentage: 0.3 // thinner bars
             },
             y: {
-              display: true,
-              title: {
-                display: true,
-                text: '',
-                font: {
-                  size: 12,
-                  weight: 'bold'
-                }
-              },
               grid: {
                 color: 'rgba(0, 0, 0, 0.1)'
               },
@@ -165,7 +129,6 @@ const AssetSummaryChart = () => {
       });
     }
 
-    // Cleanup function
     return () => {
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
@@ -175,11 +138,13 @@ const AssetSummaryChart = () => {
 
   return (
     <div className='border-2 bg-white border-white p-4 rounded-md shadow-sm'>
-      <div className="flex flex-row justify-between items-center mb-4">
-        <p className='font-semibold'>Asset Summary Chart</p>
+      <div className="flex flex-row justify-between mb-2">
+        <p className="font-semibold">Asset Summary Chart</p>
+        <p className="border-[0.05px] border-gray-400 py-1 px-5 rounded-sm text-[14px] text-gray-600">Weekly</p>
       </div>
-      
-      <div className="relative h-64">
+
+      {/* Updated height to match first chart */}
+      <div className="relative h-56">
         <canvas 
           ref={chartRef}
           className="w-full h-full"
