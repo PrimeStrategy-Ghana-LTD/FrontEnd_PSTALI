@@ -18,11 +18,11 @@ import Sidebar from "../components/Sidebar";
 const AssetOverview = () => {
     return (
             
-            <div className='bg-[#f0f1f3] min-h-screen flex flex-row gap-5 w-full pl-[20%] pt-5'>
-            <div className="space-y-4">
+            <div className='bg-[#f0f1f3] min-h-[90%] flex flex-row gap-5 w-full pl-[2.5%] pt-5'>
+            <div className="space-y-4 w-[55%]">
                 <div className='border-2 bg-white border-white p-4 rounded-md shadow-sm'>
                     <p className='font-semibold mb-4'>Asset Overview</p>
-                    <div className='flex flex-row gap-8 items-center'>
+                    <div className='flex flex-row gap-12 items-center'>
                         <div className='flex flex-col items-center'>
                             <img src={Sales} alt="" className='mb-2 w-6 h-6' />
                             <div className='flex flex-row gap-3 text-center'>
@@ -64,7 +64,7 @@ const AssetOverview = () => {
                 </div>
                 <div className='border-2 bg-white border-white p-4 rounded-md shadow-sm'>
                     <p className='font-semibold mb-4'>Assignments Overview</p>
-                    <div className='flex flex-row gap-8 items-center'>
+                    <div className='flex flex-row gap-9 items-center'>
                         <div className='flex flex-col items-center'>
                             <img src={Purchase} alt="" className='mb-2 w-6 h-6' />
                             <div className='flex flex-row gap-3 text-center'>
@@ -89,7 +89,7 @@ const AssetOverview = () => {
                             <img src={Cancel} alt="" className='mb-2 w-6 h-6' />
                             <div className='flex flex-row gap-1 text-center'>
                                 <p className='text-[13px]'>56</p>
-                                <p className='text-gray-600 text-[13px]'>N/A</p>
+                                <p className='text-gray-600 text-[13px]'>Not Assigned</p>
                             </div>
                         </div>
                         
@@ -107,10 +107,10 @@ const AssetOverview = () => {
                 
                 <AssetSummaryChart />
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 w-[40%]">
                 <div className='border-2 bg-white border-white p-4 rounded-md shadow-sm'>
                     <p className='font-semibold mb-1'>Asset Summary</p>
-                    <div className='flex flex-row gap-8 items-center'>
+                    <div className='flex flex-row gap-8 items-center justify-center'>
                         <div className='flex flex-col items-center'>
                             <img src={Quantity} alt="" className=' w-6 h-6' />
                             <div className='text-center'>
@@ -133,7 +133,7 @@ const AssetOverview = () => {
                 </div>
                 <div className='border-2 bg-white border-white p-4 rounded-md shadow-sm'>
                     <p className='font-semibold mb-1'>Report Summary</p>
-                    <div className='flex flex-row gap-8 items-center'>
+                    <div className='flex flex-row gap-8 items-center justify-center'>
                         <div className='flex flex-col items-center'>
                             <img src={Suppliers} alt="" className=' w-6 h-6' />
                             <div className=' text-center'>
