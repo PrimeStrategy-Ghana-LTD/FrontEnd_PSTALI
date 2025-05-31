@@ -10,11 +10,13 @@ import AssetOverview from './pages/AssetOverview'
 import SearchResult from './pages/SearchResult'
 import DashboardLayout from './Layouts/DashboardLayout'
 import Sidebar from './components/Sidebar'
-import Dashboard from './pages/dashboard'
+
 
 // Toastify import
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Sidebar1 from './components/Sidebar1'
+import AllAssets from './pages/AllAssets'
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -35,8 +37,16 @@ const router = createBrowserRouter([
     element: <AddUser />,
   },
   {
+    path: '/assets',
+    element: <AllAssets />
+  },
+  {
     path: '/overview',
     element: <AssetOverview />,
+  },
+  {
+    path: "/side-bar",
+    element: <Sidebar1 />,
   },
   {
     path: "/dashboard",
@@ -45,17 +55,15 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <AssetOverview />,
-      }
+      },
+      
     ]
   },
   {
     path: "/sidebar",
     element: <Sidebar />,
   },
-  {
-    path: "/dash",
-    element: <Dashboard />,
-  },
+  
 ])
 
 function App() {

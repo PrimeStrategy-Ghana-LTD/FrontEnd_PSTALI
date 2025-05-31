@@ -7,7 +7,7 @@ import { PiHouse } from "react-icons/pi";
 function Sidebar() {
   return (
     <div className="flex">
-      <div className='border-2 border-white pl-3 w-[18vw] pt-6 fixed bg-white h-[150%]'>
+      <div className='border-2 border-white pl-3 w-[18vw] pt-6 fixed bg-white h-[960px]'>
         <img src={logo} alt="" className='w-[60%]'/>
         <div className='space-y-3 text-[14px] mt-10'>
           <div className='flex items-center gap-2 pb-2'>
