@@ -5,11 +5,11 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 import LoginPage from './pages/LoginPage'
 import SearchPage from './pages/SearchPage'
-import AddUser from './components/AddUser'
 import AssetOverview from './pages/AssetOverview'
 import SearchResult from './pages/SearchResult'
 import DashboardLayout from './Layouts/DashboardLayout'
 import Sidebar from './components/Sidebar'
+import AddAssetModal from './pages/AddAssetModal'
 
 
 // Toastify import
@@ -17,6 +17,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Sidebar1 from './components/Sidebar1'
 import AllAssets from './pages/AllAssets'
+import ViewAsset from './pages/ViewAsset'
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -32,10 +33,7 @@ const router = createBrowserRouter([
     path: '/search-result',
     element: <SearchResult />,
   },
-  {
-    path: '/add-user',
-    element: <AddUser />,
-  },
+  
   {
     path: '/assets',
     element: <AllAssets />
@@ -43,6 +41,14 @@ const router = createBrowserRouter([
   {
     path: '/overview',
     element: <AssetOverview />,
+  },
+  {
+    path: "/assetmodal",
+    element: <AddAssetModal />,
+  },
+  {
+    path: "/view-asset",
+    element: <ViewAsset />,
   },
   {
     path: "/side-bar",
