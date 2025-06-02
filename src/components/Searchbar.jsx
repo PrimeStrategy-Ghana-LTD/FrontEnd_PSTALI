@@ -3,7 +3,7 @@ import { IoSearchOutline, IoNotificationsOutline } from "react-icons/io5";
 
 const Searchbar = () => {
   return (
-    <div >
+    <div className='bg-[#f0f1f3]'>
         <div className='w-[79vw] ml-[1px]'>
         <div className='flex justify-between items-center px-6 py-4 bg-white border-b border-gray-200 '>
           <div className='flex items-center bg-gray-100 rounded-lg px-4 py-2 w-[400px]'>
