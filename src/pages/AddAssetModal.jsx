@@ -13,6 +13,7 @@ const AddAssetModal = ({ isOpen, onClose }) => {
       try {
         const response = await axios.get('https://backend-ps-tali.onrender.com/locations');
         console.log("Fetched locations:", response.data);
+        console.log("Type of response:", typeof response.data);
         setLocations(response.data); // adjust based on your backend response
       } catch (error) {
         console.error("Failed to fetch locations", error);
@@ -37,7 +38,7 @@ const AddAssetModal = ({ isOpen, onClose }) => {
       console.log("error", error);
     }
   };
-   console.log("Locations to map:", locations);
+  console.log("Locations to map:", locations);
 
   return (
     <div className="fixed inset-0 bg-black/25 z-50 flex items-center justify-center pointer-events-none">
@@ -83,11 +84,19 @@ const AddAssetModal = ({ isOpen, onClose }) => {
               className="mt-1 block border w-64 border-gray-300 rounded-md py-1 ml-1 pl-2"
             >
               <option value="">Select location</option>
-              {Array.isArray(locations) && locations.map((loc) => (
-                <option key={loc._id} value={loc.assetLocation}>
-                  {loc.assetLocation}
-                </option>
-              ))}
+              {Array.isArray(locations) && locations.length > 0 ? (
+                locations.map((loc) => {
+                  console.log("Location item:", loc); // Log each location object
+                  return (
+                    <option key={loc._id} value={loc.assetLocation}>
+                      {loc.assetLocation}
+                    </option>
+                  );
+                })
+              ) : (
+                <option disabled>No locations found</option>
+              )}
+
             </select>
           </div>
 
