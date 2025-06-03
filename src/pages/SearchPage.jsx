@@ -76,18 +76,24 @@ const SearchPage = () => {
       <div className="flex justify-center mb-10">
         <div className="flex space-x-12">
           {['Assets', 'Assignments'].map(tab => (
-            <p 
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`text-lg font-medium cursor-pointer transition-colors ${
-                activeTab === tab 
-                  ? 'text-white pb-1' 
-                  : 'text-white'
-              }`}
-            >
-              {tab}
-            </p>
-          ))}
+  <p 
+    key={tab}
+    onClick={() => {
+      setActiveTab(tab);
+      if (tab === 'Assets') {
+        navigate('/assets'); // 👈 navigate when "Assets" is clicked
+      }
+    }}
+    className={`text-lg font-medium cursor-pointer transition-colors ${
+      activeTab === tab 
+        ? 'text-white pb-1' 
+        : 'text-white'
+    }`}
+  >
+    {tab}
+  </p>
+))}
+
         </div>
       </div>
 

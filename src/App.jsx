@@ -18,6 +18,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import Sidebar1 from './components/Sidebar1'
 import AllAssets from './pages/AllAssets'
 import ViewAsset from './pages/ViewAsset'
+import AddUser from './pages/AddUser'
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
   {
     path: '/assets',
     element: <AllAssets />
+  },
+  {
+    path: "/add-user",
+    element: <AddUser />,
   },
   {
     path: '/overview',
