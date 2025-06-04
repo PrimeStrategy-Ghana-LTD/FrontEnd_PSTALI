@@ -5,6 +5,7 @@ import Sidebar1 from '../components/Sidebar1';
 import AddAssetModal from './AddAssetModal';
 import { apiGetAllAssets } from '../servicess/tali';
 import AssetAssignmentModal from './AssetAssignmentModal';
+import { Link } from 'react-router-dom';
 
 
 const AllAssets = () => {
@@ -117,7 +118,7 @@ const AllAssets = () => {
             {/* Table Rows */}
             {filteredAssets.map((item, index) => (
               <div key={index} className='flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200'>
-                <p className='w-[15%]'>{item.product}</p>
+                <Link to={`/view-asset/${assets._id}`} className='w-[15%]'>{item.product}</Link>
                 <p className='w-[10%]'>{item.quantity}</p>
                 <p className='w-[15%]'>{item.location}</p>
                 <p
@@ -142,9 +143,9 @@ const AllAssets = () => {
         </div>
       </div>
       <AddAssetModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
-        {/* <AssetAssignmentModal isOpen={isAssignModalOpen} 
+        <AssetAssignmentModal isOpen={isAssignModalOpen} 
   onClose={() => setIsAssignModalOpen(false)} 
-  asset={selectedAsset}/> */}
+  asset={selectedAsset}/>
     </div>
   );
 };

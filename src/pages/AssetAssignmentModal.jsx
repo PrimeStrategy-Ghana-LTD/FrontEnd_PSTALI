@@ -3,7 +3,7 @@ import { apiAddAsset } from '../servicess/tali';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const AssetAssignmentModal = ({isOpen, onClose, asset}) => { if (isOpen) return null;
+const AssetAssignmentModal = ({isOpen, onClose, asset}) => { if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black/25 z-50 flex items-center justify-center pointer-events-none">
@@ -51,7 +51,7 @@ const AssetAssignmentModal = ({isOpen, onClose, asset}) => { if (isOpen) return 
                         <button
                             type="button"
                             className="bg-gray-200 px-4 py-1 rounded hover:bg-gray-300"
-                            
+                            onClick={onClose}
                         >
                             Discard
                         </button>

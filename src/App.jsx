@@ -52,7 +52,7 @@ const router = createBrowserRouter([
     element: <AddAssetModal />,
   },
   {
-    path: "/view-asset",
+    path: "/view-asset/:id",
     element: <ViewAsset />,
   },
   {
