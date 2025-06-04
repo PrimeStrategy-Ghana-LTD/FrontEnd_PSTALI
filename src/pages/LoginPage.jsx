@@ -3,11 +3,15 @@ import logo from "../assets/images/logo.png";
 import { useNavigate } from 'react-router-dom';
 import { apiSignin } from '../servicess/auth';
 import { toast } from 'react-toastify';
+import { FiEye, FiEyeOff } from "react-icons/fi";
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -69,6 +73,7 @@ const LoginPage = () => {
                 placeholder="Enter your email"
                 required
               />
+              
             </div>
 
             <div>
