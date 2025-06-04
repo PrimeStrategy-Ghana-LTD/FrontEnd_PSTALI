@@ -28,7 +28,7 @@ const LoginPage = () => {
 
         // Navigate after toast delay
         setTimeout(() => {
-          navigate("/search");
+          navigate("/dashboard");
         },);
       } else {
         toast.error("Login failed. Please try again.");
