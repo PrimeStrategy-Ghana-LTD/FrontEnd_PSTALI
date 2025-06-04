@@ -4,6 +4,7 @@ import Sidebar1 from '../components/Sidebar1';
 import Searchbar from '../components/Searchbar';
 import { useParams } from 'react-router-dom';
 import jsPDF from 'jspdf';
+import axios from 'axios';
 
 const ViewAsset = () => {
 
@@ -28,6 +29,10 @@ const ViewAsset = () => {
 
     fetchAsset();
   }, [id]);
+
+  console.log("Asset:", asset);
+console.log("Stock Locations:", asset?.stockLocations);
+
 
 
   const handleDownload = () => {
@@ -86,7 +91,7 @@ const ViewAsset = () => {
                   <div className='space-y-5 mt-3'>
                     <div className='flex flex-row gap-36'>
                       <p className='text-gray-400 text-[16px] font-semibold'>Asset Name</p>
-                      <p className='text-gray-600 font-medium'>{asset?.name}</p>
+                      <p className='text-gray-600 font-medium'>{asset?.assetName}</p>
                     </div>
                     <div className='flex flex-row gap-44'>
                       <p className='text-gray-400 text-[16px] font-semibold'>Asset ID</p>
@@ -98,7 +103,7 @@ const ViewAsset = () => {
                     </div>
                     <div className='flex flex-row gap-32'>
                       <p className='text-gray-400 text-[16px] font-semibold'>Asset Location</p>
-                      <p className='text-gray-600 font-medium'>{locationName}</p>
+                      <p className='text-gray-600 font-medium'>{asset?.assetLocation}</p>
                     </div>
                   </div>
                 </div>
@@ -116,9 +121,9 @@ const ViewAsset = () => {
               </div>
               <div className='mt-7'>
                 <div className="relative border-2 border-dashed border-gray-300 rounded-md p-4 flex items-center justify-center w-56 h-56">
-                  {asset?.imageUrl ? (
+                  {asset?.assetImage ? (
                     <img
-                      src={asset.imageUrl}
+                      src={asset.assetImage}
                       alt="Asset"
                       className="w-full h-full object-cover rounded-md"
                     />
@@ -149,8 +154,8 @@ const ViewAsset = () => {
               </div>
               <div className='flex flex-col space-y-5 mt-4'>
                 {asset?.stockLocations?.map((loc, idx) => (
-                  <div key={id} className='flex flex-row border-b-[0.5px] border-gray-300 justify-between w-[60%]'>
-                    <p className='ml-2 text-gray-400 text-[16px] font-semibold'>{loc.name}</p>
+                  <div key={idx} className='flex flex-row border-b-[0.5px] border-gray-300 justify-between w-[60%]'>
+                    <p className='ml-2 text-gray-400 text-[16px] font-semibold'>{loc.location || loc.storeName}</p>
                     <p className='mr-5 text-gray-600'>{loc.quantity}</p>
                   </div>
                 ))}

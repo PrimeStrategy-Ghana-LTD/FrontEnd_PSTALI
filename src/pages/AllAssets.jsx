@@ -6,6 +6,10 @@ import AddAssetModal from './AddAssetModal';
 import { apiGetAllAssets } from '../servicess/tali';
 import AssetAssignmentModal from './AssetAssignmentModal';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 
 
 const AllAssets = () => {
@@ -16,11 +20,46 @@ const AllAssets = () => {
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [assets, setAssets] = useState([]);
+  const uniqueLocations = [...new Set(assets.map(asset => asset.assetLocation))];
   const getAssets = async () => {
     const response = await apiGetAllAssets();
     console.log(response.data)
     setAssets(response.data.assets);
   }
+
+  const [summary, setSummary] = useState({
+    totalAssets: 0,
+    assetsAssigned: 0,
+    categories: 0,
+  });
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const [assetsRes, assignmentsRes] = await Promise.all([axios.get('https://backend-ps-tali.onrender.com/assets/count', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('https://backend-ps-tali.onrender.com/assignments/count', {
+          headers: { Authorization: `Bearer ${'token'}` }
+        })
+        ]);
+
+        setSummary({
+          totalAssets: assetsRes.data.count,      // adjust based on actual response shape
+          assetsAssigned: assignmentsRes.data.count, // adjust based on actual response shape
+          categories: 0 // or keep hardcoded for now
+        });
+
+        console.log("Assets Response:", assetsRes.data);
+      } catch (error) {
+        console.error("Error fetching counts", error)
+      }
+    };
+
+    fetchCounts();
+  }, []);
 
   useEffect(() => {
     getAssets();
@@ -28,10 +67,38 @@ const AllAssets = () => {
   // Apply filters to data
   const filteredAssets = assets.filter(item => {
     return (
-      (availabilityFilter === "" || item.availability === availabilityFilter) &&
-      (locationFilter === "" || item.location === locationFilter)
+      (availabilityFilter === "" || item.status === availabilityFilter) &&
+      (locationFilter === "" || item.assetLocation === locationFilter)
     );
   });
+
+  const handleDownloadPDF = () => {
+  const doc = new jsPDF();
+
+  doc.text("All Assets", 14, 10);
+
+  const tableColumn = ["Asset Name", "Quantity", "Location", "Availability"];
+  const tableRows = [];
+
+  filteredAssets.forEach(asset => {
+    const assetData = [
+      asset.assetName,
+      asset.unit,
+      asset.assetLocation,
+      asset.status
+    ];
+    tableRows.push(assetData);
+  });
+
+  doc.autoTable({
+    head: [tableColumn],
+    body: tableRows,
+    startY: 20,
+  });
+
+  doc.save("assets.pdf");
+};
+
 
   return (
     <div className='flex'>
@@ -45,8 +112,8 @@ const AllAssets = () => {
             <div className='flex gap-32'>
               {[
                 { title: 'Categories', count: 14, color: '#1570ef' },
-                { title: 'Total Assets', count: 200, color: '#e19133' },
-                { title: 'Asset Assigned', count: 7, color: '#845ebc' }
+                { title: 'Total Assets', count: summary.totalAssets, color: '#e19133' },
+                { title: 'Asset Assigned', count: summary.assetsAssigned, color: '#845ebc' }
               ].map((item, index) => (
                 <div key={index} className='flex flex-col items-center'>
                   <p className='mb-1 font-semibold' style={{ color: item.color }}>{item.title}</p>
@@ -71,7 +138,7 @@ const AllAssets = () => {
                   <IoFilterOutline />
                   <span>Filters</span>
                 </div>
-                <button className='px-2 py-1 rounded-sm border border-gray-300 text-gray-600'>Download All</button>
+                <button onClick={handleDownloadPDF} className='px-2 py-1 rounded-sm border border-gray-300 text-gray-600'>Download All</button>
               </div>
             </div>
 
@@ -81,7 +148,7 @@ const AllAssets = () => {
                 <div>
                   <label className='text-sm text-gray-700 font-semibold'>Availability:</label>
                   <select
-                    className='ml-2 p-1 border rounded text-[13px]  border-gray-300 '
+                    className='ml-2 p-1 border rounded text-[13px]  border-gray-300 text-black '
                     value={availabilityFilter}
                     onChange={(e) => setAvailabilityFilter(e.target.value)}
                   >
@@ -89,18 +156,21 @@ const AllAssets = () => {
                     <option value="Available">Available</option>
                     <option value="Unavailable">Unavailable</option>
                   </select>
+
                 </div>
                 <div>
                   <label className='text-sm text-gray-700 font-semibold'>Location:</label>
                   <select
-                    className='ml-2 p-1 border rounded text-[13px]  border-gray-300 '
+                    className='ml-2 p-1 border rounded text-[13px]  border-gray-300 text-black '
                     value={locationFilter}
                     onChange={(e) => setLocationFilter(e.target.value)}
                   >
                     <option value="">All</option>
-                    <option value="Head Office">Head Office</option>
-                    <option value="Warehouse">Warehouse</option>
-                    <option value="Lab A">Lab A</option>
+                    {
+                      uniqueLocations.map((loc, index) => (
+                        <option key={index} value={loc}>{loc}</option>
+                      ))}
+    
                   </select>
                 </div>
               </div>
@@ -118,14 +188,14 @@ const AllAssets = () => {
             {/* Table Rows */}
             {filteredAssets.map((item, index) => (
               <div key={index} className='flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200'>
-                <Link to={`/view-asset/${item._id}`} className='w-[15%]'>{item.product}</Link>
-                <p className='w-[10%]'>{item.quantity}</p>
-                <p className='w-[15%]'>{item.location}</p>
+                <Link to={`/view-asset/${item._id}`} className='w-[15%]'>{item.assetName}</Link>
+                <p className='w-[10%]'>{item.unit}</p>
+                <p className='w-[15%]'>{item.assetLocation}</p>
                 <p
-                  className={`w-[15%] font-semibold ${item.availability === "Available" ? "text-green-600" : "text-red-600"
+                  className={`w-[15%] font-semibold ${item.status === "Available" ? "text-green-600" : "text-red-600"
                     }`}
                 >
-                  {item.availability}
+                  {item.status}
                 </p>
                 <p
                   onClick={() => {
@@ -143,9 +213,9 @@ const AllAssets = () => {
         </div>
       </div>
       <AddAssetModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
-        <AssetAssignmentModal isOpen={isAssignModalOpen} 
-  onClose={() => setIsAssignModalOpen(false)} 
-  asset={selectedAsset}/>
+      <AssetAssignmentModal isOpen={isAssignModalOpen}
+        onClose={() => setIsAssignModalOpen(false)}
+        asset={selectedAsset} />
     </div>
   );
 };
