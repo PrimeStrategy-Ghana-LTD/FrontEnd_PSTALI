@@ -3,6 +3,7 @@ import { FiEdit2 } from "react-icons/fi";
 import Sidebar1 from '../components/Sidebar1';
 import Searchbar from '../components/Searchbar';
 import { useParams } from 'react-router-dom';
+import jsPDF from 'jspdf';
 
 const ViewAsset = () => {
 
@@ -29,6 +30,31 @@ const ViewAsset = () => {
   }, [id]);
 
 
+  const handleDownload = () => {
+  if (!asset) return;
+
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text('Asset Details', 10, 10);
+
+  doc.setFontSize(12);
+  doc.text(`Asset Name: ${asset.name || 'N/A'}`, 10, 20);
+  doc.text(`Asset ID: ${asset.assetId || 'N/A'}`, 10, 30);
+  doc.text(`Category: ${asset.category || 'N/A'}`, 10, 40);
+  doc.text(`Location: ${locationName || 'N/A'}`, 10, 50);
+  doc.text(`Assigned To: ${asset.assignedTo?.name || 'Unassigned'}`, 10, 60);
+  doc.text(`Contact: ${asset.assignedTo?.contact || 'No contact'}`, 10, 70);
+
+  doc.text('Stock Locations:', 10, 85);
+  asset.stockLocations?.forEach((loc, index) => {
+    doc.text(`${index + 1}. ${loc.name} - ${loc.quantity}`, 12, 95 + index * 10);
+  });
+
+  doc.save(`${asset.name || 'asset'}_details.pdf`);
+};
+
+
   return (
     <div className='flex flex-row'>
       <Sidebar1 />
@@ -43,7 +69,7 @@ const ViewAsset = () => {
                   <p className='mt-3'><FiEdit2 /></p>
                   <button>Edit</button>
                 </div>
-                <button className='border-[0.5px] px-2 rounded-sm border-gray-300 text-gray-600'>Download</button>
+                <button onClick={handleDownload} className='border-[0.5px] px-2 rounded-sm border-gray-300 text-gray-600'>Download</button>
               </div>
             </div>
             <div>
@@ -90,6 +116,15 @@ const ViewAsset = () => {
               </div>
               <div className='mt-7'>
                 <div className="relative border-2 border-dashed border-gray-300 rounded-md p-4 flex items-center justify-center w-56 h-56">
+                  {asset?.imageUrl ? (
+                    <img
+                      src={asset.imageUrl}
+                      alt="Asset"
+                      className="w-full h-full object-cover rounded-md"
+                    />
+                  ) : (
+                    <p className="text-gray-400 text-sm">No Image Available</p>
+                  )}
                   <input
                     type="file"
                     name="image"
@@ -114,7 +149,7 @@ const ViewAsset = () => {
               </div>
               <div className='flex flex-col space-y-5 mt-4'>
                 {asset?.stockLocations?.map((loc, idx) => (
-                  <div key={idx} className='flex flex-row border-b-[0.5px] border-gray-300 justify-between w-[60%]'>
+                  <div key={id} className='flex flex-row border-b-[0.5px] border-gray-300 justify-between w-[60%]'>
                     <p className='ml-2 text-gray-400 text-[16px] font-semibold'>{loc.name}</p>
                     <p className='mr-5 text-gray-600'>{loc.quantity}</p>
                   </div>

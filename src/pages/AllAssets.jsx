@@ -118,7 +118,7 @@ const AllAssets = () => {
             {/* Table Rows */}
             {filteredAssets.map((item, index) => (
               <div key={index} className='flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200'>
-                <Link to={`/view-asset/${assets._id}`} className='w-[15%]'>{item.product}</Link>
+                <Link to={`/view-asset/${item._id}`} className='w-[15%]'>{item.product}</Link>
                 <p className='w-[10%]'>{item.quantity}</p>
                 <p className='w-[15%]'>{item.location}</p>
                 <p
