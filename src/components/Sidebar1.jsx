@@ -9,6 +9,7 @@ import Settings from "../assets/images/Settings.png";
 import Manage from "../assets/images/Manage.png";
 import Users from "../assets/images/Users.png";
 import Order from "../assets/images/Order.png";
+import Search from "../assets/images/Search.png";
 
 const topItems = [
   { label: "Dashboard", icon: Home, path: "/dashboard" },
@@ -17,6 +18,7 @@ const topItems = [
   { label: "Users", icon: Users, path: "/users" },
   { label: "Assign", icon: Order, path: "/assign" },
   { label: "Manage Asset Location", icon: Manage, path: "/manage-location" },
+  { label: "Search", icon: Search, path: "/search" },
 ];
 
 const bottomItems = [
