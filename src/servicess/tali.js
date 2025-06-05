@@ -37,6 +37,12 @@ export const apiAddAsset = (formData) =>
       'Content-Type': 'multipart/form-data',
     },
   });
+export const apiAssignAsset = (formData) =>                          
+  apiClient.post('/assignment', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   
 
 
