@@ -15,7 +15,7 @@ const topItems = [
   { label: "Dashboard", icon: Home, path: "/dashboard" },
   { label: "Assets", icon: Assets, path: "/assets" },
   { label: "Reports", icon: Report, path: "/reports" },
-  { label: "Users", icon: Users, path: "/users" },
+  { label: "Users", icon: Users, path: "/add-user" },
   { label: "Assign", icon: Order, path: "/assign" },
   { label: "Manage Asset Location", icon: Manage, path: "/manage-location" },
   { label: "Search", icon: Search, path: "/search" },
