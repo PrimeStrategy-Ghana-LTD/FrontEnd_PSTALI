@@ -127,7 +127,7 @@ const AddAssetModal = ({ isOpen, onClose }) => {
             </div>
 
             <div className="flex items-center">
-              <label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">Asset ID</label>
+              <label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">Asset ID/VIN</label>
               <input
                 name="assetId"
                 type="text"
@@ -144,7 +144,49 @@ const AddAssetModal = ({ isOpen, onClose }) => {
                 type="text"
                 required
                 className="flex-1 ml-4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter category"
+                placeholder="Eg: Car, Truck, Motorbike..."
+              />
+            </div>
+          
+            <div className="flex items-center">
+              <label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">Color</label>
+              <input
+                name="color"
+                type="text"
+                required
+                className="flex-1 ml-4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter color"
+              />
+            </div>
+
+            <div className="flex items-center">
+              <label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">Model</label>
+              <input
+                name="model"
+                type="text"
+                required
+                className="flex-1 ml-4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Eg: X5, Civic, Ranger..."
+              />
+            </div>
+            <div className="flex items-center">
+              <label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">Engine Capacity</label>
+              <input
+                name="engineCapacity"
+                type="text"
+                required
+                className="flex-1 ml-4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Describe engine capacity"
+              />
+            </div>
+            <div className="flex items-center">
+              <label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">Origin of Manufacturer</label>
+              <input
+                name="originOfManufacturer"
+                type="text"
+                required
+                className="flex-1 ml-4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter origin of manufacturer"
               />
             </div>
 

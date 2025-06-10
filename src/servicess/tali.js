@@ -20,6 +20,15 @@ export const apiGetLocations = async () => {
         throw error;
     }
 };
+export const apiGetUsers = async () => {
+    try {
+        const response = await apiClient.get('/users');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+    }
+};
 
 // export const apiAddAsset = async (payload) => {
 //     try {

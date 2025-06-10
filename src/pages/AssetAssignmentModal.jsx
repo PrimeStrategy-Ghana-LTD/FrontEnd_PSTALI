@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { apiGetLocations, apiAssignAsset } from "../servicess/tali";
-import { apiGetUsers } from "../servicess/auth";
+import { apiGetLocations, apiAssignAsset, apiGetUsers } from "../servicess/tali";
+
 
 const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
   const [users, setUsers] = useState([]);
@@ -24,10 +24,10 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
         ]);
         
         console.log("Fetched users:", userData);
-        console.log("Fetched locations:", locationData);
+        console.log("Fetched locations (raw):", locationData);
         
         setUsers(userData.users || []);
-        setLocations(locationData.locations|| []);
+        setLocations(locationData || []);
       } catch (err) {
         console.error("Failed to fetch data:", err);
         setError("Failed to load user or location data.");
@@ -156,7 +156,7 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
                 Name
               </label>
               <select
-                name="assignedTo"
+                name="userName"
                 onChange={handleUserChange}
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
@@ -164,8 +164,8 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
                 <option value="">Select Name</option>
                 {users.length > 0 ? (
                   users.map((user) => (
-                    <option key={user._id} value={user._id}>
-                      {user.username}
+                    <option key={user.id} value={user.id}>
+                      {user.userName}
                     </option>
                   ))
                 ) : (
@@ -195,8 +195,8 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
               </label>
               <input
                 type="text"
-                name="contact"
-                value={selectedUser?.contact || ""}
+                name="phone"
+                value={selectedUser?.phone || ""}
                 readOnly
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700"
               />
@@ -208,7 +208,7 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
                 Location/Department
               </label>
               <select
-                name="assetLocation"
+                name="storeLocation"
                 required
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -216,7 +216,7 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
                 {locations.length > 0 ? (
                   locations.map((loc) => (
                     <option key={loc._id} value={loc._id}>
-                      {loc.assetLocation}
+                      {loc.storeLocation}
                     </option>
                   ))
                 ) : (
