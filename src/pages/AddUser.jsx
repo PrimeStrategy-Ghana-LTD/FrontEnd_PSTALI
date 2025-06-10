@@ -3,6 +3,13 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { apiAddUser } from "../servicess/auth";
 import axios from "axios";
+import { apiGetLocations } from "../servicess/tali";
+
+const DEFAULT_ROLES = [
+  { value: "adminstrator", name: "Administrator" },
+  { value: "asset manager", name: "Asset Manager" },
+  // Add more roles as needed
+];
 
 const AddUser = () => {
   const [formData, setFormData] = useState({
@@ -18,31 +25,26 @@ const AddUser = () => {
   const [loading, setLoading] = useState(false);
   const [locations, setLocations] = useState([]);
   const [loadingLocations, setLoadingLocations] = useState(true);
+  const [roles, setRoles] = useState(DEFAULT_ROLES);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const res = await axios.get("https://backend-ps-tali.onrender.com/locations");
-        // Make sure res.data is an array - if API sends {locations: [...]}, adjust accordingly
-        if (Array.isArray(res.data)) {
-          setLocations(res.data);
-        } else if (Array.isArray(res.data.locations)) {
-          setLocations(res.data.locations);
-        } else {
-          console.error("Locations data format unexpected:", res.data);
-          setLocations([]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch locations", err);
-        toast.error("Failed to load locations");
-        setLocations([]);
-      } finally {
-        setLoadingLocations(false);
-      }
-    };
+  const getLocations = async () => {
+    try {
+      setLoadingLocations(true);
+      const response = await apiGetLocations();
+      console.log('Locations:', response);
+      // Assuming the API returns an array of locations with name and _id
+      setLocations(Array.isArray(response) ? response : response.locations || []);
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      toast.error("Failed to load locations");
+    } finally {
+      setLoadingLocations(false);
+    }
+  };
 
-    fetchLocations();
+  useEffect(() => {
+    getLocations();
   }, []);
 
   const handleChange = (e) => {
@@ -64,11 +66,6 @@ const AddUser = () => {
 
       if (profile_picture) {
         formDataToSend.append("profile_picture", profile_picture);
-      }
-
-      // Debug: log entries
-      for (let pair of formDataToSend.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
       }
 
       const response = await apiAddUser(formDataToSend);
@@ -161,8 +158,8 @@ const AddUser = () => {
                 <>
                   <option value="">Select Location</option>
                   {locations.map((location) => (
-                    <option key={location._id || location.id} value={location._id || location.id}>
-                      {location.name || location.location || location.title || "Unnamed Location"}
+                    <option key={location._id} value={location._id}>
+                      {location.assetLocation || location.name || location._id}
                     </option>
                   ))}
                 </>
@@ -180,8 +177,11 @@ const AddUser = () => {
               required
             >
               <option value="">Choose user role</option>
-              <option value="administrator">Administrator</option>
-              <option value="asset manager">Asset Manager</option>
+            {DEFAULT_ROLES.map((role) => (
+              <option key={role.value} value={role.value}>
+                {role.name}
+              </option>
+            ))}
             </select>
           </div>
 

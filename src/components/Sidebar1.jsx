@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import logo from "../assets/images/logo.png";
 import Home from "../assets/images/Home.png";
 import Assets from "../assets/images/Assets.png";
@@ -9,14 +9,16 @@ import Settings from "../assets/images/Settings.png";
 import Manage from "../assets/images/Manage.png";
 import Users from "../assets/images/Users.png";
 import Order from "../assets/images/Order.png";
+import Search from "../assets/images/Search.png";
 
 const topItems = [
   { label: "Dashboard", icon: Home, path: "/dashboard" },
   { label: "Assets", icon: Assets, path: "/assets" },
   { label: "Reports", icon: Report, path: "/reports" },
-  { label: "Users", icon: Users, path: "/users" },
+  { label: "Users", icon: Users, path: "/add-user" },
   { label: "Assign", icon: Order, path: "/assign" },
   { label: "Manage Asset Location", icon: Manage, path: "/manage-location" },
+  { label: "Search", icon: Search, path: "/search" },
 ];
 
 const bottomItems = [
@@ -28,7 +30,7 @@ const Sidebar1 = () => {
   return (
     <div className='flex flex-col border-2 border-white w-[19vw] h-[900px] items-center justify-between py-6'>
       <div className="flex flex-col items-center w-full">
-        <img src={logo} alt="Logo" className='w-[60%]' />
+        <Link to="/dashboard"><img src={logo} alt="Logo" className='w-[60%]' /></Link>
         <div className='space-y-5 text-[14px] mt-12 text-gray-600 font-semibold w-full px-4'>
           {topItems.map((item, index) => (
             <NavLink
