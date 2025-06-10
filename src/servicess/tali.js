@@ -7,8 +7,24 @@ import { apiClient } from "./config";
 //     return await apiClient.get('/locations');
 // }                                                                        
 
-export const apiGetAllAssets = async () => await apiClient.get('/assets');
+// export const apiGetAllAssets = async () => await apiClient.get('/assets');
 // Henrrike
+
+
+// Updated function to handle pagination parameters
+export const apiGetAllAssets = async (params = {}) => {
+    try {
+        // Convert params object to query string
+        const queryString = new URLSearchParams(params).toString();
+        const url = queryString ? `/assets?${queryString}` : '/assets';
+        
+        const response = await apiClient.get(url);
+        return response;
+    } catch (error) {
+        console.error('Error fetching assets:', error);
+        throw error;
+    }
+};
 
 
 export const apiGetLocations = async () => {

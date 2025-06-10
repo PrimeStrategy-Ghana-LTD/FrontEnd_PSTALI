@@ -17,13 +17,14 @@ const topItems = [
   { label: "Reports", icon: Report, path: "/reports" },
   { label: "Users", icon: Users, path: "/add-user" },
   { label: "Assign", icon: Order, path: "/assign" },
+  { label: "Asset Assignment", icon: Order, path: "/assign" },
   { label: "Manage Asset Location", icon: Manage, path: "/manage-location" },
   { label: "Search", icon: Search, path: "/search" },
 ];
 
 const bottomItems = [
   { label: "Settings", icon: Settings, path: "/settings" },
-  { label: "Log Out", icon: Log, path: "/logout" },
+  { label: "Log Out", icon: Log, path: "/login" },
 ];
 
 const Sidebar1 = () => {
