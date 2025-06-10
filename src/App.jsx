@@ -19,6 +19,8 @@ import Sidebar1 from './components/Sidebar1'
 import AllAssets from './pages/AllAssets'
 import ViewAsset from './pages/ViewAsset'
 import AddUser from './pages/AddUser'
+import AllUsers from './pages/AllUsers'
+import AssignedPage from './pages/AssignedPage'
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -42,6 +44,14 @@ const router = createBrowserRouter([
   {
     path: "/add-user",
     element: <AddUser />,
+  },
+  {
+    path: "/users",
+    element: <AllUsers />,
+  },
+  {
+    path: "/assigned",
+    element: <AssignedPage />,
   },
   {
     path: '/overview',
