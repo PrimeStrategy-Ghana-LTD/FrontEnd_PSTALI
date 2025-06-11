@@ -6,7 +6,7 @@ import axios from "axios";
 import { apiGetLocations } from "../servicess/tali";
 
 const DEFAULT_ROLES = [
-  { value: "adminstrator", name: "Administrator" },
+  { value: "administrator", name: "Administrator" },
   { value: "asset manager", name: "Asset Manager" },
   // Add more roles as needed
 ];
