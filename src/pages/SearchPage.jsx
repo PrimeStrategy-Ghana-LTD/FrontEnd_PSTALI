@@ -131,7 +131,7 @@ const SearchPage = () => {
             {filteredAssets.map((item, idx) => (
               <div 
                 key={idx}
-                onClick={() => navigate(`/search-result?q=${encodeURIComponent(item)}`)}
+                onClick={() => navigate(`/view-asset/:id?q=${encodeURIComponent(item)}`)}
                 className="p-2 hover:bg-gray-100 rounded-md cursor-pointer text-gray-700 text-sm"
               >
                 {item}
