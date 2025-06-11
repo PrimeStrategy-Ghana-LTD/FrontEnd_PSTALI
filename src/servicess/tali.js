@@ -63,31 +63,35 @@ export const apiAddAsset = (formData) =>
     },
   });
   
-export const apiAssignAsset = async (formData) => {
+
+
+// In your API service file (servicess/tali.js)
+export const apiAssignAsset = async (assignmentData) => {
   try {
-    const response = await fetch("https://backend-ps-tali.onrender.com/assignments", {
-      method: "POST",
-      body: formData,
+    // Get the token from localStorage, sessionStorage, or your auth context
+    const token = localStorage.getItem('authToken') || localStorage.getItem('token') || localStorage.getItem('accessToken');
+    
+    if (!token) {
+      throw new Error('No authentication token found. Please log in again.');
+    }
+
+    const response = await fetch('https://backend-ps-tali.onrender.com/assignments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(assignmentData)
     });
 
-    const contentType = response.headers.get("content-type");
-
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Server error response:", errorText);
-      throw new Error("Assignment failed. Server responded with an error.");
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Assignment failed');
     }
 
-    if (contentType && contentType.includes("application/json")) {
-      const data = await response.json();
-      return data;
-    } else {
-      const text = await response.text();
-      console.error("Unexpected response type. Raw text:", text);
-      throw new Error("Unexpected server response. Not JSON.");
-    }
+    return await response.json();
   } catch (error) {
-    console.error("apiAssignAsset error:", error.message);
+    console.error('API Assignment Error:', error);
     throw error;
   }
 };
