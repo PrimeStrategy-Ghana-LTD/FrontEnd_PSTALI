@@ -63,13 +63,35 @@ export const apiAddAsset = (formData) =>
     },
   });
   
-export const apiAssignAsset = (formData) =>                          
-  apiClient.post('/assignments', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  
+export const apiAssignAsset = async (formData) => {
+  try {
+    const response = await fetch("https://backend-ps-tali.onrender.com/assignments", {
+      method: "POST",
+      body: formData,
+    });
+
+    const contentType = response.headers.get("content-type");
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Server error response:", errorText);
+      throw new Error("Assignment failed. Server responded with an error.");
+    }
+
+    if (contentType && contentType.includes("application/json")) {
+      const data = await response.json();
+      return data;
+    } else {
+      const text = await response.text();
+      console.error("Unexpected response type. Raw text:", text);
+      throw new Error("Unexpected server response. Not JSON.");
+    }
+  } catch (error) {
+    console.error("apiAssignAsset error:", error.message);
+    throw error;
+  }
+};
+
 
 
 

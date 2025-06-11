@@ -2,16 +2,15 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { apiAddUser } from "../servicess/auth";
-import axios from "axios";
 import { apiGetLocations } from "../servicess/tali";
 
 const DEFAULT_ROLES = [
   { value: "administrator", name: "Administrator" },
   { value: "asset manager", name: "Asset Manager" },
-  // Add more roles as needed
+  { value: "user", name: "User" },
 ];
 
-const AddUser = () => {
+const AddUser = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     userName: "",
     password: "",
@@ -25,27 +24,27 @@ const AddUser = () => {
   const [loading, setLoading] = useState(false);
   const [locations, setLocations] = useState([]);
   const [loadingLocations, setLoadingLocations] = useState(true);
-  const [roles, setRoles] = useState(DEFAULT_ROLES);
+  const [roles] = useState(DEFAULT_ROLES);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isOpen) {
+      getLocations();
+    }
+  }, [isOpen]);
 
   const getLocations = async () => {
     try {
       setLoadingLocations(true);
       const response = await apiGetLocations();
-      console.log('Locations:', response);
-      // Assuming the API returns an array of locations with name and _id
       setLocations(Array.isArray(response) ? response : response.locations || []);
     } catch (error) {
-      console.error('Error fetching locations:', error);
+      console.error("Error fetching locations:", error);
       toast.error("Failed to load locations");
     } finally {
       setLoadingLocations(false);
     }
   };
-
-  useEffect(() => {
-    getLocations();
-  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -57,34 +56,45 @@ const AddUser = () => {
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append("userName", formData.userName);
-      formDataToSend.append("password", formData.password);
-      formDataToSend.append("storeLocation", formData.storeLocation);
-      formDataToSend.append("role", formData.role);
-      formDataToSend.append("email", formData.email);
-      formDataToSend.append("phone", formData.phone);
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
+      });
 
       if (profile_picture) {
         formDataToSend.append("profile_picture", profile_picture);
       }
 
-      const response = await apiAddUser(formDataToSend);
-      console.log(response.data);
-
+      await apiAddUser(formDataToSend);
       toast.success("User Added Successfully");
-      navigate("/");
+      onClose?.(); // Close modal on success
+      navigate(0);  // Refresh page
     } catch (error) {
       console.log("Error:", error);
-      if (error.response) console.log("Backend response:", error.response.data);
       toast.error(error.response?.data?.message || "Adding user failed.");
     } finally {
       setLoading(false);
     }
   };
 
+  const resetAndClose = () => {
+    setFormData({
+      userName: "",
+      password: "",
+      storeLocation: "",
+      role: "",
+      email: "",
+      phone: "",
+    });
+    setProfile_picture(null);
+    onClose?.();
+  };
+
+  // Don't render modal if isOpen is false
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 bg-white bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-semibold mb-4">New User</h2>
 
         <div className="flex flex-row items-center justify-center mb-4">
@@ -92,7 +102,7 @@ const AddUser = () => {
             {profile_picture ? (
               <img
                 src={URL.createObjectURL(profile_picture)}
-                alt="Profile Preview"
+                alt="Profile"
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
@@ -116,32 +126,27 @@ const AddUser = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="flex items-center mb-3">
-            <label className="w-60 block text-md font-medium text-gray-700">User Name</label>
-            <input
-              type="text"
-              name="userName"
-              placeholder="Enter supplier name"
-              value={formData.userName}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
-              required
-            />
-          </div>
+          {[
+            { name: "userName", type: "text", placeholder: "Enter supplier name", label: "User Name" },
+            { name: "password", type: "text", placeholder: "Enter password", label: "Password" },
+            { name: "email", type: "email", placeholder: "Enter user email", label: "Email" },
+            { name: "phone", type: "text", placeholder: "Enter phone number", label: "Contact Number" },
+          ].map(({ name, type, placeholder, label }) => (
+            <div key={name} className="flex items-center mb-3">
+              <label className="w-60 block text-md font-medium text-gray-700">{label}</label>
+              <input
+                type={type}
+                name={name}
+                placeholder={placeholder}
+                value={formData[name]}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                required
+              />
+            </div>
+          ))}
 
-          <div className="flex items-center mb-3">
-            <label className="w-60 block text-md font-medium text-gray-700">Password</label>
-            <input
-              type="text"
-              name="password"
-              placeholder="Enter password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
-              required
-            />
-          </div>
-
+          {/* Store Location */}
           <div className="flex items-center mb-3">
             <label className="w-60 block text-md font-medium text-gray-700">Store Location</label>
             <select
@@ -167,6 +172,7 @@ const AddUser = () => {
             </select>
           </div>
 
+          {/* Role */}
           <div className="flex items-center mb-3">
             <label className="w-60 block text-md font-medium text-gray-700">User Role</label>
             <select
@@ -177,55 +183,20 @@ const AddUser = () => {
               required
             >
               <option value="">Choose user role</option>
-            {DEFAULT_ROLES.map((role) => (
-              <option key={role.value} value={role.value}>
-                {role.name}
-              </option>
-            ))}
+              {roles.map((role) => (
+                <option key={role.value} value={role.value}>
+                  {role.name}
+                </option>
+              ))}
             </select>
           </div>
 
-          <div className="flex items-center mb-3">
-            <label className="w-60 block text-md font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter user email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
-              required
-            />
-          </div>
-
-          <div className="flex items-center mb-3">
-            <label className="w-60 block text-md font-medium text-gray-700">Contact Number</label>
-            <input
-              type="text"
-              name="phone"
-              placeholder="Enter phone number"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
-              required
-            />
-          </div>
-
+          {/* Buttons */}
           <div className="flex justify-end space-x-2 mt-6">
             <button
               type="button"
               className="px-4 py-1 rounded-sm border border-gray-400"
-              onClick={() => {
-                setFormData({
-                  userName: "",
-                  password: "",
-                  storeLocation: "",
-                  role: "",
-                  email: "",
-                  phone: "",
-                });
-                setProfile_picture(null);
-              }}
+              onClick={resetAndClose}
             >
               Discard
             </button>
