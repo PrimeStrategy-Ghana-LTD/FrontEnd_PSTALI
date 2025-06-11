@@ -7,8 +7,24 @@ import { apiClient } from "./config";
 //     return await apiClient.get('/locations');
 // }                                                                        
 
-export const apiGetAllAssets = async () => await apiClient.get('/assets');
+// export const apiGetAllAssets = async () => await apiClient.get('/assets');
 // Henrrike
+
+
+// Updated function to handle pagination parameters
+export const apiGetAllAssets = async (params = {}) => {
+    try {
+        // Convert params object to query string
+        const queryString = new URLSearchParams(params).toString();
+        const url = queryString ? `/assets?${queryString}` : '/assets';
+        
+        const response = await apiClient.get(url);
+        return response;
+    } catch (error) {
+        console.error('Error fetching assets:', error);
+        throw error;
+    }
+};
 
 
 export const apiGetLocations = async () => {
@@ -17,6 +33,15 @@ export const apiGetLocations = async () => {
         return response.data;
     } catch (error) {
         console.error('Error fetching locations:', error);
+        throw error;
+    }
+};
+export const apiGetUsers = async () => {
+    try {
+        const response = await apiClient.get('/users');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching users:', error);
         throw error;
     }
 };
@@ -37,8 +62,9 @@ export const apiAddAsset = (formData) =>
       'Content-Type': 'multipart/form-data',
     },
   });
+  
 export const apiAssignAsset = (formData) =>                          
-  apiClient.post('/assignment', formData, {
+  apiClient.post('/assignments', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

@@ -225,7 +225,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { IoFilterOutline } from "react-icons/io5";
+import { IoFilterOutline, IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 import Searchbar from '../components/Searchbar';
 import Sidebar1 from '../components/Sidebar1';
 import AddAssetModal from './AddAssetModal';
@@ -245,6 +245,13 @@ const AllAssets = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [assets, setAssets] = useState([]);
   const [locations, setLocations] = useState([]);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const itemsPerPage = 10; // You can adjust this value
 
   // Helper function to get location name by ID
   const getLocationName = (locationId) => {
@@ -252,22 +259,43 @@ const AllAssets = () => {
     return location ? location.assetLocation : locationId; // fallback to ID if name not found
   };
 
-  const getAssets = async () => {
-    const response = await apiGetAllAssets();
-    console.log(response.data)
-    setAssets(response.data.assets);
-  }
+  const getAssets = async (page = 1, filters = {}) => {
+    try {
+      setLoading(true);
+      
+      // Update your API call to include pagination parameters
+      const params = {
+        page: page,
+        limit: itemsPerPage,
+        ...filters
+      };
+      
+      const response = await apiGetAllAssets(params);
+      console.log(response.data);
+      
+      // Assuming your API returns data in this structure:
+      // { assets: [...], totalCount: number, totalPages: number, currentPage: number }
+      setAssets(response.data.assets || response.data);
+      setCurrentPage(response.data.currentPage || page);
+      setTotalPages(response.data.totalPages || Math.ceil((response.data.totalCount || response.data.length) / itemsPerPage));
+      setTotalAssets(response.data.totalCount || response.data.length);
+      
+    } catch (error) {
+      console.error('Error fetching assets:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getLocations = async () => {
     try {
       const response = await apiGetLocations();
       console.log('Locations:', response);
-      // Assuming response is directly an array or has a locations property
       setLocations(Array.isArray(response) ? response : response.locations || []);
     } catch (error) {
       console.error('Error fetching locations:', error);
     }
-  }
+  };
 
   // Get unique location names for filter dropdown
   const uniqueLocationNames = [...new Set(assets.map(asset => getLocationName(asset.assetLocation)))];
@@ -283,12 +311,13 @@ const AllAssets = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const [assetsRes, assignmentsRes] = await Promise.all([axios.get('https://backend-ps-tali.onrender.com/assets/count', {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('https://backend-ps-tali.onrender.com/assignments/count', {
-          headers: { Authorization: `Bearer ${token}` } // Fixed: was hardcoded 'token'
-        })
+        const [assetsRes, assignmentsRes] = await Promise.all([
+          axios.get('https://backend-ps-tali.onrender.com/assets/count', {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get('https://backend-ps-tali.onrender.com/assignments/count', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
         ]);
 
         setSummary({
@@ -299,7 +328,7 @@ const AllAssets = () => {
 
         console.log("Assets Response:", assetsRes.data);
       } catch (error) {
-        console.error("Error fetching counts", error)
+        console.error("Error fetching counts", error);
       }
     };
 
@@ -307,11 +336,22 @@ const AllAssets = () => {
   }, []);
 
   useEffect(() => {
-    getAssets();
-    getLocations(); // Fetch locations on component mount
+    getAssets(1); // Load first page
+    getLocations();
   }, []);
 
-  // Apply filters to data
+  // Handle filter changes
+  useEffect(() => {
+    // Reset to first page when filters change
+    setCurrentPage(1);
+    const filters = {};
+    if (availabilityFilter) filters.status = availabilityFilter;
+    if (locationFilter) filters.location = locationFilter;
+    
+    getAssets(1, filters);
+  }, [availabilityFilter, locationFilter]);
+
+  // Apply local filters (if needed for client-side filtering)
   const filteredAssets = assets.filter(item => {
     const locationName = getLocationName(item.assetLocation);
     return (
@@ -320,31 +360,67 @@ const AllAssets = () => {
     );
   });
 
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF();
+  // Pagination handlers
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+      setCurrentPage(page);
+      const filters = {};
+      if (availabilityFilter) filters.status = availabilityFilter;
+      if (locationFilter) filters.location = locationFilter;
+      getAssets(page, filters);
+    }
+  };
 
-    doc.text("All Assets", 14, 10);
+  const handleDownloadPDF = async () => {
+    try {
+      // For PDF, get all assets without pagination
+      const allAssetsResponse = await apiGetAllAssets({ limit: 1000 }); // Get all assets
+      const allAssets = allAssetsResponse.data.assets || allAssetsResponse.data;
+      
+      const doc = new jsPDF();
+      doc.text("All Assets", 14, 10);
 
-    const tableColumn = ["Asset Name", "Quantity", "Location", "Availability"];
-    const tableRows = [];
+      const tableColumn = ["Asset Name", "Quantity", "Location", "Availability"];
+      const tableRows = [];
 
-    filteredAssets.forEach(asset => {
-      const assetData = [
-        asset.assetName,
-        asset.unit,
-        getLocationName(asset.assetLocation), // Use location name instead of ID
-        asset.status
-      ];
-      tableRows.push(assetData);
-    });
+      allAssets.forEach(asset => {
+        const assetData = [
+          asset.assetName,
+          asset.unit,
+          getLocationName(asset.assetLocation),
+          asset.status
+        ];
+        tableRows.push(assetData);
+      });
 
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
-    });
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+      });
 
-    doc.save("assets.pdf");
+      doc.save("assets.pdf");
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
   };
 
   return (
@@ -375,7 +451,12 @@ const AllAssets = () => {
           <div className='bg-white p-4 rounded-md shadow-sm w-[78vw] border border-white'>
             {/* Header Row with Buttons */}
             <div className='flex justify-between items-center mb-4'>
-              <p className='font-semibold'>Assets</p>
+              <div className='flex items-center gap-4'>
+                <p className='font-semibold'>Assets</p>
+                <p className='text-sm text-gray-600'>
+                  Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalAssets)} of {totalAssets} assets
+                </p>
+              </div>
               <div className='flex gap-3 text-[13px]'>
                 <button className='px-2 py-1 rounded-sm bg-[#1366d9] text-white border border-[#1366d9]' onClick={() => setIsAddModalOpen(true)}>Add Asset</button>
                 <div
@@ -420,6 +501,13 @@ const AllAssets = () => {
               </div>
             )}
 
+            {/* Loading Indicator */}
+            {loading && (
+              <div className='flex justify-center items-center py-8'>
+                <div className='text-gray-600'>Loading assets...</div>
+              </div>
+            )}
+
             {/* Table Header */}
             <div className='flex justify-between font-semibold text-[14px] text-gray-700 pb-2 border-b-2 border-gray-200 mt-10'>
               <p className='w-[15%]'>Products</p>
@@ -430,7 +518,7 @@ const AllAssets = () => {
             </div>
 
             {/* Table Rows */}
-            {filteredAssets.map((item, index) => (
+            {!loading && filteredAssets.map((item, index) => (
               <div key={index} className='flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200'>
                 <Link to={`/view-asset/${item._id}`} className='w-[15%]'>{item.assetName}</Link>
                 <p className='w-[10%]'>{item.unit}</p>
@@ -452,13 +540,107 @@ const AllAssets = () => {
                 </p>
               </div>
             ))}
+
+            {/* No data message */}
+            {!loading && filteredAssets.length === 0 && (
+              <div className='flex justify-center items-center py-8'>
+                <div className='text-gray-600'>No assets found</div>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className='flex justify-between items-center mt-6 pt-4 border-t border-gray-200'>
+                <div className='text-sm text-gray-600'>
+                  Page {currentPage} of {totalPages}
+                </div>
+                
+                <div className='flex items-center gap-2'>
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`flex items-center gap-1 px-3 py-1 rounded text-sm ${
+                      currentPage === 1 
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-gray-600 hover:bg-gray-100 cursor-pointer'
+                    }`}
+                  >
+                    <IoChevronBackOutline />
+                    Previous
+                  </button>
+
+                  {/* Page Numbers */}
+                  <div className='flex gap-1'>
+                    {/* First page */}
+                    {getPageNumbers()[0] > 1 && (
+                      <>
+                        <button
+                          onClick={() => handlePageChange(1)}
+                          className='px-3 py-1 rounded text-sm text-gray-600 hover:bg-gray-100'
+                        >
+                          1
+                        </button>
+                        {getPageNumbers()[0] > 2 && <span className='px-2 py-1 text-gray-400'>...</span>}
+                      </>
+                    )}
+
+                    {/* Visible page numbers */}
+                    {getPageNumbers().map(page => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-3 py-1 rounded text-sm ${
+                          page === currentPage
+                            ? 'bg-[#1366d9] text-white'
+                            : 'text-gray-600 hover:bg-gray-100'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+
+                    {/* Last page */}
+                    {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
+                      <>
+                        {getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1 && 
+                          <span className='px-2 py-1 text-gray-400'>...</span>
+                        }
+                        <button
+                          onClick={() => handlePageChange(totalPages)}
+                          className='px-3 py-1 rounded text-sm text-gray-600 hover:bg-gray-100'
+                        >
+                          {totalPages}
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`flex items-center gap-1 px-3 py-1 rounded text-sm ${
+                      currentPage === totalPages 
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-gray-600 hover:bg-gray-100 cursor-pointer'
+                    }`}
+                  >
+                    Next
+                    <IoChevronForwardOutline />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
       <AddAssetModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
-      <AssetAssignmentModal isOpen={isAssignModalOpen}
+      <AssetAssignmentModal 
+        isOpen={isAssignModalOpen}
         onClose={() => setIsAssignModalOpen(false)}
-        asset={selectedAsset} />
+        asset={selectedAsset} 
+      />
     </div>
   );
 };
