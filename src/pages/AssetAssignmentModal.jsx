@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { apiGetLocations, apiAssignAsset, apiGetUsers } from "../servicess/tali";
+import { apiGetLocations, apiGetUsers } from "../servicess/tali";
 
 
 const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
@@ -64,42 +64,49 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError('');
+  event.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      const form = event.target;
-      const formData = new FormData(form);
-      
-      // Add asset ID to form data if available
-      if (asset && asset._id) {
-        formData.append('assetId', asset._id);
-      }
-      
-      // Add selected user ID
-      if (selectedUser && selectedUser._id) {
-        formData.append('userId', selectedUser.id);
-      }
+  try {
+    const form = event.target;
+    const formData = new FormData(form);
 
-      // Debugging output
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-
-      const response = await apiAssignAsset(formData);
-      console.log("Asset assigned successfully:", response);
-
-      onClose();
-      // Navigate to assignments page or refresh current page
-      navigate('/assignments'); // Adjust route as needed
-    } catch (error) {
-      console.error("Error assigning asset:", error);
-      setError(error.response?.data?.message || 'Failed to assign asset. Please try again.');
-    } finally {
-      setLoading(false);
+    if (asset && asset._id) {
+      formData.append('assetId', asset._id);
     }
-  };
+
+    if (selectedUser && selectedUser.id) {
+      formData.append('userId', selectedUser.id);
+    }
+
+    // Debug log
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
+    const response = await fetch("https://backend-ps-tali.onrender.com/assignments", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Assignment failed.');
+    }
+
+    const result = await response.json();
+    console.log("Asset assigned successfully:", result);
+
+    onClose();
+    navigate('/assignments');
+  } catch (error) {
+    console.error("Error assigning asset:", error);
+    setError(error.message || 'Failed to assign asset. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (!isOpen) return null;
 
