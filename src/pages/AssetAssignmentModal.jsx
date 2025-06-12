@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { apiGetLocations, apiGetUsers } from "../servicess/tali";
-
+import { apiClient } from "../servicess/config";
 
 const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
   const [users, setUsers] = useState([]);
@@ -25,12 +25,8 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
         console.log("Fetched users:", userData);
         console.log("Fetched locations (raw):", locationData);
         
-        // setUsers(userData.users || []);
         setUsers(Array.isArray(userData) ? userData : []);
-        // setLocations(locationData || []);
-        // setLocations(Array.isArray(locationData) ? locationData : []);
         setLocations(Array.isArray(locationData.locations) ? locationData.locations : []);
-
 
       } catch (err) {
         console.error("Failed to fetch data:", err);
@@ -46,11 +42,16 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
     }
   }, [isOpen]);
 
+
   const handleUserChange = (e) => {
-    const userId = e.target.value;
-    const foundUser = users.find((u) => u.id === userId);
-    setSelectedUser(foundUser || null);
-  };
+  const userId = e.target.value;
+  const foundUser = users.find((u) => u.id === userId);
+  if (!foundUser) {
+    setError('Selected user not found');
+    return;
+  }
+  setSelectedUser(foundUser);
+};
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -63,46 +64,124 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
     }
   };
 
-  const handleSubmit = async (event) => {
+//  const handleSubmit = async (event) => {
+//   event.preventDefault();
+//   setLoading(true);
+//   setError('');
+
+//   try {
+//     // Create FormData manually instead of from form
+//     const formData = new FormData();
+
+//     // Add all required fields manually
+//     if (asset && asset._id) {
+//       formData.append('asset', asset._id);
+//     }
+
+//     if (selectedUser && selectedUser.id) {
+//       formData.append('userName', selectedUser.id);
+//     }
+
+//     // Get other form values manually
+//     const form = event.target;
+//     const assetLocation = form.assetLocation.value;
+//     const durationDays = form.durationDays.value;
+//     const assignmentImage = form.assignmentImage.files[0];
+
+//     if (assetLocation) {
+//       formData.append('assetLocation', assetLocation);
+//     }
+    
+//     if (durationDays) {
+//       formData.append('durationDays', durationDays);
+//     }
+
+//     if (assignmentImage) {
+//       formData.append('assignmentImage', assignmentImage);
+//     }
+
+//     // Add current date as assignedAt
+//     formData.append('assignedAt', new Date().toISOString());
+
+//     // Debug log
+//     console.log("FormData contents:");
+//     for (let [key, value] of formData.entries()) {
+//       console.log(`${key}:`, value);
+//     }
+
+//     const response = await apiClient.post('/assignments', formData, {
+//       headers: {
+//         'Content-Type': 'multipart/form-data'
+//       }
+//     });
+
+//     console.log("Asset assigned successfully:", response.data);
+//     onClose();
+//     navigate('/assignments');
+//   } catch (error) {
+//     console.error("Error assigning asset:", error);
+//     setError(error.response?.data?.message || 'Failed to assign asset. Please try again.');
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
+const handleSubmit = async (event) => {
   event.preventDefault();
   setLoading(true);
   setError('');
 
   try {
-    const form = event.target;
-    const formData = new FormData(form);
+    // Include email field in the payload
+    const payload = {
+      userName: selectedUser?.id,
+      email: selectedUser?.email, // Add this required field
+      phone: selectedUser?.phone, // Add this required field
+      asset: asset?._id,
+      assetLocation: event.target.assetLocation.value,
+      durationDays: event.target.durationDays.value,
+      assignedAt: new Date().toISOString()
+    };
 
-    if (asset && asset._id) {
-      formData.append('assetId', asset._id);
+    // Validate required fields before sending
+    if (!payload.userName) {
+      setError('Please select a user');
+      return;
+    }
+    
+    if (!payload.email) {
+      setError('Selected user must have an email address');
+      return;
+    }
+    if (!payload.phone) {
+      setError('Selected user must have a phone');
+      return;
+    }
+    
+    if (!payload.asset) {
+      setError('Asset information is missing');
+      return;
+    }
+    
+    if (!payload.assetLocation) {
+      setError('Please select a location');
+      return;
     }
 
-    if (selectedUser && selectedUser.id) {
-      formData.append('userId', selectedUser.id);
-    }
+    console.log("Sending payload:", payload);
 
-    // Debug log
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
-
-    const response = await fetch("https://backend-ps-tali.onrender.com/assignments", {
-      method: "POST",
-      body: formData,
+    const response = await apiClient.post('/assignments', payload, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Assignment failed.');
-    }
-
-    const result = await response.json();
-    console.log("Asset assigned successfully:", result);
-
+    console.log("Success:", response.data);
     onClose();
-    navigate('/assignments');
+    navigate('/assigned');
   } catch (error) {
-    console.error("Error assigning asset:", error);
-    setError(error.message || 'Failed to assign asset. Please try again.');
+    console.error("Error:", error.response?.data);
+    setError(error.response?.data?.message || 'Failed to assign asset');
   } finally {
     setLoading(false);
   }
@@ -161,7 +240,7 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
               )}
             </div>
 
-            {/* Name Dropdown */}
+ {/* Name Dropdown */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Name
