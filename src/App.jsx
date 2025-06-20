@@ -1,45 +1,44 @@
-
 // src/App.jsx
-import React from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import './App.css'
-import LoginPage from './pages/LoginPage'
-import SearchPage from './pages/SearchPage'
-import AssetOverview from './pages/AssetOverview'
-import SearchResult from './pages/SearchResult'
-import DashboardLayout from './Layouts/DashboardLayout'
-import Sidebar from './components/Sidebar'
-import AddAssetModal from './pages/AddAssetModal'
-
+import React from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import "./App.css";
+import LoginPage from "./pages/LoginPage";
+import SearchPage from "./pages/SearchPage";
+import AssetOverview from "./pages/AssetOverview";
+import SearchResult from "./pages/SearchResult";
+import DashboardLayout from "./Layouts/DashboardLayout";
+import Sidebar from "./components/Sidebar";
+import AddAssetModal from "./pages/AddAssetModal";
 
 // Toastify import
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
-import Sidebar1 from './components/Sidebar1'
-import AllAssets from './pages/AllAssets'
-import ViewAsset from './pages/ViewAsset'
-import AddUser from './pages/AddUser'
-import AllUsers from './pages/AllUsers'
-import AssignedPage from './pages/AssignedPage'
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Sidebar1 from "./components/Sidebar1";
+import AllAssets from "./pages/AllAssets";
+import ViewAsset from "./pages/ViewAsset";
+import AddUser from "./pages/AddUser";
+import AllUsers from "./pages/AllUsers";
+import AssignedPage from "./pages/AssignedPage";
+import ManageStore from "./pages/ManageStore";
 
 // Define all your routes here
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <LoginPage />,
   },
   {
-    path: '/search',
+    path: "/search",
     element: <SearchPage />,
   },
   {
-    path: '/search-result',
+    path: "/search-result",
     element: <SearchResult />,
   },
-  
+
   {
-    path: '/assets',
-    element: <AllAssets />
+    path: "/assets",
+    element: <AllAssets />,
   },
   {
     path: "/add-user",
@@ -54,7 +53,7 @@ const router = createBrowserRouter([
     element: <AssignedPage />,
   },
   {
-    path: '/overview',
+    path: "/overview",
     element: <AssetOverview />,
   },
   {
@@ -69,6 +68,7 @@ const router = createBrowserRouter([
     path: "/side-bar",
     element: <Sidebar1 />,
   },
+
   {
     path: "/dashboard",
     element: <DashboardLayout />,
@@ -77,15 +77,14 @@ const router = createBrowserRouter([
         index: true,
         element: <AssetOverview />,
       },
-      
-    ]
+      { path: "manage-location", element: <ManageStore /> },
+    ],
   },
   {
     path: "/sidebar",
     element: <Sidebar />,
   },
-  
-])
+]);
 
 function App() {
   return (
@@ -104,7 +103,7 @@ function App() {
         theme="light"
       />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
