@@ -8,7 +8,60 @@ const SearchPage = () => {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState(null);
   const navigate = useNavigate();
+
+  // Function to fetch user profile picture
+  const fetchProfilePicture = async () => {
+    setProfileLoading(true);
+    setProfileError(null);
+    
+    try {
+      // Get user ID from localStorage, sessionStorage, or context
+      const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const response = await fetch(`https://backend-ps-tali.onrender.com/user/profile/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add authorization header if you use tokens
+          'Authorization': `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const userData = await response.json();
+      
+      // Extract profile picture URL from response
+      // Adjust these property names based on your API response structure
+      const profilePicUrl = userData.profilePicture || 
+                           userData.profile_picture || 
+                           userData.avatar || 
+                           userData.image || 
+                           userData.photo ||
+                           userData.user?.profilePicture ||
+                           userData.data?.profilePicture;
+      
+      setProfilePicture(profilePicUrl);
+      
+    } catch (err) {
+      console.error('Error fetching profile picture:', err);
+      setProfileError('Failed to load profile picture');
+      // Set to null so default avatar shows
+      setProfilePicture(null);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   // Function to fetch assets from your API
   const fetchAssets = async () => {
@@ -24,38 +77,56 @@ const SearchPage = () => {
       
       const data = await response.json();
       
-      // Process the API response to ensure we get an array
+      // Process the API response to keep full asset objects
       let processedAssets = [];
       
       if (Array.isArray(data)) {
-        // If data is already an array
+        // Keep full objects or convert strings to objects
         processedAssets = data.map(item => {
-          // If items are strings, use them directly
-          if (typeof item === 'string') return item;
-          // If items are objects, extract the name property (adjust property name as needed)
-          return item.name || item.title || item.assetName || JSON.stringify(item);
+          if (typeof item === 'string') {
+            return { name: item, id: item.toLowerCase().replace(/\s+/g, '-') };
+          }
+          // Keep the full object and ensure it has required properties
+          return {
+            id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
+            name: item.name || item.title || item.assetName || 'Unknown Asset',
+            ...item // Keep all other properties
+          };
         });
       } else if (data && typeof data === 'object') {
-        // If data is an object, look for common array properties
+        // Process nested arrays while keeping full objects
         if (Array.isArray(data.assets)) {
-          processedAssets = data.assets.map(item => 
-            typeof item === 'string' ? item : (item.name || item.title || item.assetName || JSON.stringify(item))
-          );
+          processedAssets = data.assets.map(item => ({
+            id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
+            name: item.name || item.title || item.assetName || 'Unknown Asset',
+            ...item
+          }));
         } else if (Array.isArray(data.data)) {
-          processedAssets = data.data.map(item => 
-            typeof item === 'string' ? item : (item.name || item.title || item.assetName || JSON.stringify(item))
-          );
+          processedAssets = data.data.map(item => ({
+            id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
+            name: item.name || item.title || item.assetName || 'Unknown Asset',
+            ...item
+          }));
         } else if (Array.isArray(data.results)) {
-          processedAssets = data.results.map(item => 
-            typeof item === 'string' ? item : (item.name || item.title || item.assetName || JSON.stringify(item))
-          );
+          processedAssets = data.results.map(item => ({
+            id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
+            name: item.name || item.title || item.assetName || 'Unknown Asset',
+            ...item
+          }));
         } else {
-          // If we can't find an array, create one from the object keys or values
+          // Convert object values to asset objects
           processedAssets = Object.values(data).filter(item => 
             typeof item === 'string' || (typeof item === 'object' && item !== null)
-          ).map(item => 
-            typeof item === 'string' ? item : (item.name || item.title || item.assetName || JSON.stringify(item))
-          );
+          ).map(item => {
+            if (typeof item === 'string') {
+              return { name: item, id: item.toLowerCase().replace(/\s+/g, '-') };
+            }
+            return {
+              id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
+              name: item.name || item.title || item.assetName || 'Unknown Asset',
+              ...item
+            };
+          });
         }
       }
       
@@ -66,125 +137,178 @@ const SearchPage = () => {
       setError('Failed to load assets');
       // Fallback to dummy data on error (optional)
       setAssets([
-        'Laptop - Dell XPS',
-        'Laptop - Dell',
-        'Laptop - XPS',
-        'Laptop - DellPS',
-        'Monitor - Samsung 24"',
-        'Keyboard - Logitech',
-        'Mouse - Razer',
-        'Chair - Ergonomic',
-        'Desk - Wooden',
+        { id: 'laptop-dell-xps', name: 'Laptop - Dell XPS', category: 'Electronics', status: 'Available' },
+        { id: 'laptop-dell', name: 'Laptop - Dell', category: 'Electronics', status: 'Available' },
+        { id: 'laptop-xps', name: 'Laptop - XPS', category: 'Electronics', status: 'Available' },
+        { id: 'laptop-dellps', name: 'Laptop - DellPS', category: 'Electronics', status: 'Available' },
+        { id: 'monitor-samsung-24', name: 'Monitor - Samsung 24"', category: 'Electronics', status: 'Available' },
+        { id: 'keyboard-logitech', name: 'Keyboard - Logitech', category: 'Electronics', status: 'Available' },
+        { id: 'mouse-razer', name: 'Mouse - Razer', category: 'Electronics', status: 'Available' },
+        { id: 'chair-ergonomic', name: 'Chair - Ergonomic', category: 'Furniture', status: 'Available' },
+        { id: 'desk-wooden', name: 'Desk - Wooden', category: 'Furniture', status: 'Available' },
       ]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch assets when component mounts
+  // Fetch assets and profile picture when component mounts
   useEffect(() => {
     fetchAssets();
+    fetchProfilePicture();
   }, []);
 
   // Filter assets based on search term (with safety check)
   const filteredAssets = Array.isArray(assets) ? assets.filter(asset =>
-    asset && asset.toLowerCase().includes(searchTerm.toLowerCase())
+    asset && asset.name && asset.name.toLowerCase().includes(searchTerm.toLowerCase())
   ) : [];
 
+  // Function to handle asset selection and navigation
+  const handleAssetClick = (asset) => {
+    // Store the complete asset data in sessionStorage for the view page
+    sessionStorage.setItem('selectedAsset', JSON.stringify(asset));
+    
+    // Navigate to view page with asset ID
+    navigate(`/view-asset/${asset.id}`);
+  };
+
   return (
-    <div className="p-5 min-h-screen bg-[#009ed8]">
-      {/* User and Notification Icons */}
-      <div className="flex justify-end mb-8">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 mr-2 bg-white p-2 rounded-full shadow-sm hover:shadow transition-shadow">
-            <Bell className="text-gray-500" size={20} />
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="border-2 border-gray-300 h-10 w-10 rounded-full bg-gray-100 shadow-sm"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Logo */}
-      <div className="flex flex-row items-center justify-center mt-20">
-        <p className="text-[6rem] font-extrabold text-white">TALI</p>
-        <p className="text-[6rem] font-bold text-[#01fe9d]">.</p>
-      </div>
-
-      {/* Search Bar */}
-      <div className="relative flex justify-center mb-12">
-        <div className="border-2 border-white w-full max-w-[55%] h-14 rounded-4xl flex flex-row items-center px-4 gap-2 focus-within:shadow-md transition-all bg-white relative z-10">
-          <Search className="text-gray-400" size={20} />
-          <input 
-            type="text" 
-            placeholder={loading ? "Loading assets..." : "Search Assets"}
-            className="flex-1 bg-transparent border-none outline-none text-gray-700"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            disabled={loading}
-          />
-        </div>
-
-        {/* Suggestions Box */}
-        {searchTerm && filteredAssets.length > 0 && (
-          <div className="absolute top-full mt-2 w-full max-w-[55%] bg-white rounded-lg shadow-lg z-20 p-2">
-            {filteredAssets.map((item, idx) => (
-              <div 
-                key={idx}
-                onClick={() => navigate(`/view-asset/:id?q=${encodeURIComponent(item)}`)}
-                className="p-2 hover:bg-gray-100 rounded-md cursor-pointer text-gray-700 text-sm"
-              >
-                {item}
+    <div className="p-5 lg:px-8 xl:px-12 2xl:px-16 min-h-screen bg-[#051b34]">
+      {/* Container for max width on very large screens */}
+      <div className="mx-auto max-w-7xl">
+        {/* User and Notification Icons */}
+        <div className="flex justify-end mb-6 lg:mb-8">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 mr-2 bg-white p-2 lg:p-3 rounded-full shadow-sm hover:shadow transition-shadow">
+              <Bell className="text-gray-500" size={20} />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative h-10 w-10 lg:h-12 lg:w-12 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                {profileLoading ? (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : profilePicture ? (
+                  <img 
+                    src={profilePicture} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                    onError={() => {
+                      setProfilePicture(null);
+                      setProfileError('Failed to load image');
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-blue-600">
+                    <span className="text-white font-semibold text-sm lg:text-base">
+                      {/* Show first letter of user's name or default to 'U' */}
+                      U
+                    </span>
+                  </div>
+                )}
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Logo - Responsive sizing */}
+        <div className="flex flex-row items-center justify-center mt-12 lg:mt-16 xl:mt-20 2xl:mt-24">
+          <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-extrabold text-white">TALI</p>
+          <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold text-[#01fe9d]">.</p>
+        </div>
+
+        {/* Search Bar - Better responsive behavior */}
+        <div className="relative flex justify-center mb-8 lg:mb-12 mt-8 lg:mt-12">
+          <div className="border-2 border-white w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl h-12 lg:h-14 xl:h-16 rounded-4xl flex flex-row items-center px-4 lg:px-6 gap-2 lg:gap-3 focus-within:shadow-md transition-all bg-white relative z-10">
+            <Search className="text-gray-400" size={20} />
+            <input 
+              type="text" 
+              placeholder={loading ? "Loading assets..." : "Search Assets"}
+              className="flex-1 bg-transparent border-none outline-none text-gray-700 text-sm lg:text-base xl:text-lg"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+
+          {/* Suggestions Box - Matching search bar width */}
+          {searchTerm && filteredAssets.length > 0 && (
+            <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-2">
+              {filteredAssets.slice(0, 8).map((asset, idx) => (
+                <div 
+                  key={asset.id || idx}
+                  onClick={() => handleAssetClick(asset)}
+                  className="p-2 lg:p-3 hover:bg-gray-100 rounded-md cursor-pointer text-gray-700 text-sm lg:text-base border-b border-gray-100 last:border-b-0"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">{asset.name}</span>
+                    {asset.category && (
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {asset.category}
+                      </span>
+                    )}
+                  </div>
+                  {asset.status && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Status: {asset.status}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {filteredAssets.length > 8 && (
+                <div className="p-2 lg:p-3 text-gray-500 text-xs lg:text-sm text-center border-t">
+                  +{filteredAssets.length - 8} more results
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* No results message */}
+          {searchTerm && filteredAssets.length === 0 && !loading && (
+            <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-4">
+              <p className="text-gray-500 text-sm lg:text-base text-center">No assets found</p>
+            </div>
+          )}
+
+          {/* Error message */}
+          {error && (
+            <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-4">
+              <p className="text-red-500 text-sm lg:text-base text-center">{error}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Tabs - Better spacing on larger screens */}
+        <div className="flex justify-center mb-8 lg:mb-10">
+          <div className="flex space-x-8 lg:space-x-16 xl:space-x-20">
+            {['Assets', 'Assignments'].map(tab => (
+              <p 
+                key={tab}
+                onClick={() => {
+                  setActiveTab(tab);
+                  if (tab === 'Assets') {
+                    navigate('/assets');
+                  }
+                }}
+                className={`text-base lg:text-lg xl:text-xl font-medium cursor-pointer transition-colors hover:text-[#01fe9d] ${
+                  activeTab === tab 
+                    ? 'text-white pb-1 border-b-2 border-white' 
+                    : 'text-white'
+                }`}
+              >
+                {tab}
+              </p>
             ))}
           </div>
-        )}
-
-        {/* No results message */}
-        {searchTerm && filteredAssets.length === 0 && !loading && (
-          <div className="absolute top-full mt-2 w-full max-w-[55%] bg-white rounded-lg shadow-lg z-20 p-4">
-            <p className="text-gray-500 text-sm text-center">No assets found</p>
-          </div>
-        )}
-
-        {/* Error message */}
-        {error && (
-          <div className="absolute top-full mt-2 w-full max-w-[55%] bg-white rounded-lg shadow-lg z-20 p-4">
-            <p className="text-red-500 text-sm text-center">{error}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Tabs */}
-      <div className="flex justify-center mb-10">
-        <div className="flex space-x-12">
-          {['Assets', 'Assignments'].map(tab => (
-            <p 
-              key={tab}
-              onClick={() => {
-                setActiveTab(tab);
-                if (tab === 'Assets') {
-                  navigate('/assets');
-                }
-              }}
-              className={`text-lg font-medium cursor-pointer transition-colors ${
-                activeTab === tab 
-                  ? 'text-white pb-1' 
-                  : 'text-white'
-              }`}
-            >
-              {tab}
-            </p>
-          ))}
         </div>
-      </div>
 
-      {/* Settings */}
-      <div className="flex mt-32">
-        <p className="flex items-center gap-2 text-white cursor-pointer transition-colors">
-          <Settings size={18} />
-          Settings
-        </p>
+        {/* Settings - Positioned better on larger screens */}
+        <div className="flex mt-16 lg:mt-24 xl:mt-32">
+          <p className="flex items-center gap-2 lg:gap-3 text-white cursor-pointer transition-colors hover:text-[#01fe9d] text-sm lg:text-base xl:text-lg">
+            <Settings size={18} className="lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
+            Settings
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import * as Chart from 'chart.js';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,7 +7,6 @@ import {
   BarController,
   Tooltip,
   Legend,
-  Title
 } from 'chart.js';
 
 ChartJS.register(
@@ -17,8 +15,7 @@ ChartJS.register(
   BarElement,
   BarController,
   Tooltip,
-  Legend,
-  Title
+  Legend
 );
 
 const AssetSummaryChart = () => {
@@ -26,32 +23,34 @@ const AssetSummaryChart = () => {
   const chartInstanceRef = useRef(null);
 
   const chartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'May', 'Jun'],
     datasets: [
       {
-        label: 'In Store',
-        data: [45000, 48000, 52000, 49000, 55000, 58000, 60000, 57000, 62000, 65000],
-        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-        borderColor: 'rgb(59, 130, 246)',
-        borderWidth: 1.5,
-        borderRadius: {
-          topLeft: 10,
-          topRight: 10,
+        label: 'Received',
+        data: [55000, 58000, 52000, 49000, 47000, 48000, 53000, 51000, 50000, 49000],
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(59, 130, 246, 0.9)');   // Blue top
+          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.3)');   // Blue bottom
+          return gradient;
         },
+        borderRadius: 6,
         borderSkipped: false,
       },
       {
-        label: 'Shipped',
-        data: [32000, 33000, 31500, 34000, 35000, 36000, 37000, 35500, 38000, 39000],
-        backgroundColor: 'rgba(16, 185, 129, 0.8)',
-        borderColor: 'rgb(16, 185, 129)',
-        borderWidth: 1.5,
-        borderRadius: {
-          topLeft: 10,
-          topRight: 10,
+        label: 'Sent',
+        data: [48000, 50000, 46000, 44000, 43000, 42000, 47000, 46000, 45000, 44000],
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(34, 197, 94, 0.9)');   // Green top
+          gradient.addColorStop(1, 'rgba(34, 197, 94, 0.3)');   // Green bottom
+          return gradient;
         },
+        borderRadius: 6,
         borderSkipped: false,
-      },
+      }
     ]
   };
 
@@ -63,65 +62,52 @@ const AssetSummaryChart = () => {
         chartInstanceRef.current.destroy();
       }
 
-      chartInstanceRef.current = new Chart.Chart(ctx, {
+      chartInstanceRef.current = new ChartJS(ctx, {
         type: 'bar',
         data: chartData,
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            title: {
-              display: false,
-            },
             legend: {
               position: 'bottom',
               labels: {
-                padding: 10,
                 usePointStyle: true,
-                pointStyle: 'circle', // circle dot
+                pointStyle: 'circle',
                 boxWidth: 6,
-                boxHeight: 6, // smaller dot size
+                boxHeight: 6,
                 font: {
                   size: 12
-                }
+                },
+                padding: 20
               }
             },
             tooltip: {
-              mode: 'index',
-              intersect: false,
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              titleColor: 'white',
-              bodyColor: 'white',
-              borderColor: 'rgba(255, 255, 255, 0.1)',
-              borderWidth: 1,
               callbacks: {
-                label: function(context) {
-                  return `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`;
-                }
+                label: (context) => `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`
               }
             }
-          },
-          interaction: {
-            mode: 'nearest',
-            axis: 'x',
-            intersect: false
           },
           scales: {
             x: {
               grid: {
                 display: false
               },
-              categoryPercentage: 0.5, // more spacing between groups
-              barPercentage: 0.3 // thinner bars
+              categoryPercentage: 0.4,
+              barPercentage: 0.5,
+              ticks: {
+                font: {
+                  size: 12
+                }
+              }
             },
             y: {
+              beginAtZero: true,
               grid: {
-                color: 'rgba(0, 0, 0, 0.1)'
+                color: 'rgba(0,0,0,0.05)'
               },
               ticks: {
-                callback: function(value) {
-                  return value.toLocaleString();
-                }
+                callback: (value) => value.toLocaleString()
               }
             }
           }
@@ -137,18 +123,14 @@ const AssetSummaryChart = () => {
   }, []);
 
   return (
-    <div className='border-2 bg-white border-white p-4 rounded-md shadow-sm'>
+    <div className="border-2 bg-white border-white p-4 rounded-md shadow-sm">
       <div className="flex flex-row justify-between mb-2">
         <p className="font-semibold">Asset Summary Chart</p>
         <p className="border-[0.05px] border-gray-400 py-1 px-5 rounded-sm text-[14px] text-gray-600">Weekly</p>
       </div>
 
-      {/* Updated height to match first chart */}
       <div className="relative h-56">
-        <canvas 
-          ref={chartRef}
-          className="w-full h-full"
-        />
+        <canvas ref={chartRef} className="w-full h-full" />
       </div>
     </div>
   );
