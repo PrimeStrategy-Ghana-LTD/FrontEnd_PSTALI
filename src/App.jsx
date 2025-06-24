@@ -20,6 +20,8 @@ import AddUser from "./pages/AddUser";
 import AllUsers from "./pages/AllUsers";
 import AssignedPage from "./pages/AssignedPage";
 import ManageStore from "./pages/ManageStore";
+import AssetCardView from "./pages/AssetCardView";
+
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -55,6 +57,10 @@ const router = createBrowserRouter([
   {
     path: "/overview",
     element: <AssetOverview />,
+  },
+  {
+    path: "/card-view",
+    element: <AssetCardView />
   },
   {
     path: "/assetmodal",
