@@ -6,7 +6,6 @@ import {
 } from "react-icons/io5";
 import Searchbar from "../components/Searchbar";
 import Sidebar1 from "../components/Sidebar1";
-import AddAssetModal from "./AddAssetModal";
 import { apiGetAllAssets, apiGetLocations } from "../servicess/tali";
 import AssetAssignmentModal from "./AssetAssignmentModal";
 import { Link } from "react-router-dom";
@@ -23,7 +22,7 @@ const AssetCardView = () => {
   const [locationFilter, setLocationFilter] = useState("");
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  
   const [assets, setAssets] = useState([]);
   const [locations, setLocations] = useState([]);
 
@@ -232,12 +231,13 @@ const AssetCardView = () => {
                 View and Manage Assets
               </p>
               <div className="flex text-[13px]">
-                <button
-                  className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] mr-5"
-                  onClick={() => setIsAddModalOpen(true)}
-                >
-                  Add Asset
-                </button>
+                <Link
+  to="/add-asset"
+  className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] mr-5"
+>
+  Add Asset
+</Link>
+
                 <Link to="/assets" className="flex flex-row items-center gap-2 px-3 py-1 rounded-l-sm border border-gray-300 text-gray-600 cursor-pointer bg-[#051b34] text-white">
                   <span><FaListUl /></span>
                   <span>List View</span>
@@ -498,10 +498,7 @@ const AssetCardView = () => {
           </div>
         </div>
       </div>
-      <AddAssetModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-      />
+      
       <AssetAssignmentModal
         isOpen={isAssignModalOpen}
         onClose={() => setIsAssignModalOpen(false)}

@@ -8,7 +8,7 @@ import AssetOverview from "./pages/AssetOverview";
 import SearchResult from "./pages/SearchResult";
 import DashboardLayout from "./Layouts/DashboardLayout";
 import Sidebar from "./components/Sidebar";
-import AddAssetModal from "./pages/AddAssetModal";
+
 
 // Toastify import
 import { ToastContainer } from "react-toastify";
@@ -21,6 +21,7 @@ import AllUsers from "./pages/AllUsers";
 import AssignedPage from "./pages/AssignedPage";
 import ManageStore from "./pages/ManageStore";
 import AssetCardView from "./pages/AssetCardView";
+import AddAsset from "./pages/AddAsset";
 
 
 // Define all your routes here
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
     element: <AllUsers />,
   },
   {
+    path: "/add-asset",
+    element: <AddAsset />
+  },
+  {
     path: "/assigned",
     element: <AssignedPage />,
   },
@@ -61,10 +66,6 @@ const router = createBrowserRouter([
   {
     path: "/card-view",
     element: <AssetCardView />
-  },
-  {
-    path: "/assetmodal",
-    element: <AddAssetModal />,
   },
   {
     path: "/view-asset/:id",
