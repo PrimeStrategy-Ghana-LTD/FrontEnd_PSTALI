@@ -227,7 +227,7 @@ import {
 } from "react-icons/io5";
 import Searchbar from "../components/Searchbar";
 import Sidebar1 from "../components/Sidebar1";
-import AddAssetModal from "./AddAssetModal";
+
 import { apiGetAllAssets, apiGetLocations } from "../servicess/tali";
 import AssetAssignmentModal from "./AssetAssignmentModal";
 import { Link } from "react-router-dom";
@@ -243,7 +243,7 @@ const AllAssets = () => {
   const [locationFilter, setLocationFilter] = useState("");
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const [assets, setAssets] = useState([]);
   const [locations, setLocations] = useState([]);
 
@@ -452,18 +452,26 @@ const AllAssets = () => {
                 View and Manage Assets
               </p>
               <div className="flex text-[13px]">
-                <button
+                <Link
+                  to="/add-asset"
                   className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] mr-5"
-                  onClick={() => setIsAddModalOpen(true)}
                 >
                   Add Asset
-                </button>
+                </Link>
+
                 <div className="flex flex-row items-center gap-2 px-3 py-1 rounded-l-sm border border-gray-300 text-gray-600 cursor-pointer bg-[#051b34] text-white">
-                  <span><FaListUl /></span>
+                  <span>
+                    <FaListUl />
+                  </span>
                   <span>List View</span>
                 </div>
-                <Link to="/card-view" className="flex flex-row items-center gap-2 px-3 py-1 rounded-r-sm border border-gray-300 text-gray-600 cursor-pointer">
-                  <span><FaTh /></span>
+                <Link
+                  to="/card-view"
+                  className="flex flex-row items-center gap-2 px-3 py-1 rounded-r-sm border border-gray-300 text-gray-600 cursor-pointer"
+                >
+                  <span>
+                    <FaTh />
+                  </span>
                   <span>Card View</span>
                 </Link>
               </div>
@@ -562,25 +570,30 @@ const AllAssets = () => {
                         className="border-2 h-8 w-8 rounded-full border-transparent flex-shrink-0"
                       />
                       <div className="min-w-0 flex-1">
-                        <Link to={`/view-asset/${item._id}`} className="block truncate hover:text-blue-600">
+                        <Link
+                          to={`/view-asset/${item._id}`}
+                          className="block truncate hover:text-blue-600"
+                        >
                           {item.assetName}
                         </Link>
                         <p className="text-gray-400">2025</p>
                       </div>
                     </div>
-                    
+
                     {/* Vin column - 15% width */}
                     <div className="w-[15%]">{item.unit}</div>
-                    
+
                     {/* Origin/Status column - 15% width */}
-                    <div className={`w-[15%] font-semibold ${
-                      item.status === "Available"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}>
+                    <div
+                      className={`w-[15%] font-semibold ${
+                        item.status === "Available"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
                       {item.status}
                     </div>
-                    
+
                     {/* Location column - 20% width */}
                     <div className="w-[20%]">
                       {getLocationName(item.assetLocation)}
@@ -702,10 +715,7 @@ const AllAssets = () => {
           {/* Asset List Box */}
         </div>
       </div>
-      <AddAssetModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-      />
+      
       <AssetAssignmentModal
         isOpen={isAssignModalOpen}
         onClose={() => setIsAssignModalOpen(false)}

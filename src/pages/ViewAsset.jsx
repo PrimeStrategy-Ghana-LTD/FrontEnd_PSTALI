@@ -173,7 +173,7 @@
 // export default ViewAsset;
 
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { FiEdit2 } from "react-icons/fi";
 import Sidebar1 from '../components/Sidebar1';
 import Searchbar from '../components/Searchbar';
@@ -182,7 +182,6 @@ import jsPDF from 'jspdf';
 import axios from 'axios';
 
 const ViewAsset = () => {
-
   const [asset, setAsset] = useState(null);
   const [locationName, setLocationName] = useState('');
   const { id } = useParams();
@@ -192,15 +191,11 @@ const ViewAsset = () => {
       try {
         const res = await axios.get(`https://backend-ps-tali.onrender.com/assets/${id}`);
         setAsset(res.data);
-
-        // Fetch location name using the assetLocation field (which contains the location ID)
         if (res.data.assetLocation) {
           try {
             const locationRes = await axios.get(`https://backend-ps-tali.onrender.com/locations/${res.data.assetLocation}`);
-            // Use the assetLocation field from the location object as the display name
             setLocationName(locationRes.data.assetLocation || 'Unknown Location');
-          } catch (locationError) {
-            console.error("Error fetching location:", locationError);
+          } catch {
             setLocationName('Location not found');
           }
         }
@@ -208,22 +203,14 @@ const ViewAsset = () => {
         console.error("Error fetching asset:", err);
       }
     };
-
     fetchAsset();
   }, [id]);
 
-  console.log("Asset:", asset);
-  console.log("Location Name:", locationName);
-  console.log("Stock Locations:", asset?.stockLocations);
-
   const handleDownload = () => {
     if (!asset) return;
-
     const doc = new jsPDF();
-
     doc.setFontSize(16);
     doc.text('Asset Details', 10, 10);
-
     doc.setFontSize(12);
     doc.text(`Asset Name: ${asset.assetName || 'N/A'}`, 10, 20);
     doc.text(`Asset ID: ${asset.assetId || 'N/A'}`, 10, 30);
@@ -232,138 +219,99 @@ const ViewAsset = () => {
     doc.text(`Status: ${asset.status || 'N/A'}`, 10, 60);
     doc.text(`Assigned To: ${asset.assignedTo?.name || 'Unassigned'}`, 10, 70);
     doc.text(`Contact: ${asset.assignedTo?.contact || 'No contact'}`, 10, 80);
-
     doc.text('Stock Locations:', 10, 95);
     asset.stockLocations?.forEach((loc, index) => {
       doc.text(`${index + 1}. ${loc.location || loc.storeName} - ${loc.quantity}`, 12, 105 + index * 10);
     });
-
     doc.save(`${asset.assetName || 'asset'}_details.pdf`);
   };
 
   return (
-    <div className='flex flex-row'>
+    <div className='flex'>
       <Sidebar1 />
-      <div className='w-[80vw]'>
+      <div className='flex flex-col w-full'>
         <Searchbar />
-        <div className='bg-[#f0f1f3] min-h-[90%] p-4'>
-          <div className='bg-white rounded-md shadow-sm border border-white p-4'>
-            <div className='flex flex-row justify-between '>
-              <p className='font-semibold mb-4'>Asset: {asset?.assetName || 'Unnamed Asset'}</p>
-              <div className='flex flex-row gap-3 text-[13px]'>
-                <div className='flex flex-row border-[0.5px] px-3 gap-1 rounded-sm border-gray-300 text-gray-600'>
-                  <p className='mt-3'><FiEdit2 /></p>
-                  <button>Edit</button>
-                </div>
-                <button onClick={handleDownload} className='border-[0.5px] px-2 rounded-sm border-gray-300 text-gray-600'>Download</button>
-              </div>
-            </div>
-            <div>
-              <div className='flex fex-row mt-5 gap-40 text-gray-600 font-medium'>
-                <p>Overview</p>
-                <p>History</p>
-              </div>
-              <p className='border-b-[0.5px] border-gray-300 mt-2'></p>
-            </div>
-            <div className='flex flex-row gap-[40%]'>
-              <div>
-                <div className=''>
-                  <p className='text-[16px] font-medium text-gray-700 mt-4'>Primary Details</p>
-                  <div className='space-y-5 mt-3'>
-                    <div className='flex flex-row gap-36'>
-                      <p className='text-gray-400 text-[16px] font-semibold'>Asset Name</p>
-                      <p className='text-gray-600 font-medium'>{asset?.assetName}</p>
-                    </div>
-                    <div className='flex flex-row gap-44'>
-                      <p className='text-gray-400 text-[16px] font-semibold'>Asset ID</p>
-                      <p className='text-gray-600 font-medium'>{asset?.assetId}</p>
-                    </div>
-                    <div className='flex flex-row gap-[37%]'>
-                      <p className='text-gray-400 text-[16px] font-semibold'>Asset Category</p>
-                      <p className='text-gray-600 font-medium'>{asset?.category}</p>
-                    </div>
-                    <div className='flex flex-row gap-32'>
-                      <p className='text-gray-400 text-[16px] font-semibold'>Asset Location</p>
-                      <p className='text-gray-600 font-medium'>{locationName || 'Loading...'}</p>
-                    </div>
-                    <div className='flex flex-row gap-[42%]'>
-                      <p className='text-gray-400 text-[16px] font-semibold'>Status</p>
-                      <p className={`font-medium ${asset?.status === 'Available' ? 'text-green-600' : 'text-red-600'}`}>
-                        {asset?.status || 'Unknown'}
-                      </p>
-                    </div>
+        <div className='bg-[#f0f1f3] p-6 min-h-screen'>
+          <div className='bg-white rounded-lg shadow-sm p-6'>
+            <div className='flex justify-between items-start'>
+              <div className='flex gap-4'>
+                <img
+                  src={asset?.assetImage || '/placeholder.jpg'}
+                  alt="Asset"
+                  className='w-60 h-40 object-cover rounded-md border border-gray-200'
+                />
+                <div>
+                  <h2 className='text-xl font-semibold'>{asset?.assetName}</h2>
+                  <p className='text-sm text-gray-500'>{locationName}</p>
+                  <p className='text-xs mt-2 text-gray-600'>VIN: {asset?.assetId || 'N/A'}</p>
+                  <button className='mt-3 bg-gray-800 text-white text-sm px-4 py-1 rounded'>Assign</button>
+                  <div className='mt-3'>
+                    <label className='text-gray-600 text-sm'>Justification</label>
+                    <textarea
+                      rows={3}
+                      className='w-full border mt-1 p-2 rounded-md text-sm border-gray-300'
+                      placeholder='Enter justification...'
+                    ></textarea>
                   </div>
+                </div>
+              </div>
+              <div className='flex gap-2'>
+                <button className='flex items-center gap-1 border px-3 py-1 rounded text-sm text-gray-600 border-gray-300'>
+                  <FiEdit2 /> Edit
+                </button>
+                <button onClick={handleDownload} className='border px-3 py-1 rounded text-sm text-gray-600 border-gray-300'>Download</button>
+              </div>
+            </div>
+
+            <div className='mt-6 grid grid-cols-2 gap-6'>
+              <div>
+                <h3 className='text-md font-semibold text-gray-700 mb-2'>Overview</h3>
+                <ul className='text-sm text-gray-600 space-y-1'>
+                  <li><strong>Make:</strong> {asset?.make || 'N/A'}</li>
+                  <li><strong>Model:</strong> {asset?.model || 'N/A'}</li>
+                  <li><strong>Year:</strong> {asset?.year || 'N/A'}</li>
+                  <li><strong>Condition:</strong> {asset?.condition || 'N/A'}</li>
+                  <li><strong>Body Type:</strong> {asset?.bodyType || 'N/A'}</li>
+                  <li><strong>Color:</strong> {asset?.color || 'N/A'}</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className='text-md font-semibold text-gray-700 mb-2'>Features</h3>
+                <ul className='text-sm text-gray-600 space-y-1'>
+                  <li><strong>Mileage:</strong> {asset?.mileage || 'N/A'}</li>
+                  <li><strong>Drivetrain:</strong> {asset?.drivetrain || 'N/A'}</li>
+                  <li><strong>Doors:</strong> {asset?.doors || 'N/A'}</li>
+                  <li><strong>Max Seating:</strong> {asset?.maxSeating || 'N/A'}</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className='mt-8'>
+              <h3 className='text-md font-semibold text-gray-700 mb-2'>Inspection Details</h3>
+              <p className='text-sm text-gray-600'>Inspected by: Kofi Baah</p>
+              <p className='text-sm text-gray-600'>Approved by: Jordan Owusu</p>
+              <p className='text-sm text-gray-600'>Date Uploaded: 18 June, 2025</p>
+            </div>
+
+            <div className='mt-8'>
+              <h3 className='text-md font-semibold text-gray-700 mb-2'>Similar Assets</h3>
+              <div className='flex gap-4 text-sm text-gray-600'>
+                <div>
+                  <img src='/car-placeholder.png' alt='Asset' className='w-28 h-16 rounded-md object-cover'/>
+                  <p>2023 Toyota Corolla</p>
                 </div>
                 <div>
-                  <p className='text-[16px] font-medium text-gray-700 mt-20'>User Details</p>
-                  <div className='flex flex-row gap-[44%] space-y-5 mt-3'>
-                    <p className='text-gray-400 text-[16px] font-medium'>User Name</p>
-                    <p className='text-gray-600 font-medium'>{asset?.assignedTo?.name || 'Unassigned'}</p>
-                  </div>
-                  <div className='flex flex-row gap-28'>
-                    <p className='text-gray-400 text-[16px] font-semibold'>Contact Number</p>
-                    <p className='text-gray-600 font-medium'>{asset?.assignedTo?.contact || 'No contact'}</p>
-                  </div>
-                </div>
-              </div>
-              <div className='mt-7'>
-                <div className="relative border-2 border-dashed border-gray-300 rounded-md p-4 flex items-center justify-center w-56 h-56">
-                  {asset?.assetImage ? (
-                    <img
-                      src={asset.assetImage}
-                      alt="Asset"
-                      className="w-full h-full object-cover rounded-md"
-                    />
-                  ) : (
-                    <p className="text-gray-400 text-sm">No Image Available</p>
-                  )}
-                  <input
-                    type="file"
-                    name="image"
-                    id="imageUpload"
-                    className="opacity-0 absolute w-full h-full cursor-pointer"
-                  />
-                </div>
-                <div className='mt-4 space-y-5'>
-                  <div className='flex flex-row gap-3'>
-                    <p className='text-green-600'>Available:</p>
-                    <p className='text-gray-600'>{asset?.unit || 0}</p>
-                  </div>
-                  <div className='flex flex-row gap-3'>
-                    <p className='text-red-500'>Status:</p>
-                    <p className={`${asset?.status === 'Available' ? 'text-green-600' : 'text-red-600'}`}>
-                      {asset?.status || 'Unknown'}
-                    </p>
-                  </div>
+                  <img src='/car-placeholder.png' alt='Asset' className='w-28 h-16 rounded-md object-cover'/>
+                  <p>2022 Honda Civic</p>
                 </div>
               </div>
             </div>
-            <div>
-              <p className='text-[16px] font-medium text-gray-700 mt-12'>Stock Locations</p>
-              <div className='flex flex-row border-2 justify-between py-2 mt-3 bg-gray-100 border-gray-100 w-[60%] text-sm text-gray-700 font-medium'>
-                <p className='ml-2'>Store Name</p>
-                <p className='mr-5'>Stock in hand</p>
-              </div>
-              <div className='flex flex-col space-y-5 mt-4'>
-                {asset?.stockLocations && asset.stockLocations.length > 0 ? (
-                  asset.stockLocations.map((loc, idx) => (
-                    <div key={idx} className='flex flex-row border-b-[0.5px] border-gray-300 justify-between w-[60%]'>
-                      <p className='ml-2 text-gray-400 text-[16px] font-semibold'>{loc.location || loc.storeName || 'Unknown Location'}</p>
-                      <p className='mr-5 text-gray-600'>{loc.quantity}</p>
-                    </div>
-                  ))
-                ) : (
-                  <div className='flex flex-row justify-center w-[60%] py-4'>
-                    <p className='text-gray-400 text-sm'>No stock locations available</p>
-                  </div>
-                )}
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ViewAsset;
