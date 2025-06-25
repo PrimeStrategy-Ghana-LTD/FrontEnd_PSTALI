@@ -20,7 +20,7 @@ const topItems = [
   
   { label: "Asset Assignment", icon: Order, path: "/assigned" },
 
-  { label: "Manage Asset Location", icon: Manage, path: "/manage-location" },
+  { label: "Manage Asset Location", icon: Manage, path: "/dashboard/manage-location" },
   { label: "Search", icon: Search, path: "/search" },
 ];
 
