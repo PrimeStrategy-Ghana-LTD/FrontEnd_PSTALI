@@ -93,124 +93,209 @@ const AddUser = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-semibold mb-4">New User</h2>
-
-        <div className="flex flex-row items-center justify-center mb-4">
-          <div className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center text-gray-500 text-4xl">
-            {profile_picture ? (
-              <img
-                src={URL.createObjectURL(profile_picture)}
-                alt="Profile"
-                className="w-full h-full object-cover rounded-full"
-              />
-            ) : (
-              <span>👤</span>
-            )}
-          </div>
-          <div className="text-sm mt-2 ml-3">
-            Drag image here <br />
-            <p className="text-center">or</p>
-            <label className="text-blue-500 cursor-pointer">
-              Browse image
-              <input
-                type="file"
-                name="profile_picture"
-                accept="image/*"
-                onChange={(e) => setProfile_picture(e.target.files[0])}
-                className="hidden"
-              />
-            </label>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={resetAndClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h2 className="text-xl font-semibold text-gray-900">New User</h2>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          {[
-            { name: "userName", type: "text", placeholder: "Enter supplier name", label: "User Name" },
-            { name: "password", type: "text", placeholder: "Enter password", label: "Password" },
-            { name: "email", type: "email", placeholder: "Enter user email", label: "Email" },
-            { name: "phone", type: "text", placeholder: "Enter phone number", label: "Contact Number" },
-          ].map(({ name, type, placeholder, label }) => (
-            <div key={name} className="flex items-center mb-3">
-              <label className="w-60 block text-md font-medium text-gray-700">{label}</label>
-              <input
-                type={type}
-                name={name}
-                placeholder={placeholder}
-                value={formData[name]}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                required
-              />
+        {/* Content */}
+        <div className="p-6">
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left Column - Image Upload */}
+              <div className="flex flex-col items-center justify-center">
+                <div className="w-64 h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer relative">
+                  {profile_picture ? (
+                    <div className="relative w-full h-full">
+                      <img
+                        src={URL.createObjectURL(profile_picture)}
+                        alt="Profile"
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setProfile_picture(null)}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
+                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-3">
+                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-500 mb-1">Drag image here</p>
+                      <p className="text-xs text-gray-400 mb-2">or</p>
+                      <span className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                        Browse image
+                      </span>
+                      <input
+                        type="file"
+                        name="profile_picture"
+                        accept="image/*"
+                        onChange={(e) => setProfile_picture(e.target.files[0])}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column - Form Fields */}
+              <div className="space-y-6">
+                {/* User Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    User Name
+                  </label>
+                  <input
+                    type="text"
+                    name="userName"
+                    placeholder="Enter name"
+                    value={formData.userName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter Password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location
+                  </label>
+                  <select
+                    name="storeLocation"
+                    value={formData.storeLocation}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                    required
+                    disabled={loadingLocations}
+                  >
+                    {loadingLocations ? (
+                      <option>Loading locations...</option>
+                    ) : (
+                      <>
+                        <option value="">Select Location</option>
+                        {locations.map((location) => (
+                          <option key={location._id} value={location._id}>
+                            {location.assetLocation || location.name || location._id}
+                          </option>
+                        ))}
+                      </>
+                    )}
+                  </select>
+                </div>
+
+                {/* User Role */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    User Role
+                  </label>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                    required
+                  >
+                    <option value="">Select user role</option>
+                    {roles.map((role) => (
+                      <option key={role.value} value={role.value}>
+                        {role.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Contact Number */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Contact Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Enter user contact number"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter user email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-          ))}
 
-          {/* Store Location */}
-          <div className="flex items-center mb-3">
-            <label className="w-60 block text-md font-medium text-gray-700">Store Location</label>
-            <select
-              name="storeLocation"
-              value={formData.storeLocation}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-500"
-              required
-              disabled={loadingLocations}
-            >
-              {loadingLocations ? (
-                <option>Loading locations...</option>
-              ) : (
-                <>
-                  <option value="">Select Location</option>
-                  {locations.map((location) => (
-                    <option key={location._id} value={location._id}>
-                      {location.assetLocation || location.name || location._id}
-                    </option>
-                  ))}
-                </>
-              )}
-            </select>
-          </div>
-
-          {/* Role */}
-          <div className="flex items-center mb-3">
-            <label className="w-60 block text-md font-medium text-gray-700">User Role</label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-500"
-              required
-            >
-              <option value="">Choose user role</option>
-              {roles.map((role) => (
-                <option key={role.value} value={role.value}>
-                  {role.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end space-x-2 mt-6">
-            <button
-              type="button"
-              className="px-4 py-1 rounded-sm border border-gray-400"
-              onClick={resetAndClose}
-            >
-              Discard
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`px-4 text-white text-md rounded-sm shadow-md transition duration-300 ease-in-out ${
-                loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-600"
-              }`}
-            >
-              {loading ? "Loading..." : "Add User"}
-            </button>
-          </div>
-        </form>
+            {/* Buttons */}
+            <div className="flex justify-end items-center gap-4 mt-8 pt-6 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={resetAndClose}
+                className="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              >
+                Discard
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className={`px-8 py-3 rounded-lg font-medium text-white transition-all ${
+                  loading 
+                    ? "bg-gray-400 cursor-not-allowed" 
+                    : "bg-slate-800 hover:bg-slate-900 shadow-lg hover:shadow-xl"
+                }`}
+              >
+                {loading ? "Adding User..." : "Add User"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

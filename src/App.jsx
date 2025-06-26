@@ -19,9 +19,11 @@ import ViewAsset from "./pages/ViewAsset";
 import AddUser from "./pages/AddUser";
 import AllUsers from "./pages/AllUsers";
 import AssignedPage from "./pages/AssignedPage";
-import ManageStore from "./pages/ManageStore";
+// import ManageStore from "./pages/ManageStore";
 import AssetCardView from "./pages/AssetCardView";
 import AddAsset from "./pages/AddAsset";
+import ManageStore from "./pages/ManageStore";
+import UserAccount from "./pages/UserAccount";
 
 
 // Define all your routes here
@@ -74,6 +76,10 @@ const router = createBrowserRouter([
   {
     path: "/side-bar",
     element: <Sidebar1 />,
+  },
+  {
+    path: "/user-account",
+    element: <UserAccount />,
   },
 
   {
