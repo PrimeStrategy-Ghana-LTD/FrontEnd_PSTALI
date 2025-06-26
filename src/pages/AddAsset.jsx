@@ -67,7 +67,8 @@ const AddAsset = () => {
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Image Section */}
-          <div className="col-span-1 flex flex-col items-center border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
+          <div className="flex flex-col">
+            <div className="col-span-1 flex flex-col items-center border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
             <input
               type="file"
               name="assetImage"
@@ -112,6 +113,7 @@ const AddAsset = () => {
             ))}
           </div>
 
+          </div>
           {/* Right Column */}
           <div className="col-span-1 space-y-4">
             {[

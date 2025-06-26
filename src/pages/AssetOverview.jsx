@@ -1,4 +1,3 @@
-
 import Cars from "../assets/images/Cars.png";
 import house from "../assets/images/house.png";
 import plane from "../assets/images/plane.png";
@@ -6,6 +5,10 @@ import Cost from "../assets/images/Cost.png";
 import Way from "../assets/images/Way.png";
 import Users from "../assets/images/Users.png";
 import Cancel from "../assets/images/Cancel.png";
+import Goods from "../assets/images/Goods.png";
+import Location from "../assets/images/Location.png";
+import Pending from "../assets/images/Pending.png";
+import Total from "../assets/images/Total.png";
 import Profit from "../assets/images/Profit.png";
 import AssetSummaryChart from "./AssetSummaryChart";
 import Quantity from "../assets/images/Quantity.png";
@@ -33,30 +36,30 @@ const AssetOverview = () => {
             <div className="border-l-2 border-gray-200 h-12"></div>
 
             <div className="flex flex-col items-center">
-              <img src={house} alt="" className="mb-2 w-6 h-6" />
+              <img src={Goods} alt="" className="mb-2 w-6 h-6" />
               <div className="flex flex-row gap-3 text-center">
                 <p className="text-[13px]">423</p>
-                <p className="text-gray-600 text-[13px]">Trucks</p>
+                <p className="text-gray-600 text-[13px]">Goods</p>
               </div>
             </div>
 
             <div className="border-l-2 border-gray-200 h-12"></div>
 
             <div className="flex flex-col items-center">
-              <img src={house} alt="" className="mb-2 w-6 h-6" />
+              <img src={Goods} alt="" className="mb-2 w-6 h-6" />
               <div className="flex flex-row gap-3 text-center">
                 <p className="text-[13px]">156</p>
-                <p className="text-gray-600 text-[13px]">Bikes</p>
+                <p className="text-gray-600 text-[13px]">Goods</p>
               </div>
             </div>
 
             <div className="border-l-2 border-gray-200 h-12"></div>
 
             <div className="flex flex-col items-center">
-              <img src={house} alt="" className="mb-2 w-6 h-6" />
+              <img src={Goods} alt="" className="mb-2 w-6 h-6" />
               <div className="flex flex-row gap-3 text-center">
                 <p className="text-[13px]">89</p>
-                <p className="text-gray-600 text-[13px]">Boats</p>
+                <p className="text-gray-600 text-[13px]">Goods</p>
               </div>
             </div>
           </div>
@@ -65,32 +68,30 @@ const AssetOverview = () => {
           <p className="font-semibold mb-4">Assignments Overview</p>
           <div className="flex flex-row gap-9 items-center">
             <div className="flex flex-col items-center">
-              <img src={Way} alt="" className="mb-2 w-6 h-6" />
+              <img src={Location} alt="" className="mb-2 w-6 h-6" />
               <div className="flex flex-row gap-3 text-center">
                 <p className="text-[13px]">82</p>
-                <p className="text-gray-600 text-[13px]">Pending</p>
+                <p className="text-gray-600 text-[13px]">Location</p>
               </div>
             </div>
-
-            
 
             <div className="border-l-2 border-gray-200 h-12"></div>
 
             <div className="flex flex-col items-center">
-              <img src={Cancel} alt="" className="mb-2 w-6 h-6" />
+              <img src={Pending} alt="" className="mb-2 w-6 h-6" />
               <div className="flex flex-row gap-1 text-center">
                 <p className="text-[13px]">56</p>
-                <p className="text-gray-600 text-[13px]">Not Assigned</p>
+                <p className="text-gray-600 text-[13px]">Pending Approvals</p>
               </div>
             </div>
 
             <div className="border-l-2 border-gray-200 h-12"></div>
 
             <div className="flex flex-col items-center">
-              <img src={Profit} alt="" className="mb-2 w-6 h-6" />
+              <img src={Total} alt="" className="mb-2 w-6 h-6" />
               <div className="flex flex-row gap-3 text-center">
                 <p className="text-[13px]">89</p>
-                <p className="text-gray-600 text-[13px]">Total</p>
+                <p className="text-gray-600 text-[13px]">Total Assets</p>
               </div>
             </div>
             <div className="border-l-2 border-gray-200 h-12"></div>
@@ -99,7 +100,7 @@ const AssetOverview = () => {
               <img src={Users} alt="" className="mb-2 w-6 h-6" />
               <div className="flex flex-row gap-3 text-center">
                 <p className="text-[13px]">43</p>
-                <p className="text-gray-600 text-[13px]">Location</p>
+                <p className="text-gray-600 text-[13px]">Users</p>
               </div>
             </div>
           </div>
@@ -109,43 +110,38 @@ const AssetOverview = () => {
       <div className="space-y-4 w-[40%]">
         <div className="border-2 bg-white border-white p-4 rounded-md shadow-sm">
           <p className="font-semibold mb-1">Asset Summary</p>
-          <div className="flex gap-8 items-center justify-center">
+          <div className="grid grid-cols-2 gap-8">
             <div className="flex flex-col items-center">
-              <img src={Way} alt="" className=" w-6 h-6" />
+              <img src={Way} alt="" className="w-6 h-6" />
               <div className="text-center">
                 <p className="text-[13px]">823</p>
                 <p className="text-gray-600 text-[13px]">Asset Assigned</p>
               </div>
             </div>
 
-            <div className="border-l-2 border-gray-200 h-12"></div>
-
             <div className="flex flex-col items-center">
-              <img src={Way} alt="" className=" w-6 h-6" />
-              <div className=" text-center">
+              <img src={Way} alt="" className="w-6 h-6" />
+              <div className="text-center">
                 <p className="text-[13px]">423</p>
                 <p className="text-gray-600 text-[13px]">Asset In Store</p>
               </div>
             </div>
-            
-              <div className="flex flex-col items-center">
-                <img src={Way} alt="" className=" w-6 h-6" />
-                <div className=" text-center">
-                  <p className="text-[13px]">31</p>
-                  <p className="text-gray-600 text-[13px]">Number of User</p>
-                </div>
-              </div>
 
-              <div className="border-l-2 border-gray-200 h-12"></div>
-
-              <div className="flex flex-col items-center">
-                <img src={Way} alt="" className=" w-6 h-6" />
-                <div className=" text-center">
-                  <p className="text-[13px]">26</p>
-                  <p className="text-gray-600 text-[13px]">Number of Assigns</p>
-                </div>
+            <div className="flex flex-col items-center">
+              <img src={Way} alt="" className="w-6 h-6" />
+              <div className="text-center">
+                <p className="text-[13px]">31</p>
+                <p className="text-gray-600 text-[13px]">Number of User</p>
               </div>
-            
+            </div>
+
+            <div className="flex flex-col items-center">
+              <img src={Way} alt="" className="w-6 h-6" />
+              <div className="text-center">
+                <p className="text-[13px]">26</p>
+                <p className="text-gray-600 text-[13px]">Number of Assigns</p>
+              </div>
+            </div>
           </div>
         </div>
 
