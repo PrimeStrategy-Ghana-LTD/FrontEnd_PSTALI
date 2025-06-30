@@ -1,5 +1,7 @@
+// Sidebar1.jsx
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { X } from 'lucide-react';
 import logo from "../assets/images/logo.png";
 import Home from "../assets/images/Home.png";
 import Assets from "../assets/images/Assets.png";
@@ -16,10 +18,7 @@ const topItems = [
   { label: "Assets", icon: Assets, path: "/assets" },
   { label: "Reports", icon: Report, path: "/reports" },
   { label: "Users", icon: Users, path: "/users" },
-  
-  
   { label: "Asset Assignment", icon: Order, path: "/assigned" },
-
   { label: "Manage Asset Location", icon: Manage, path: "/dashboard/manage-location" },
   { label: "Search", icon: Search, path: "/search" },
 ];
@@ -29,65 +28,89 @@ const bottomItems = [
   { label: "Log Out", icon: Log, path: "/login" },
 ];
 
-const Sidebar1 = () => {
+const Sidebar1 = ({ setSidebarOpen }) => {
+  const handleNavClick = () => {
+    // Close sidebar on mobile when navigating
+    if (setSidebarOpen) {
+      setSidebarOpen(false);
+    }
+  };
+
   return (
-    <div className='flex flex-col border-2 border-white w-[19vw] h-[900px] items-center bg-[#051b34] justify-between py-6'>
-      <div className="flex flex-col items-center w-full">
-        <Link to="/dashboard"><img src={logo} alt="Logo" className='w-[60%]' /></Link>
-        <div className='space-y-5 text-[14px] mt-12 text-white font-semibold w-full px-4'>
+    <div className="flex flex-col h-full w-64 bg-[#051b34] border-r border-gray-200">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 lg:justify-center">
+        <Link to="/dashboard" onClick={handleNavClick}>
+          <img src={logo} alt="Logo" className="h-10 w-auto" />
+        </Link>
+        
+        {/* Close button for mobile */}
+        <button
+          className="lg:hidden p-2 rounded-md text-white hover:bg-gray-700"
+          onClick={() => setSidebarOpen && setSidebarOpen(false)}
+        >
+          <X className="h-6 w-6" />
+        </button>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 flex flex-col justify-between px-4 pb-4">
+        {/* Top navigation items */}
+        <div className="space-y-2 mt-8">
           {topItems.map((item, index) => (
             <NavLink
               key={index}
               to={item.path}
+              onClick={handleNavClick}
               className={({ isActive }) =>
-                `flex items-center gap-2 pb-2 ${
-                  isActive ? 'text-blue-600' : 'text-white'
+                `flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                  isActive 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
                 }`
               }
             >
               <img
                 src={item.icon}
                 alt={item.label}
-                className='w-5 h-5'
+                className="w-5 h-5 mr-3 flex-shrink-0"
                 style={{
-                  filter:
-                    window.location.pathname === item.path
-                      ? 'brightness(0) saturate(100%) invert(22%) sepia(91%) saturate(1581%) hue-rotate(201deg) brightness(90%) contrast(92%)'
-                      : 'brightness(0) saturate(100%) invert(100%)',
+                  filter: 'brightness(0) saturate(100%) invert(100%)'
                 }}
               />
-              <span className='ml-2'>{item.label}</span>
+              <span className="truncate">{item.label}</span>
             </NavLink>
           ))}
         </div>
-      </div>
 
-      <div className='space-y-5 text-[14px] text-white font-semibold w-full px-4'>
-        {bottomItems.map((item, index) => (
-          <NavLink
-            key={index}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center gap-2 pb-2 ${
-                isActive ? 'text-blue-600' : 'text-white'
-              }`
-            }
-          >
-            <img
-              src={item.icon}
-              alt={item.label}
-              className='w-5 h-5'
-              style={{
-                filter:
-                  window.location.pathname === item.path
-                    ? 'brightness(0) saturate(100%) invert(22%) sepia(91%) saturate(1581%) hue-rotate(201deg) brightness(90%) contrast(92%)'
-                    : 'brightness(0) saturate(100%) invert(100%)',
-              }}
-            />
-            <span className='ml-2'>{item.label}</span>
-          </NavLink>
-        ))}
-      </div>
+        {/* Bottom navigation items */}
+        <div className="space-y-2">
+          {bottomItems.map((item, index) => (
+            <NavLink
+              key={index}
+              to={item.path}
+              onClick={handleNavClick}
+              className={({ isActive }) =>
+                `flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                  isActive 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                }`
+              }
+            >
+              <img
+                src={item.icon}
+                alt={item.label}
+                className="w-5 h-5 mr-3 flex-shrink-0"
+                style={{
+                  filter: 'brightness(0) saturate(100%) invert(100%)'
+                }}
+              />
+              <span className="truncate">{item.label}</span>
+            </NavLink>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 };
