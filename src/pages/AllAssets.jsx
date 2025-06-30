@@ -1,249 +1,25 @@
-// import React, { useEffect, useState } from 'react';
-// import { IoFilterOutline } from "react-icons/io5";
-// import Searchbar from '../components/Searchbar';
-// import Sidebar1 from '../components/Sidebar1';
-// import AddAssetModal from './AddAssetModal';
-// import { apiGetAllAssets } from '../servicess/tali';
-// import AssetAssignmentModal from './AssetAssignmentModal';
-// import { Link } from 'react-router-dom';
-// import axios from 'axios';
-// import jsPDF from 'jspdf';
-// import 'jspdf-autotable';
-
-// const AllAssets = () => {
-//   const [showFilters, setShowFilters] = useState(false);
-//   const [availabilityFilter, setAvailabilityFilter] = useState("");
-//   const [locationFilter, setLocationFilter] = useState("");
-//   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-//   const [selectedAsset, setSelectedAsset] = useState(null);
-//   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-//   const [assets, setAssets] = useState([]);
-//   const uniqueLocations = [...new Set(assets.map(asset => asset.assetLocation))];
-//   const getAssets = async () => {
-//     const response = await apiGetAllAssets();
-//     console.log(response.data)
-//     setAssets(response.data.assets);
-//   }
-
-//   const [summary, setSummary] = useState({
-//     totalAssets: 0,
-//     assetsAssigned: 0,
-//     categories: 0,
-//   });
-
-//   useEffect(() => {
-//     const fetchCounts = async () => {
-//       try {
-//         const token = localStorage.getItem("token");
-
-//         const [assetsRes, assignmentsRes] = await Promise.all([axios.get('https://backend-ps-tali.onrender.com/assets/count', {
-//           headers: { Authorization: `Bearer ${token}` }
-//         }),
-//         axios.get('https://backend-ps-tali.onrender.com/assignments/count', {
-//           headers: { Authorization: `Bearer ${'token'}` }
-//         })
-//         ]);
-
-//         setSummary({
-//           totalAssets: assetsRes.data.count,      // adjust based on actual response shape
-//           assetsAssigned: assignmentsRes.data.count, // adjust based on actual response shape
-//           categories: 0 // or keep hardcoded for now
-//         });
-
-//         console.log("Assets Response:", assetsRes.data);
-//       } catch (error) {
-//         console.error("Error fetching counts", error)
-//       }
-//     };
-
-//     fetchCounts();
-//   }, []);
-
-//   useEffect(() => {
-//     getAssets();
-//   }, []);
-//   // Apply filters to data
-//   const filteredAssets = assets.filter(item => {
-//     return (
-//       (availabilityFilter === "" || item.status === availabilityFilter) &&
-//       (locationFilter === "" || item.assetLocation === locationFilter)
-//     );
-//   });
-
-//   const handleDownloadPDF = () => {
-//   const doc = new jsPDF();
-
-//   doc.text("All Assets", 14, 10);
-
-//   const tableColumn = ["Asset Name", "Quantity", "Location", "Availability"];
-//   const tableRows = [];
-
-//   filteredAssets.forEach(asset => {
-//     const assetData = [
-//       asset.assetName,
-//       asset.unit,
-//       asset.assetLocation,
-//       asset.status
-//     ];
-//     tableRows.push(assetData);
-//   });
-
-//   doc.autoTable({
-//     head: [tableColumn],
-//     body: tableRows,
-//     startY: 20,
-//   });
-
-//   doc.save("assets.pdf");
-// };
-
-//   return (
-//     <div className='flex'>
-//       <Sidebar1 />
-//       <div className='w-[80vw]'>
-//         <Searchbar />
-//         <div className='bg-[#f0f1f3] min-h-[90%] space-y-5 py-6 px-4'>
-//           {/* Top Summary Box */}
-//           <div className='bg-white p-4 rounded-md shadow-sm w-[78vw] border border-white'>
-//             <p className='font-semibold mb-4'>Assets</p>
-//             <div className='flex gap-32'>
-//               {[
-//                 { title: 'Categories', count: 14, color: '#1570ef' },
-//                 { title: 'Total Assets', count: summary.totalAssets, color: '#e19133' },
-//                 { title: 'Asset Assigned', count: summary.assetsAssigned, color: '#845ebc' }
-//               ].map((item, index) => (
-//                 <div key={index} className='flex flex-col items-center'>
-//                   <p className='mb-1 font-semibold' style={{ color: item.color }}>{item.title}</p>
-//                   <p className='text-[13px] mb-1 font-semibold'>{item.count}</p>
-//                   <p className='text-gray-600 text-[13px]'>Last 7 Days</p>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-
-//           {/* Asset List Box */}
-//           <div className='bg-white p-4 rounded-md shadow-sm w-[78vw] border border-white'>
-//             {/* Header Row with Buttons */}
-//             <div className='flex justify-between items-center mb-4'>
-//               <p className='font-semibold'>Assets</p>
-//               <div className='flex gap-3 text-[13px]'>
-//                 <button className='px-2 py-1 rounded-sm bg-[#1366d9] text-white border border-[#1366d9]' onClick={() => setIsAddModalOpen(true)}>Add Asset</button>
-//                 <div
-//                   className='flex items-center gap-2 px-3 py-1 rounded-sm border border-gray-300 text-gray-600 cursor-pointer'
-//                   onClick={() => setShowFilters(!showFilters)}
-//                 >
-//                   <IoFilterOutline />
-//                   <span>Filters</span>
-//                 </div>
-//                 <button onClick={handleDownloadPDF} className='px-2 py-1 rounded-sm border border-gray-300 text-gray-600'>Download All</button>
-//               </div>
-//             </div>
-
-//             {/* Filter Section */}
-//             {showFilters && (
-//               <div className='mb-4 flex gap-4'>
-//                 <div>
-//                   <label className='text-sm text-gray-700 font-semibold'>Availability:</label>
-//                   <select
-//                     className='ml-2 p-1 border rounded text-[13px]  border-gray-300 text-black '
-//                     value={availabilityFilter}
-//                     onChange={(e) => setAvailabilityFilter(e.target.value)}
-//                   >
-//                     <option value="">All</option>
-//                     <option value="Available">Available</option>
-//                     <option value="Unavailable">Unavailable</option>
-//                   </select>
-
-//                 </div>
-//                 <div>
-//                   <label className='text-sm text-gray-700 font-semibold'>Location:</label>
-//                   <select
-//                     className='ml-2 p-1 border rounded text-[13px]  border-gray-300 text-black '
-//                     value={locationFilter}
-//                     onChange={(e) => setLocationFilter(e.target.value)}
-//                   >
-//                     <option value="">All</option>
-//                     {
-//                       uniqueLocations.map((loc, index) => (
-//                         <option key={index} value={loc}>{loc}</option>
-//                       ))}
-
-//                   </select>
-//                 </div>
-//               </div>
-//             )}
-
-//             {/* Table Header */}
-//             <div className='flex justify-between font-semibold text-[14px] text-gray-700 pb-2 border-b-2 border-gray-200 mt-10'>
-//               <p className='w-[15%]'>Products</p>
-//               <p className='w-[10%]'>Quantity</p>
-//               <p className='w-[15%]'>Location</p>
-//               <p className='w-[15%]'>Availability</p>
-//               <p className='w-[8%] mr-12'>Assignments</p>
-//             </div>
-
-//             {/* Table Rows */}
-//             {filteredAssets.map((item, index) => (
-//               <div key={index} className='flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200'>
-//                 <Link to={`/view-asset/${item._id}`} className='w-[15%]'>{item.assetName}</Link>
-//                 <p className='w-[10%]'>{item.unit}</p>
-//                 <p className='w-[15%]'>{item.assetLocation}</p>
-//                 <p
-//                   className={`w-[15%] font-semibold ${item.status === "Available" ? "text-green-600" : "text-red-600"
-//                     }`}
-//                 >
-//                   {item.status}
-//                 </p>
-//                 <p
-//                   onClick={() => {
-//                     setSelectedAsset(item); // capture the asset if needed
-//                     setIsAssignModalOpen(true);
-//                   }}
-//                   className='w-[8%] border-2 py-1 flex flex-row items-center justify-center mr-12 rounded-md bg-[#1ce586] border-[#1ce586] text-white cursor-pointer'
-//                 >
-//                   Assign to
-//                 </p>
-
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//       <AddAssetModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
-//       <AssetAssignmentModal isOpen={isAssignModalOpen}
-//         onClose={() => setIsAssignModalOpen(false)}
-//         asset={selectedAsset} />
-//     </div>
-//   );
-// };
-
-// export default AllAssets;
-
 import React, { useEffect, useState } from "react";
 import {
   IoFilterOutline,
   IoChevronBackOutline,
   IoChevronForwardOutline,
 } from "react-icons/io5";
-import Searchbar from "../components/Searchbar";
-import Sidebar1 from "../components/Sidebar1";
-
-import { apiGetAllAssets, apiGetLocations } from "../servicess/tali";
+import { FaListUl, FaTh } from "react-icons/fa";
+// import { apiGetAllAssets, apiGetLocations } from "../services/tali";
 import AssetAssignmentModal from "./AssetAssignmentModal";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import { FaListUl } from "react-icons/fa";
-import { FaTh } from "react-icons/fa";
+// import AddAssetModal from "./AddAssetModal";
+import { apiGetAllAssets, apiGetLocations } from "../servicess/tali";
+import AddAssetModal from "./AddAsset";
 
 const AllAssets = () => {
+  const [viewMode, setViewMode] = useState("list"); // 'list' or 'grid'
   const [showFilters, setShowFilters] = useState(false);
   const [availabilityFilter, setAvailabilityFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
-
   const [assets, setAssets] = useState([]);
   const [locations, setLocations] = useState([]);
 
@@ -252,38 +28,26 @@ const AllAssets = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalAssets, setTotalAssets] = useState(0);
   const [loading, setLoading] = useState(false);
-  const itemsPerPage = 10; // You can adjust this value
+  const itemsPerPage = viewMode === "list" ? 10 : 12;
 
   // Helper function to get location name by ID
   const getLocationName = (locationId) => {
     const location = locations.find((loc) => loc._id === locationId);
-    return location ? location.assetLocation : locationId; // fallback to ID if name not found
+    return location ? location.assetLocation : locationId;
   };
 
   const getAssets = async (page = 1, filters = {}) => {
     try {
       setLoading(true);
-
-      // Update your API call to include pagination parameters
       const params = {
         page: page,
         limit: itemsPerPage,
         ...filters,
       };
-
       const response = await apiGetAllAssets(params);
-      console.log(response.data);
-
-      // Assuming your API returns data in this structure:
-      // { assets: [...], totalCount: number, totalPages: number, currentPage: number }
       setAssets(response.data.assets || response.data);
       setCurrentPage(response.data.currentPage || page);
-      setTotalPages(
-        response.data.totalPages ||
-          Math.ceil(
-            (response.data.totalCount || response.data.length) / itemsPerPage
-          )
-      );
+      setTotalPages(response.data.totalPages || Math.ceil((response.data.totalCount || response.data.length) / itemsPerPage));
       setTotalAssets(response.data.totalCount || response.data.length);
     } catch (error) {
       console.error("Error fetching assets:", error);
@@ -295,72 +59,25 @@ const AllAssets = () => {
   const getLocations = async () => {
     try {
       const response = await apiGetLocations();
-      console.log("Locations:", response);
-      setLocations(
-        Array.isArray(response) ? response : response.locations || []
-      );
+      setLocations(Array.isArray(response) ? response : response.locations || []);
     } catch (error) {
       console.error("Error fetching locations:", error);
     }
   };
 
-  // Get unique location names for filter dropdown
-  const uniqueLocationNames = [
-    ...new Set(assets.map((asset) => getLocationName(asset.assetLocation))),
-  ];
-
-  const [summary, setSummary] = useState({
-    totalAssets: 0,
-    assetsAssigned: 0,
-    categories: 0,
-  });
-
   useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        const [assetsRes, assignmentsRes] = await Promise.all([
-          axios.get("https://backend-ps-tali.onrender.com/assets/count", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get("https://backend-ps-tali.onrender.com/assignments/count", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
-        setSummary({
-          totalAssets: assetsRes.data.count,
-          assetsAssigned: assignmentsRes.data.count,
-          categories: 0,
-        });
-
-        console.log("Assets Response:", assetsRes.data);
-      } catch (error) {
-        console.error("Error fetching counts", error);
-      }
-    };
-
-    fetchCounts();
-  }, []);
-
-  useEffect(() => {
-    getAssets(1); // Load first page
+    getAssets(1);
     getLocations();
-  }, []);
+  }, [viewMode]);
 
-  // Handle filter changes
   useEffect(() => {
-    // Reset to first page when filters change
     setCurrentPage(1);
     const filters = {};
     if (availabilityFilter) filters.status = availabilityFilter;
     if (locationFilter) filters.location = locationFilter;
-
     getAssets(1, filters);
   }, [availabilityFilter, locationFilter]);
 
-  // Apply local filters (if needed for client-side filtering)
   const filteredAssets = assets.filter((item) => {
     const locationName = getLocationName(item.assetLocation);
     return (
@@ -369,7 +86,6 @@ const AllAssets = () => {
     );
   });
 
-  // Pagination handlers
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages && page !== currentPage) {
       setCurrentPage(page);
@@ -380,46 +96,244 @@ const AllAssets = () => {
     }
   };
 
-  const handleDownloadPDF = async () => {
-    try {
-      // For PDF, get all assets without pagination
-      const allAssetsResponse = await apiGetAllAssets({ limit: 1000 }); // Get all assets
-      const allAssets = allAssetsResponse.data.assets || allAssetsResponse.data;
+  // View toggle buttons
+  const ViewToggle = () => (
+    <div className="flex border border-gray-300 rounded-sm overflow-hidden">
+      <button
+        onClick={() => setViewMode("list")}
+        className={`flex items-center gap-2 px-3 py-1 text-sm ${viewMode === "list" ? "bg-[#051b34] text-white" : "bg-white text-gray-600"}`}
+      >
+        <FaListUl />
+        <span>List</span>
+      </button>
+      <button
+        onClick={() => setViewMode("grid")}
+        className={`flex items-center gap-2 px-3 py-1 text-sm ${viewMode === "grid" ? "bg-[#051b34] text-white" : "bg-white text-gray-600"}`}
+      >
+        <FaTh />
+        <span>Grid</span>
+      </button>
+    </div>
+  );
 
-      const doc = new jsPDF();
-      doc.text("All Assets", 14, 10);
+  return (
+    <div className="bg-[#f0f1f3] min-h-[90%] space-y-5 py-6 px-4">
+      <div className="bg-white p-4 rounded-md shadow-sm w-full border border-white">
+        <p className="font-semibold text-[18px]">Assets</p>
 
-      const tableColumn = [
-        "Asset Name",
-        "Quantity",
-        "Location",
-        "Availability",
-      ];
-      const tableRows = [];
+        <div className="flex justify-between mb-3">
+          <p className="text-[13px] text-gray-500">View and Manage Assets</p>
+          <div className="flex text-[13px] gap-3">
+            <button
+              onClick={() => setIsAddAssetModalOpen(true)}
+              className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34]"
+            >
+              Add Asset
+            </button>
+            <ViewToggle />
+          </div>
+        </div>
 
-      allAssets.forEach((asset) => {
-        const assetData = [
-          asset.assetName,
-          asset.unit,
-          getLocationName(asset.assetLocation),
-          asset.status,
-        ];
-        tableRows.push(assetData);
-      });
+        <div className="bg-white p-4 rounded-md border-gray-300 border-[0.5px]">
+          {/* Header Row with Buttons */}
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-4">
+              <p className="font-semibold">Total Assets: {totalAssets}</p>
+            </div>
+            <div className="flex gap-3 text-[13px]">
+              <button
+                className="flex items-center gap-2 px-3 py-1 rounded-sm border border-gray-300 text-gray-600 cursor-pointer"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <IoFilterOutline />
+                <span>Filters</span>
+              </button>
+            </div>
+          </div>
 
-      doc.autoTable({
-        head: [tableColumn],
-        body: tableRows,
-        startY: 20,
-      });
+          {showFilters && (
+            <div className="mb-4 flex gap-4">
+              <div>
+                <label className="text-sm text-gray-700 font-semibold">
+                  Availability:
+                </label>
+                <select
+                  className="ml-2 p-1 border rounded text-[13px] border-gray-300 text-black"
+                  value={availabilityFilter}
+                  onChange={(e) => setAvailabilityFilter(e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="Available">Available</option>
+                  <option value="Unavailable">Unavailable</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm text-gray-700 font-semibold">
+                  Location:
+                </label>
+                <select
+                  className="ml-2 p-1 border rounded text-[13px] border-gray-300 text-black"
+                  value={locationFilter}
+                  onChange={(e) => setLocationFilter(e.target.value)}
+                >
+                  <option value="">All</option>
+                  {[...new Set(assets.map(asset => getLocationName(asset.assetLocation)))].map((location, index) => (
+                    <option key={index} value={location}>{location}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
-      doc.save("assets.pdf");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    }
-  };
+          {loading && (
+            <div className="flex justify-center items-center py-8">
+              <div className="text-gray-600">Loading assets...</div>
+            </div>
+          )}
 
-  // Generate page numbers for pagination
+          {viewMode === "list" ? (
+            <ListView 
+              assets={filteredAssets} 
+              getLocationName={getLocationName}
+              onAssignClick={(asset) => {
+                setSelectedAsset(asset);
+                setIsAssignModalOpen(true);
+              }}
+            />
+          ) : (
+            <GridView 
+              assets={filteredAssets} 
+              getLocationName={getLocationName}
+              onAssignClick={(asset) => {
+                setSelectedAsset(asset);
+                setIsAssignModalOpen(true);
+              }}
+            />
+          )}
+
+          {!loading && filteredAssets.length === 0 && (
+            <div className="flex justify-center items-center py-8">
+              <div className="text-gray-600">No assets found</div>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              totalItems={totalAssets}
+              itemsPerPage={itemsPerPage}
+            />
+          )}
+        </div>
+      </div>
+
+      <AssetAssignmentModal
+        isOpen={isAssignModalOpen}
+        onClose={() => setIsAssignModalOpen(false)}
+        asset={selectedAsset}
+      />
+
+      <AddAssetModal
+        isOpen={isAddAssetModalOpen}
+        onClose={() => setIsAddAssetModalOpen(false)}
+        onAssetAdded={() => {
+          getAssets(currentPage);
+          setIsAddAssetModalOpen(false);
+        }}
+      />
+    </div>
+  );
+};
+
+// List View Component - FIXED LINK
+const ListView = ({ assets, getLocationName, onAssignClick }) => (
+  <div className="space-y-2">
+    <div className="flex font-semibold text-[14px] text-gray-700 pb-2 border-b-2 border-gray-200">
+      <div className="w-[35%]">Name</div>
+      <div className="w-[15%]">Vin</div>
+      <div className="w-[15%]">Status</div>
+      <div className="w-[20%]">Location</div>
+      <div className="w-[15%] text-center">Assignments</div>
+    </div>
+
+    {assets.map((item, index) => (
+      <div key={index} className="flex text-[13px] text-gray-600 py-3 border-b border-gray-200 items-center">
+        <div className="w-[35%] flex items-center gap-2">
+          <img src={item.assetImage} alt="" className="border-2 h-8 w-8 rounded-full border-transparent" />
+          <div className="min-w-0 flex-1">
+            <Link to={`/dashboard/view-asset/${item._id}`} className="block truncate hover:text-blue-600">
+              {item.assetName}
+            </Link>
+            <p className="text-gray-400">2025</p>
+          </div>
+        </div>
+        <div className="w-[15%]">{item.unit}</div>
+        <div className={`w-[15%] font-semibold ${item.status === "Available" ? "text-green-600" : "text-red-600"}`}>
+          {item.status}
+        </div>
+        <div className="w-[20%]">{getLocationName(item.assetLocation)}</div>
+        <div className="w-[15%] flex justify-center">
+          <button
+            onClick={() => onAssignClick(item)}
+            className="px-3 py-1 rounded-md bg-[#051b34] text-white text-xs hover:bg-[#051b34]/90"
+          >
+            Assign to
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// Grid View Component - FIXED LINK
+const GridView = ({ assets, getLocationName, onAssignClick }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+    {assets.map((item, index) => (
+      <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex gap-4">
+          <div className="flex-shrink-0">
+            <img src={item.assetImage} alt={item.assetName} className="w-20 h-20 rounded-lg object-cover" />
+          </div>
+          <div className="flex-1 flex flex-col justify-between">
+            <div className="mb-2">
+              <Link to={`/dashboard/view-asset/${item._id}`} className="font-semibold text-gray-800 hover:text-blue-600 text-sm">
+                {item.assetName}
+              </Link>
+              <p className="text-xs text-gray-500 mt-1">2025</p>
+            </div>
+            <div className="space-y-1 mb-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-500">VIN:</span>
+                <span className="text-xs text-gray-700 font-medium">{item.unit}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-500">Location:</span>
+                <span className="text-xs text-gray-700">{getLocationName(item.assetLocation)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-500">Status:</span>
+                <span className={`text-xs font-semibold ${item.status === "Available" ? "text-green-600" : "text-red-600"}`}>
+                  {item.status}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => onAssignClick(item)}
+              className="py-1.5 text-xs bg-[#051b34] text-white rounded-md hover:bg-[#0a2a4a]"
+            >
+              Assign Asset
+            </button>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// Pagination Component
+const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPerPage }) => {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -438,289 +352,74 @@ const AllAssets = () => {
   };
 
   return (
-    <div className="flex">
-      <Sidebar1 />
-      <div className="w-[80vw]">
-        <Searchbar />
-        <div className="bg-[#f0f1f3] min-h-[90%] space-y-5 py-6 px-4">
-          {/* Top Summary Box */}
-          <div className="bg-white p-4 rounded-md shadow-sm w-[78vw] border border-white">
-            <p className="font-semibold text-[18px]">Assets</p>
-
-            <div className="flex justify-between mb-3">
-              <p className="text-[13px] text-gray-500">
-                View and Manage Assets
-              </p>
-              <div className="flex text-[13px]">
-                <Link
-                  to="/add-asset"
-                  className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] mr-5"
-                >
-                  Add Asset
-                </Link>
-
-                <div className="flex flex-row items-center gap-2 px-3 py-1 rounded-l-sm border border-gray-300 text-gray-600 cursor-pointer bg-[#051b34] text-white">
-                  <span>
-                    <FaListUl />
-                  </span>
-                  <span>List View</span>
-                </div>
-                <Link
-                  to="/card-view"
-                  className="flex flex-row items-center gap-2 px-3 py-1 rounded-r-sm border border-gray-300 text-gray-600 cursor-pointer"
-                >
-                  <span>
-                    <FaTh />
-                  </span>
-                  <span>Card View</span>
-                </Link>
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-md border-gray-300 border-[0.5px]">
-              {/* Header Row with Buttons */}
-              <div className="flex justify-between items-center mb-4 ">
-                <div className="flex items-center gap-4">
-                  <p className="font-semibold">Icon</p>
-                  <p className="font-semibold">Total Assets:</p>
-                </div>
-                <div className="flex gap-3 text-[13px]">
-                  <div
-                    className="flex items-center gap-2 px-3 py-1 rounded-sm border border-gray-300 text-gray-600 cursor-pointer"
-                    onClick={() => setShowFilters(!showFilters)}
-                  >
-                    <IoFilterOutline />
-                    <span>Filters</span>
-                  </div>
-                  <div
-                    className="flex items-center gap-2 px-3 py-1 rounded-sm border border-gray-300 text-gray-600 cursor-pointer"
-                    onClick={() => setShowFilters(!showFilters)}
-                  >
-                    <IoFilterOutline />
-                    <span>Sort</span>
-                  </div>
-                </div>
-              </div>
-              <div className="border-b-[0.5px] border-gray-200"></div>
-              {/* Filter Section */}
-              {showFilters && (
-                <div className="mb-4 flex gap-4">
-                  <div>
-                    <label className="text-sm text-gray-700 font-semibold">
-                      Availability:
-                    </label>
-                    <select
-                      className="ml-2 p-1 border rounded text-[13px] border-gray-300 text-black"
-                      value={availabilityFilter}
-                      onChange={(e) => setAvailabilityFilter(e.target.value)}
-                    >
-                      <option value="">All</option>
-                      <option value="Available">Available</option>
-                      <option value="Unavailable">Unavailable</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-700 font-semibold">
-                      Location:
-                    </label>
-                    <select
-                      className="ml-2 p-1 border rounded text-[13px] border-gray-300 text-black"
-                      value={locationFilter}
-                      onChange={(e) => setLocationFilter(e.target.value)}
-                    >
-                      <option value="">All</option>
-                      {uniqueLocationNames.map((locationName, index) => (
-                        <option key={index} value={locationName}>
-                          {locationName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {/* Loading Indicator */}
-              {loading && (
-                <div className="flex justify-center items-center py-8">
-                  <div className="text-gray-600">Loading assets...</div>
-                </div>
-              )}
-
-              {/* Table Header - Fixed alignment */}
-              <div className="flex font-semibold text-[14px] text-gray-700 pb-2 border-b-2 border-gray-200 mt-3">
-                <div className="w-[35%]">Name</div>
-                <div className="w-[15%]">Vin</div>
-                <div className="w-[15%]">Origin</div>
-                <div className="w-[20%]">Location</div>
-                <div className="w-[15%] text-center">Assignments</div>
-              </div>
-
-              {/* Table Rows - Fixed alignment */}
-              {!loading &&
-                filteredAssets.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex text-[13px] text-gray-600 py-3 border-b border-gray-200 items-center"
-                  >
-                    {/* Name column - 35% width */}
-                    <div className="w-[35%] flex items-center gap-2">
-                      <img
-                        src={item.assetImage}
-                        alt=""
-                        className="border-2 h-8 w-8 rounded-full border-transparent flex-shrink-0"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <Link
-                          to={`/view-asset/${item._id}`}
-                          className="block truncate hover:text-blue-600"
-                        >
-                          {item.assetName}
-                        </Link>
-                        <p className="text-gray-400">2025</p>
-                      </div>
-                    </div>
-
-                    {/* Vin column - 15% width */}
-                    <div className="w-[15%]">{item.unit}</div>
-
-                    {/* Origin/Status column - 15% width */}
-                    <div
-                      className={`w-[15%] font-semibold ${
-                        item.status === "Available"
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {item.status}
-                    </div>
-
-                    {/* Location column - 20% width */}
-                    <div className="w-[20%]">
-                      {getLocationName(item.assetLocation)}
-                    </div>
-
-                    {/* Assignments column - 15% width */}
-                    <div className="w-[15%] flex justify-center">
-                      <button
-                        onClick={() => {
-                          setSelectedAsset(item);
-                          setIsAssignModalOpen(true);
-                        }}
-                        className="px-3 py-1 rounded-md bg-[#051b34] border-[#051b34] text-white cursor-pointer text-xs hover:bg-[#051b34]/90 transition-colors"
-                      >
-                        Assign to
-                      </button>
-                    </div>
-                  </div>
-                ))}
-
-              {/* No data message */}
-              {!loading && filteredAssets.length === 0 && (
-                <div className="flex justify-center items-center py-8">
-                  <div className="text-gray-600">No assets found</div>
-                </div>
-              )}
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
-                  <div className="text-sm text-gray-600">
-                    Page {currentPage} of {totalPages}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {/* Previous Button */}
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className={`flex items-center gap-1 px-3 py-1 rounded text-sm ${
-                        currentPage === 1
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-gray-600 hover:bg-gray-100 cursor-pointer"
-                      }`}
-                    >
-                      <IoChevronBackOutline />
-                      Previous
-                    </button>
-
-                    {/* Page Numbers */}
-                    <div className="flex gap-1">
-                      {/* First page */}
-                      {getPageNumbers()[0] > 1 && (
-                        <>
-                          <button
-                            onClick={() => handlePageChange(1)}
-                            className="px-3 py-1 rounded text-sm text-gray-600 hover:bg-gray-100"
-                          >
-                            1
-                          </button>
-                          {getPageNumbers()[0] > 2 && (
-                            <span className="px-2 py-1 text-gray-400">...</span>
-                          )}
-                        </>
-                      )}
-
-                      {/* Visible page numbers */}
-                      {getPageNumbers().map((page) => (
-                        <button
-                          key={page}
-                          onClick={() => handlePageChange(page)}
-                          className={`px-3 py-1 rounded text-sm ${
-                            page === currentPage
-                              ? "bg-[#1366d9] text-white"
-                              : "text-gray-600 hover:bg-gray-100"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
-
-                      {/* Last page */}
-                      {getPageNumbers()[getPageNumbers().length - 1] <
-                        totalPages && (
-                        <>
-                          {getPageNumbers()[getPageNumbers().length - 1] <
-                            totalPages - 1 && (
-                            <span className="px-2 py-1 text-gray-400">...</span>
-                          )}
-                          <button
-                            onClick={() => handlePageChange(totalPages)}
-                            className="px-3 py-1 rounded text-sm text-gray-600 hover:bg-gray-100"
-                          >
-                            {totalPages}
-                          </button>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Next Button */}
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className={`flex items-center gap-1 px-3 py-1 rounded text-sm ${
-                        currentPage === totalPages
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-gray-600 hover:bg-gray-100 cursor-pointer"
-                      }`}
-                    >
-                      Next
-                      <IoChevronForwardOutline />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Asset List Box */}
-        </div>
+    <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+      <div className="text-sm text-gray-600">
+        Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} assets
       </div>
-      
-      <AssetAssignmentModal
-        isOpen={isAssignModalOpen}
-        onClose={() => setIsAssignModalOpen(false)}
-        asset={selectedAsset}
-      />
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`flex items-center gap-1 px-3 py-1 rounded text-sm ${
+            currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-gray-600 hover:bg-gray-100"
+          }`}
+        >
+          <IoChevronBackOutline />
+          Previous
+        </button>
+
+        <div className="flex gap-1">
+          {getPageNumbers()[0] > 1 && (
+            <>
+              <button
+                onClick={() => onPageChange(1)}
+                className="px-3 py-1 rounded text-sm text-gray-600 hover:bg-gray-100"
+              >
+                1
+              </button>
+              {getPageNumbers()[0] > 2 && <span className="px-2 py-1 text-gray-400">...</span>}
+            </>
+          )}
+
+          {getPageNumbers().map((page) => (
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              className={`px-3 py-1 rounded text-sm ${
+                page === currentPage ? "bg-[#1366d9] text-white" : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+
+          {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
+            <>
+              {getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1 && (
+                <span className="px-2 py-1 text-gray-400">...</span>
+              )}
+              <button
+                onClick={() => onPageChange(totalPages)}
+                className="px-3 py-1 rounded text-sm text-gray-600 hover:bg-gray-100"
+              >
+                {totalPages}
+              </button>
+            </>
+          )}
+        </div>
+
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`flex items-center gap-1 px-3 py-1 rounded text-sm ${
+            currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-gray-600 hover:bg-gray-100"
+          }`}
+        >
+          Next
+          <IoChevronForwardOutline />
+        </button>
+      </div>
     </div>
   );
 };

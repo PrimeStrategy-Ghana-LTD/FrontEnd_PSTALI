@@ -15,10 +15,10 @@ import Search from "../assets/images/Search.png";
 
 const topItems = [
   { label: "Dashboard", icon: Home, path: "/dashboard" },
-  { label: "Assets", icon: Assets, path: "/assets" },
-  { label: "Reports", icon: Report, path: "/reports" },
-  { label: "Users", icon: Users, path: "/users" },
-  { label: "Asset Assignment", icon: Order, path: "/assigned" },
+  { label: "Assets", icon: Assets, path: "/dashboard/assets" },
+  { label: "Reports", icon: Report, path: "/dashboard/reports" },
+  { label: "Users", icon: Users, path: "/dashboard/users" },
+  { label: "Asset Assignment", icon: Order, path: "/dashboard/assigned" },
   { label: "Manage Asset Location", icon: Manage, path: "/dashboard/manage-location" },
   { label: "Search", icon: Search, path: "/search" },
 ];

@@ -238,7 +238,7 @@ const AssetCardView = () => {
   Add Asset
 </Link>
 
-                <Link to="/assets" className="flex flex-row items-center gap-2 px-3 py-1 rounded-l-sm border border-gray-300 text-gray-600 cursor-pointer bg-[#051b34] text-white">
+                <Link to="/assets" className="flex flex-row items-center gap-2 px-3 py-1 rounded-l-sm border border-gray-300 text-gray-600 cursor-pointer bg-[#051b34]">
                   <span><FaListUl /></span>
                   <span>List View</span>
                 </Link>
