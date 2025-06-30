@@ -119,9 +119,9 @@ const AllUsers = () => {
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
-      <Sidebar1 />
+      {/* <Sidebar1 />
       <div className='flex-1 flex flex-col'>
-        <Searchbar />
+        <Searchbar /> */}
         <div className='flex-1 p-4 lg:p-6'>
           <div className='bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col'>
             {/* Header */}
@@ -356,7 +356,7 @@ const AllUsers = () => {
             onClose={() => setIsAddUserOpen(false)} 
           />
         )}
-      </div>
+      {/* </div> */}
     </div>
   );
 };

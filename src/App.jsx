@@ -9,22 +9,23 @@ import SearchResult from "./pages/SearchResult";
 import DashboardLayout from "./Layouts/DashboardLayout";
 import Sidebar from "./components/Sidebar";
 
-
 // Toastify import
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Sidebar1 from "./components/Sidebar1";
-import AllAssets from "./pages/AllAssets";
-import ViewAsset from "./pages/ViewAsset";
+// import ViewAsset from "./pages/ViewAsset";
 import AddUser from "./pages/AddUser";
-import AllUsers from "./pages/AllUsers";
-import AssignedPage from "./pages/AssignedPage";
+
+// import AssignedPage from "./pages/AssignedPage";
 // import ManageStore from "./pages/ManageStore";
 import AssetCardView from "./pages/AssetCardView";
 import AddAsset from "./pages/AddAsset";
 import ManageStore from "./pages/ManageStore";
 import UserAccount from "./pages/UserAccount";
-
+import AllAssets from "./pages/AllAssets";
+import AllUsers from "./pages/AllUsers";
+import ViewAsset from "./pages/ViewAsset";
+import AssignedPage from "./pages/AssignedPage";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -42,37 +43,24 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/assets",
-    element: <AllAssets />,
-  },
-  {
     path: "/add-user",
     element: <AddUser />,
   },
-  {
-    path: "/users",
-    element: <AllUsers />,
-  },
+
   {
     path: "/add-asset",
-    element: <AddAsset />
+    element: <AddAsset />,
   },
-  {
-    path: "/assigned",
-    element: <AssignedPage />,
-  },
+  
   {
     path: "/overview",
     element: <AssetOverview />,
   },
   {
     path: "/card-view",
-    element: <AssetCardView />
+    element: <AssetCardView />,
   },
-  {
-    path: "/view-asset/:id",
-    element: <ViewAsset />,
-  },
+  
   {
     path: "/side-bar",
     element: <Sidebar1 />,
@@ -90,6 +78,22 @@ const router = createBrowserRouter([
         index: true,
         element: <AssetOverview />,
       },
+      {
+        path: "assets",
+        element: <AllAssets />,
+      },
+      {
+    path: "view-asset/:id",
+    element: <ViewAsset />,
+  },
+      {
+        path: "users",
+        element: <AllUsers />,
+      },
+      {
+    path: "assigned",
+    element: <AssignedPage />,
+  },
       { path: "manage-location", element: <ManageStore /> },
     ],
   },

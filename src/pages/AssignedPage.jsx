@@ -21,9 +21,9 @@ const AssignedPage = () => {
 
   return (
     <div className='flex'>
-      <Sidebar1 />
+      {/* <Sidebar1 />
       <div>
-        <Searchbar />
+        <Searchbar /> */}
         <div className='bg-[#f0f1f3] min-h-[90%] space-y-5 py-6 px-4'>
 
           {/* Summary Card */}
@@ -121,7 +121,7 @@ const AssignedPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    // </div>
   );
 };
 
