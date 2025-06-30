@@ -46,15 +46,6 @@ export const apiGetUsers = async () => {
     }
 };
 
-// export const apiAddAsset = async (payload) => {
-//     try {
-//         const response = await apiClient.post("/assets", payload);
-//         return response.data;                                        
-//     } catch (error) {
-//         console.error('Error adding asset:', error);
-//         throw error;
-//     }
-// };
 
 export const apiAddAsset = (formData) =>                          
   apiClient.post('/assets', formData, {
@@ -96,15 +87,3 @@ export const apiAssignAsset = async (assignmentData) => {
   }
 };
 
-
-
-
-// export const apiGetAllAssets = async () => {
-//     try {
-//         const response = await apiClient.get('/assets');
-//         return response.data;
-//     } catch (error) {
-//         console.error('Error fetching assets:', error);
-//         throw error;
-//     }
-// };
