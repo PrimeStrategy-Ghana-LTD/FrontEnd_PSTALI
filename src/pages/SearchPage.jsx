@@ -1,61 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Settings, Bell } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Search, Settings, Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
+import { ClipboardCheck, Wrench, UserCircle } from "lucide-react";
 
 const SearchPage = () => {
-  const [activeTab, setActiveTab] = useState('Assets');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState("Assets");
+  const [searchTerm, setSearchTerm] = useState("");
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState(null);
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+
+
   const navigate = useNavigate();
+
+  const userInfo = {
+    name: "John Doe",
+    role: "Asset Manager",
+    contact: "+233 555 123 456",
+    email: "johndoe@example.com",
+    location: "Accra, Ghana",
+  };
+
+  const dropdownRef = useRef();
+
+  useEffect(() => {
+    setTimeout(() => {
+      setProfileLoading(false);
+      setProfilePicture(null); // Or set to actual profile image URL
+    }, 1000);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Function to fetch user profile picture
   const fetchProfilePicture = async () => {
     setProfileLoading(true);
     setProfileError(null);
-    
+
     try {
       // Get user ID from localStorage, sessionStorage, or context
-      const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
-      
+      const userId =
+        localStorage.getItem("userId") || sessionStorage.getItem("userId");
+
       if (!userId) {
-        throw new Error('User not authenticated');
+        throw new Error("User not authenticated");
       }
 
-      const response = await fetch(`https://backend-ps-tali.onrender.com/user/profile/${userId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          // Add authorization header if you use tokens
-          'Authorization': `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`
+      const response = await fetch(
+        `https://backend-ps-tali.onrender.com/user/profile/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            // Add authorization header if you use tokens
+            Authorization: `Bearer ${
+              localStorage.getItem("token") || sessionStorage.getItem("token")
+            }`,
+          },
         }
-      });
-      
+      );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const userData = await response.json();
-      
+
       // Extract profile picture URL from response
       // Adjust these property names based on your API response structure
-      const profilePicUrl = userData.profilePicture || 
-                           userData.profile_picture || 
-                           userData.avatar || 
-                           userData.image || 
-                           userData.photo ||
-                           userData.user?.profilePicture ||
-                           userData.data?.profilePicture;
-      
+      const profilePicUrl =
+        userData.profilePicture ||
+        userData.profile_picture ||
+        userData.avatar ||
+        userData.image ||
+        userData.photo ||
+        userData.user?.profilePicture ||
+        userData.data?.profilePicture;
+
       setProfilePicture(profilePicUrl);
-      
     } catch (err) {
-      console.error('Error fetching profile picture:', err);
-      setProfileError('Failed to load profile picture');
+      console.error("Error fetching profile picture:", err);
+      setProfileError("Failed to load profile picture");
       // Set to null so default avatar shows
       setProfilePicture(null);
     } finally {
@@ -67,85 +108,159 @@ const SearchPage = () => {
   const fetchAssets = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await fetch('https://backend-ps-tali.onrender.com/assets'); // Replace with your actual endpoint
-      
+      const response = await fetch(
+        "https://backend-ps-tali.onrender.com/assets"
+      ); // Replace with your actual endpoint
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       // Process the API response to keep full asset objects
       let processedAssets = [];
-      
+
       if (Array.isArray(data)) {
         // Keep full objects or convert strings to objects
-        processedAssets = data.map(item => {
-          if (typeof item === 'string') {
-            return { name: item, id: item.toLowerCase().replace(/\s+/g, '-') };
+        processedAssets = data.map((item) => {
+          if (typeof item === "string") {
+            return { name: item, id: item.toLowerCase().replace(/\s+/g, "-") };
           }
           // Keep the full object and ensure it has required properties
           return {
-            id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
-            name: item.name || item.title || item.assetName || 'Unknown Asset',
-            ...item // Keep all other properties
+            id:
+              item.id ||
+              item._id ||
+              item.assetId ||
+              item.name?.toLowerCase().replace(/\s+/g, "-"),
+            name: item.name || item.title || item.assetName || "Unknown Asset",
+            ...item, // Keep all other properties
           };
         });
-      } else if (data && typeof data === 'object') {
+      } else if (data && typeof data === "object") {
         // Process nested arrays while keeping full objects
         if (Array.isArray(data.assets)) {
-          processedAssets = data.assets.map(item => ({
-            id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
-            name: item.name || item.title || item.assetName || 'Unknown Asset',
-            ...item
+          processedAssets = data.assets.map((item) => ({
+            id:
+              item.id ||
+              item._id ||
+              item.assetId ||
+              item.name?.toLowerCase().replace(/\s+/g, "-"),
+            name: item.name || item.title || item.assetName || "Unknown Asset",
+            ...item,
           }));
         } else if (Array.isArray(data.data)) {
-          processedAssets = data.data.map(item => ({
-            id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
-            name: item.name || item.title || item.assetName || 'Unknown Asset',
-            ...item
+          processedAssets = data.data.map((item) => ({
+            id:
+              item.id ||
+              item._id ||
+              item.assetId ||
+              item.name?.toLowerCase().replace(/\s+/g, "-"),
+            name: item.name || item.title || item.assetName || "Unknown Asset",
+            ...item,
           }));
         } else if (Array.isArray(data.results)) {
-          processedAssets = data.results.map(item => ({
-            id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
-            name: item.name || item.title || item.assetName || 'Unknown Asset',
-            ...item
+          processedAssets = data.results.map((item) => ({
+            id:
+              item.id ||
+              item._id ||
+              item.assetId ||
+              item.name?.toLowerCase().replace(/\s+/g, "-"),
+            name: item.name || item.title || item.assetName || "Unknown Asset",
+            ...item,
           }));
         } else {
           // Convert object values to asset objects
-          processedAssets = Object.values(data).filter(item => 
-            typeof item === 'string' || (typeof item === 'object' && item !== null)
-          ).map(item => {
-            if (typeof item === 'string') {
-              return { name: item, id: item.toLowerCase().replace(/\s+/g, '-') };
-            }
-            return {
-              id: item.id || item._id || item.assetId || item.name?.toLowerCase().replace(/\s+/g, '-'),
-              name: item.name || item.title || item.assetName || 'Unknown Asset',
-              ...item
-            };
-          });
+          processedAssets = Object.values(data)
+            .filter(
+              (item) =>
+                typeof item === "string" ||
+                (typeof item === "object" && item !== null)
+            )
+            .map((item) => {
+              if (typeof item === "string") {
+                return {
+                  name: item,
+                  id: item.toLowerCase().replace(/\s+/g, "-"),
+                };
+              }
+              return {
+                id:
+                  item.id ||
+                  item._id ||
+                  item.assetId ||
+                  item.name?.toLowerCase().replace(/\s+/g, "-"),
+                name:
+                  item.name || item.title || item.assetName || "Unknown Asset",
+                ...item,
+              };
+            });
         }
       }
-      
+
       setAssets(processedAssets);
-      
     } catch (err) {
-      console.error('Error fetching assets:', err);
-      setError('Failed to load assets');
+      console.error("Error fetching assets:", err);
+      setError("Failed to load assets");
       // Fallback to dummy data on error (optional)
       setAssets([
-        { id: 'laptop-dell-xps', name: 'Laptop - Dell XPS', category: 'Electronics', status: 'Available' },
-        { id: 'laptop-dell', name: 'Laptop - Dell', category: 'Electronics', status: 'Available' },
-        { id: 'laptop-xps', name: 'Laptop - XPS', category: 'Electronics', status: 'Available' },
-        { id: 'laptop-dellps', name: 'Laptop - DellPS', category: 'Electronics', status: 'Available' },
-        { id: 'monitor-samsung-24', name: 'Monitor - Samsung 24"', category: 'Electronics', status: 'Available' },
-        { id: 'keyboard-logitech', name: 'Keyboard - Logitech', category: 'Electronics', status: 'Available' },
-        { id: 'mouse-razer', name: 'Mouse - Razer', category: 'Electronics', status: 'Available' },
-        { id: 'chair-ergonomic', name: 'Chair - Ergonomic', category: 'Furniture', status: 'Available' },
-        { id: 'desk-wooden', name: 'Desk - Wooden', category: 'Furniture', status: 'Available' },
+        {
+          id: "laptop-dell-xps",
+          name: "Laptop - Dell XPS",
+          category: "Electronics",
+          status: "Available",
+        },
+        {
+          id: "laptop-dell",
+          name: "Laptop - Dell",
+          category: "Electronics",
+          status: "Available",
+        },
+        {
+          id: "laptop-xps",
+          name: "Laptop - XPS",
+          category: "Electronics",
+          status: "Available",
+        },
+        {
+          id: "laptop-dellps",
+          name: "Laptop - DellPS",
+          category: "Electronics",
+          status: "Available",
+        },
+        {
+          id: "monitor-samsung-24",
+          name: 'Monitor - Samsung 24"',
+          category: "Electronics",
+          status: "Available",
+        },
+        {
+          id: "keyboard-logitech",
+          name: "Keyboard - Logitech",
+          category: "Electronics",
+          status: "Available",
+        },
+        {
+          id: "mouse-razer",
+          name: "Mouse - Razer",
+          category: "Electronics",
+          status: "Available",
+        },
+        {
+          id: "chair-ergonomic",
+          name: "Chair - Ergonomic",
+          category: "Furniture",
+          status: "Available",
+        },
+        {
+          id: "desk-wooden",
+          name: "Desk - Wooden",
+          category: "Furniture",
+          status: "Available",
+        },
       ]);
     } finally {
       setLoading(false);
@@ -159,18 +274,36 @@ const SearchPage = () => {
   }, []);
 
   // Filter assets based on search term (with safety check)
-  const filteredAssets = Array.isArray(assets) ? assets.filter(asset =>
-    asset && asset.name && asset.name.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  const filteredAssets = Array.isArray(assets)
+    ? assets.filter(
+        (asset) =>
+          asset &&
+          asset.name &&
+          asset.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   // Function to handle asset selection and navigation
   const handleAssetClick = (asset) => {
     // Store the complete asset data in sessionStorage for the view page
-    sessionStorage.setItem('selectedAsset', JSON.stringify(asset));
-    
+    sessionStorage.setItem("selectedAsset", JSON.stringify(asset));
+
     // Navigate to view page with asset ID
     navigate(`/view-asset/${asset.id}`);
   };
+
+  const bellRef = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (bellRef.current && !bellRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="p-5 lg:px-8 xl:px-12 2xl:px-16 min-h-screen bg-[#051b34]">
@@ -179,50 +312,80 @@ const SearchPage = () => {
         {/* User and Notification Icons */}
         <div className="flex justify-end mb-6 lg:mb-8">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 mr-2 bg-white p-2 lg:p-3 rounded-full shadow-sm hover:shadow transition-shadow">
-              <Bell className="text-gray-500" size={20} />
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="relative h-10 w-10 lg:h-12 lg:w-12 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                {profileLoading ? (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                ) : profilePicture ? (
-                  <img 
-                    src={profilePicture} 
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                    onError={() => {
-                      setProfilePicture(null);
-                      setProfileError('Failed to load image');
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-blue-600">
-                    <span className="text-white font-semibold text-sm lg:text-base">
-                      {/* Show first letter of user's name or default to 'U' */}
-                      U
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+           <div className="relative" ref={bellRef}>
+  <div
+    className="flex items-center gap-2 mr-2 bg-white p-2 lg:p-3 rounded-full shadow-sm hover:shadow transition-shadow cursor-pointer"
+    onClick={() => {
+      setNotificationDropdownOpen((prev) => !prev);
+      setProfileDropdownOpen(false); // close profile if open
+    }}
+  >
+    <Bell className="text-gray-500" size={20} />
+  </div>
+
+  {notificationDropdownOpen && (
+    <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4">
+      <p className="text-gray-800 font-semibold mb-2">Notifications</p>
+      <ul className="text-sm text-gray-700 space-y-2">
+        <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
+          <ClipboardCheck className="text-blue-500" size={18} />
+          <span>Pending Approvals</span>
+        </li>
+        <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
+          <Wrench className="text-green-500" size={18} />
+          <span>Asset Update</span>
+        </li>
+        <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
+          <UserCircle className="text-purple-500" size={18} />
+          <span>Profile Update</span>
+        </li>
+      </ul>
+    </div>
+  )}
+</div>
+
+            <div className="flex items-center gap-2 relative" ref={dropdownRef}>
+  <div
+    className="relative h-10 w-10 lg:h-12 lg:w-12 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+    onClick={() => {
+      setProfileDropdownOpen((prev) => !prev);
+      setNotificationDropdownOpen(false); // close notification if open
+    }}
+  >
+    {/* ... profile image logic here ... */}
+  </div>
+
+  {profileDropdownOpen && (
+    <div className="absolute right-0 mt-48 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4">
+      <p className="font-semibold text-gray-800">{userInfo.name}</p>
+      <p className="text-sm text-gray-600">{userInfo.role}</p>
+      <p className="text-sm text-gray-600 mt-2">{userInfo.email}</p>
+      <p className="text-sm text-gray-600">{userInfo.contact}</p>
+      <p className="text-sm text-gray-600">{userInfo.location}</p>
+      {/* ... Add actions like logout or settings if needed ... */}
+    </div>
+  )}
+</div>
+
           </div>
         </div>
 
         {/* Logo - Responsive sizing */}
         <div className="flex flex-row items-center justify-center mt-12 lg:mt-16 xl:mt-20 2xl:mt-24">
-          <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-extrabold text-white">TALI</p>
-          <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold text-[#01fe9d]">.</p>
+          <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-extrabold text-white">
+            TALI
+          </p>
+          <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold text-[#01fe9d]">
+            .
+          </p>
         </div>
 
         {/* Search Bar - Better responsive behavior */}
         <div className="relative flex justify-center mb-8 lg:mb-12 mt-8 lg:mt-12">
           <div className="border-2 border-white w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl h-12 lg:h-14 xl:h-16 rounded-4xl flex flex-row items-center px-4 lg:px-6 gap-2 lg:gap-3 focus-within:shadow-md transition-all bg-white relative z-10">
             <Search className="text-gray-400" size={20} />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder={loading ? "Loading assets..." : "Search Assets"}
               className="flex-1 bg-transparent border-none outline-none text-gray-700 text-sm lg:text-base xl:text-lg"
               value={searchTerm}
@@ -235,7 +398,7 @@ const SearchPage = () => {
           {searchTerm && filteredAssets.length > 0 && (
             <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-2">
               {filteredAssets.slice(0, 8).map((asset, idx) => (
-                <div 
+                <div
                   key={asset.id || idx}
                   onClick={() => handleAssetClick(asset)}
                   className="p-2 lg:p-3 hover:bg-gray-100 rounded-md cursor-pointer text-gray-700 text-sm lg:text-base border-b border-gray-100 last:border-b-0"
@@ -266,14 +429,18 @@ const SearchPage = () => {
           {/* No results message */}
           {searchTerm && filteredAssets.length === 0 && !loading && (
             <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-4">
-              <p className="text-gray-500 text-sm lg:text-base text-center">No assets found</p>
+              <p className="text-gray-500 text-sm lg:text-base text-center">
+                No assets found
+              </p>
             </div>
           )}
 
           {/* Error message */}
           {error && (
             <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-4">
-              <p className="text-red-500 text-sm lg:text-base text-center">{error}</p>
+              <p className="text-red-500 text-sm lg:text-base text-center">
+                {error}
+              </p>
             </div>
           )}
         </div>
@@ -281,19 +448,19 @@ const SearchPage = () => {
         {/* Tabs - Better spacing on larger screens */}
         <div className="flex justify-center mb-8 lg:mb-10">
           <div className="flex space-x-8 lg:space-x-16 xl:space-x-20">
-            {['Assets', 'Assignments'].map(tab => (
-              <p 
+            {["Assets", "Advanced Search"].map((tab) => (
+              <p
                 key={tab}
                 onClick={() => {
                   setActiveTab(tab);
-                  if (tab === 'Assets') {
-                    navigate('/assets');
+                  if (tab === "Assets") {
+                    navigate("/assets");
                   }
                 }}
                 className={`text-base lg:text-lg xl:text-xl font-medium cursor-pointer transition-colors hover:text-[#01fe9d] ${
-                  activeTab === tab 
-                    ? 'text-white pb-1 border-b-2 border-white' 
-                    : 'text-white'
+                  activeTab === tab
+                    ? "text-white pb-1 border-b-2 border-white"
+                    : "text-white"
                 }`}
               >
                 {tab}
