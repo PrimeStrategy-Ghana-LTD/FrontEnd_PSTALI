@@ -10,7 +10,7 @@ import { VscAccount } from "react-icons/vsc";
 import { MdOutlineSettings } from "react-icons/md";
 import { LuLogIn } from "react-icons/lu";
 import icon from "../assets/images/icon.png";
-import icon2 from "../assets/images/icon2.png";
+import icon2 from "../assets/images/Icon2.png";
 
 const SearchPage = () => {
   const [activeTab, setActiveTab] = useState("Assets");
@@ -379,7 +379,7 @@ const SearchPage = () => {
               </div>
 
               {notificationDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw]">
+                <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw]">
                   <p className="text-gray-800 font-semibold mb-2 border-b-[0.5px] border-gray-200">
                     Notifications
                   </p>
@@ -428,7 +428,7 @@ const SearchPage = () => {
               </div>
 
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-76 w-64 bg-white border border-gray-200 space-y-1 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw] space-y-1.5">
+                <div className="absolute right-0 mt-76 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw] space-y-1.5">
                   {userInfo ? (
                     <>
                       <div className=" text-gray-800 font-bold">
