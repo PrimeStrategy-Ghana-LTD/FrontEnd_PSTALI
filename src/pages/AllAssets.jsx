@@ -5,20 +5,17 @@ import {
   IoChevronForwardOutline,
 } from "react-icons/io5";
 import { FaListUl, FaTh } from "react-icons/fa";
-// import { apiGetAllAssets, apiGetLocations } from "../services/tali";
 import AssetAssignmentModal from "./AssetAssignmentModal";
-import { Link } from "react-router-dom";
-// import AddAssetModal from "./AddAssetModal";
+import { Link, useNavigate } from "react-router-dom";
 import { apiGetAllAssets, apiGetLocations } from "../servicess/tali";
-import AddAssetModal from "./AddAsset";
 
 const AllAssets = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("list"); // 'list' or 'grid'
   const [showFilters, setShowFilters] = useState(false);
   const [availabilityFilter, setAvailabilityFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [assets, setAssets] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -96,6 +93,11 @@ const AllAssets = () => {
     }
   };
 
+  // Function to handle add asset button click
+  const handleAddAssetClick = () => {
+    navigate('/dashboard/add-asset');
+  };
+
   // View toggle buttons
   const ViewToggle = () => (
     <div className="flex border border-gray-300 rounded-sm overflow-hidden">
@@ -125,7 +127,7 @@ const AllAssets = () => {
           <p className="text-[13px] text-gray-500">View and Manage Assets</p>
           <div className="flex text-[13px] gap-3">
             <button
-              onClick={() => setIsAddAssetModalOpen(true)}
+              onClick={handleAddAssetClick}
               className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34]"
             >
               Add Asset
@@ -234,15 +236,6 @@ const AllAssets = () => {
         onClose={() => setIsAssignModalOpen(false)}
         asset={selectedAsset}
       />
-
-      <AddAssetModal
-        isOpen={isAddAssetModalOpen}
-        onClose={() => setIsAddAssetModalOpen(false)}
-        onAssetAdded={() => {
-          getAssets(currentPage);
-          setIsAddAssetModalOpen(false);
-        }}
-      />
     </div>
   );
 };
@@ -252,7 +245,7 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
   <div className="space-y-2">
     <div className="flex font-semibold text-[14px] text-gray-700 pb-2 border-b-2 border-gray-200">
       <div className="w-[35%]">Name</div>
-      <div className="w-[15%]">Vin</div>
+      <div className="w-[15%]">VIN</div>
       <div className="w-[15%]">Status</div>
       <div className="w-[20%]">Location</div>
       <div className="w-[15%] text-center">Assignments</div>
@@ -269,7 +262,7 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
             <p className="text-gray-400">2025</p>
           </div>
         </div>
-        <div className="w-[15%]">{item.unit}</div>
+        <div className="w-[15%]">{item.assetId}</div>
         <div className={`w-[15%] font-semibold ${item.status === "Available" ? "text-green-600" : "text-red-600"}`}>
           {item.status}
         </div>
@@ -306,7 +299,7 @@ const GridView = ({ assets, getLocationName, onAssignClick }) => (
             <div className="space-y-1 mb-3">
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-500">VIN:</span>
-                <span className="text-xs text-gray-700 font-medium">{item.unit}</span>
+                <span className="text-xs text-gray-700 font-medium">{item.assetId}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-500">Location:</span>
