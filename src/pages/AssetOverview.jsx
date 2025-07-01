@@ -12,7 +12,7 @@ import Way from "../assets/images/Way.png";
 import Users from "../assets/images/Users.png";
 import Cancel from "../assets/images/Cancel.png";
 import Goods from "../assets/images/Goods.png";
-import Location from "../assets/images/Location.png";
+import location from "../assets/images/location.png";
 import Pending from "../assets/images/Pending.png";
 import Total from "../assets/images/Total.png";
 import Profit from "../assets/images/Profit.png";
@@ -30,7 +30,7 @@ const AssetOverview = () => {
   ];
 
   const assignmentData = [
-    { icon: Location, count: 82, label: "Locations" },
+    { icon: location, count: 82, label: "locations" },
     { icon: Pending, count: 56, label: "Pending Approvals" },
     { icon: Total, count: 89, label: "Total Assets" },
     { icon: Users, count: 43, label: "Users" },
