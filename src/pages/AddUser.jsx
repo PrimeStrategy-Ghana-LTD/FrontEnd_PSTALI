@@ -10,7 +10,7 @@ const DEFAULT_ROLES = [
   { value: "user", name: "User" },
 ];
 
-const AddUser = ({ isOpen, onClose }) => {
+const AddUser = () => {
   const [formData, setFormData] = useState({
     userName: "",
     password: "",
@@ -28,10 +28,8 @@ const AddUser = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isOpen) {
-      getLocations();
-    }
-  }, [isOpen]);
+    getLocations();
+  }, []);
 
   const getLocations = async () => {
     try {
@@ -66,8 +64,7 @@ const AddUser = ({ isOpen, onClose }) => {
 
       await apiAddUser(formDataToSend);
       toast.success("User Added Successfully");
-      onClose?.(); // Close modal on success
-      navigate(0);  // Refresh page
+      navigate("/dashboard/users"); // Navigate back to users list
     } catch (error) {
       console.log("Error:", error);
       toast.error(error.response?.data?.message || "Adding user failed.");
@@ -76,37 +73,28 @@ const AddUser = ({ isOpen, onClose }) => {
     }
   };
 
-  const resetAndClose = () => {
-    setFormData({
-      userName: "",
-      password: "",
-      storeLocation: "",
-      role: "",
-      email: "",
-      phone: "",
-    });
-    setProfile_picture(null);
-    onClose?.();
+  const handleCancel = () => {
+    navigate("/dashboard/users");
   };
 
-  // Don't render modal if isOpen is false
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div className="flex-1 p-4 lg:p-6 bg-gray-50 min-h-screen">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <button
-              onClick={resetAndClose}
+              onClick={handleCancel}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h2 className="text-xl font-semibold text-gray-900">New User</h2>
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">New User</h1>
+              <p className="text-sm text-gray-600 mt-1">Add a new user to the system</p>
+            </div>
           </div>
         </div>
 
@@ -277,10 +265,10 @@ const AddUser = ({ isOpen, onClose }) => {
             <div className="flex justify-end items-center gap-4 mt-8 pt-6 border-t border-gray-200">
               <button
                 type="button"
-                onClick={resetAndClose}
+                onClick={handleCancel}
                 className="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
               >
-                Discard
+                Cancel
               </button>
               <button
                 type="submit"

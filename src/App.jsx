@@ -83,7 +83,7 @@ const router = createBrowserRouter([
         element: <AllUsers />,
       },
       {
-        path: "add-user",
+        path: "users/add-user",
         element: <AddUser />,
       },
       {

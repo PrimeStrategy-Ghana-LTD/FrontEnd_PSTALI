@@ -1,17 +1,15 @@
 import { apiClient } from "./config";
 
+export const apiGetAllUsers = async () => {
+    try {
+        const response = await apiClient.get('/users');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching locations:', error);
+        throw error;
+    }
+};
 
-// export const apiAddAsset = async (payload) => apiClient.post("/assets", payload);
-
-// export const apiGetLocations = async () => {
-//     return await apiClient.get('/locations');
-// }                                                                        
-
-// export const apiGetAllAssets = async () => await apiClient.get('/assets');
-// Henrrike
-
-
-// Updated function to handle pagination parameters
 export const apiGetAllAssets = async (params = {}) => {
     try {
         // Convert params object to query string
