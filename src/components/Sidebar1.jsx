@@ -25,7 +25,7 @@ const topItems = [
 
 const bottomItems = [
   { label: "Settings", icon: Settings, path: "/settings" },
-  { label: "Log Out", icon: Log, path: "/login" },
+  { label: "Log Out", icon: Log, path: "/" },
 ];
 
 const Sidebar1 = ({ setSidebarOpen }) => {
@@ -40,7 +40,7 @@ const Sidebar1 = ({ setSidebarOpen }) => {
     <div className="flex flex-col h-full w-64 bg-[#051b34] border-r border-gray-200">
       {/* Header */}
       <div className="flex items-center justify-between p-4 lg:justify-center">
-        <Link to="/dashboard" onClick={handleNavClick}>
+        <Link to="/" onClick={handleNavClick}>
           <img src={logo} alt="Logo" className="h-10 w-auto" />
         </Link>
         

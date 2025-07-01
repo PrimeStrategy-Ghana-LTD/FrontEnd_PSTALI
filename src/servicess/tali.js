@@ -87,3 +87,12 @@ export const apiAssignAsset = async (assignmentData) => {
   }
 };
 
+export const apiGetOneAsset = async (id) => {
+  try {
+    const response = await apiClient.get(`/assets/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Asset retrieval failed:", error);
+    throw error;
+  }
+};

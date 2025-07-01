@@ -1,224 +1,351 @@
 import React, { useEffect, useState } from "react";
-import { FiEdit2 } from "react-icons/fi";
-import Sidebar1 from "../components/Sidebar1";
-import Searchbar from "../components/Searchbar";
-import { useParams } from "react-router-dom";
-import Mileage from "../assets/images/Mileage.png";
-import Drivetrain from "../assets/images/Drivetrain.png";
-import Gearbox from "../assets/images/Gearbox.png";
-import Fuel from "../assets/images/Fuel.png";
+import { FiEdit2, FiArrowLeft } from "react-icons/fi";
+import { useParams, useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
-import axios from "axios";
+import MileageIcon from "../assets/images/Mileage.png";
+import DrivetrainIcon from "../assets/images/Drivetrain.png";
+import GearboxIcon from "../assets/images/Gearbox.png";
+import FuelIcon from "../assets/images/Fuel.png";
+import { apiGetOneAsset, apiGetLocations } from "../servicess/tali";
 
 const ViewAsset = () => {
   const [asset, setAsset] = useState(null);
-  const [locationName, setLocationName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { id } = useParams();
+  const navigate = useNavigate();
+  
 
-  useEffect(() => {
-    const fetchAsset = async () => {
-      try {
-        const res = await axios.get(
-          `https://backend-ps-tali.onrender.com/assets/${id}`
-        );
-        setAsset(res.data);
-        if (res.data.assetLocation) {
-          try {
-            const locationRes = await axios.get(
-              `https://backend-ps-tali.onrender.com/locations/${res.data.assetLocation}`
-            );
-            setLocationName(
-              locationRes.data.assetLocation || "Unknown Location"
-            );
-          } catch {
-            setLocationName("Location not found");
-          }
-        }
-      } catch (err) {
-        console.error("Error fetching asset:", err);
+const [assetLocation, setAssetLocation] = useState("Location Unknown");
+
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      const assetData = await apiGetOneAsset(id);
+      setAsset(assetData);
+
+      const locationResponse = await apiGetLocations();
+
+      // Ensure we're using the actual array if wrapped inside an object
+      const locationData = Array.isArray(locationResponse)
+  ? locationResponse
+  : locationResponse.locations || [];
+
+      // setLocations(locationData);
+
+      const locationId = assetData?.assetLocation?._id || assetData?.assetLocation;
+
+      const matchedLocation = locationData.find(
+        (loc) => loc._id === locationId || loc.id === locationId
+      );
+
+      if (matchedLocation) {
+        setAssetLocation(matchedLocation.assetLocation || matchedLocation.name);
       }
-    };
-    fetchAsset();
-  }, [id]);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (id) {
+    fetchData();
+  }
+}, [id]);
+
+
+
 
   const handleDownload = () => {
     if (!asset) return;
+    
     const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("Asset Details", 10, 10);
+    doc.setFontSize(20);
+    doc.text("Asset Details", 20, 20);
+    
     doc.setFontSize(12);
-    doc.text(`Asset Name: ${asset.assetName || "N/A"}`, 10, 20);
-    doc.text(`Asset ID: ${asset.assetId || "N/A"}`, 10, 30);
-    doc.text(`Category: ${asset.category || "N/A"}`, 10, 40);
-    doc.text(`Location: ${locationName || "N/A"}`, 10, 50);
-    doc.text(`Status: ${asset.status || "N/A"}`, 10, 60);
-    doc.text(`Assigned To: ${asset.assignedTo?.name || "Unassigned"}`, 10, 70);
-    doc.text(`Contact: ${asset.assignedTo?.contact || "No contact"}`, 10, 80);
-    doc.text("Stock Locations:", 10, 95);
-    asset.stockLocations?.forEach((loc, index) => {
-      doc.text(
-        `${index + 1}. ${loc.location || loc.storeName} - ${loc.quantity}`,
-        12,
-        105 + index * 10
-      );
-    });
+    doc.text(`Asset Name: ${asset.assetName || "N/A"}`, 20, 40);
+    doc.text(`VIN: ${asset.assetId || "N/A"}`, 20, 50);
+    doc.text(`Make: ${asset.make || "N/A"}`, 20, 60);
+    doc.text(`Model: ${asset.model || "N/A"}`, 20, 70);
+    doc.text(`Year: ${asset.year || "N/A"}`, 20, 80);
+    doc.text(`Condition: ${asset.condition || "N/A"}`, 20, 90);
+    doc.text(`Mileage: ${asset.mileage || "N/A"}`, 20, 100);
+    doc.text(`Drivetrain: ${asset.drivetrain || "N/A"}`, 20, 110);
+    doc.text(`Fuel Type: ${asset.fuelType || "N/A"}`, 20, 120);
+    doc.text(`Exterior Color: ${asset.exteriorColor || asset.exteriorColour || "N/A"}`, 20, 130);
+    doc.text(`Status: ${asset.status || "N/A"}`, 20, 140);
+    doc.text(`Location: ${assetLocation}`, 20, 150);
+
+    
     doc.save(`${asset.assetName || "asset"}_details.pdf`);
   };
 
+  const handleAssign = () => {
+    // Implement assignment logic here
+    console.log("Assign asset:", asset?.assetId);
+  };
+
+  const handleEdit = () => {
+    // Navigate to edit page
+    navigate(`/assets/edit/${id}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-lg text-gray-600">Loading asset details...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-lg text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
+
+  if (!asset) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-lg text-gray-600">Asset not found</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex">
-      {/* <Sidebar1 />
-      <div className="flex flex-col w-full">
-        <Searchbar /> */}
-        <div className="bg-[#f0f1f3] p-6 min-h-screen">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex gap-2 justify-end ">
-              <button className="flex items-center gap-1 border px-3 py-1 rounded text-sm text-gray-600 border-gray-300">
-                <FiEdit2 /> Edit
+    <div className="bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+              >
+                <FiArrowLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {asset.year} {asset.make} {asset.model} {asset.variant ? `With ${asset.variant}` : ''}
+              </h1>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleEdit}
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                <FiEdit2 className="w-4 h-4" />
+                Edit
               </button>
               <button
                 onClick={handleDownload}
-                className="border px-3 py-1 rounded text-sm text-gray-600 border-gray-300"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
               >
                 Download
               </button>
             </div>
-            <div className="flex justify-between items-start ">
-              <div className="flex gap-4 w-[1027px] h-[340px] border-">
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="bg-white rounded-lg shadow-sm">
+          {/* Top Section */}
+          <div className="p-8">
+            <div className="flex gap-8">
+              {/* Asset Image */}
+              <div className="flex-shrink-0">
                 <img
-                  src={asset?.assetImage || "/placeholder.jpg"}
-                  alt="Asset"
-                  className="w-[467px] h-[310px] object-cover rounded-md border border-gray-200"
+                  src={asset.assetImage || "/placeholder-car.jpg"}
+                  alt={asset.assetName}
+                  className="w-96 h-64 object-cover rounded-lg border border-gray-200"
                 />
-                <div className="w-[444px] h-[292px]">
-                  <h2 className="text-[22px] font-bold mb-2">
+              </div>
+
+              {/* Asset Info */}
+              <div className="flex-1 max-w-md">
+                <div className="mb-4">
+                   <h2 className="text-[22px] font-bold mb-2">
                     {asset?.assetName}
                   </h2>
-                  <p className="text-sm text-gray-500 border-2 border-[#cff7d3] bg-[#cff7d3] rounded-md px-3 py-2 w-44">
-                    {locationName}
-                  </p>
-                  <p className="text-[16px] mt-2 text-gray-600 font-bold">
-                    VIN: {asset?.assetId || "N/A"}
-                  </p>
-                  <button className="mt-3 bg-gray-800 text-white text-md w-full rounded-lg py-3">
-                    Assign
-                  </button>
-                  <div className="mt-3">
-                    <label className="text-[#1e1e1e] text-[16px] font-semibold">
-                      Justification
-                    </label>
-                    <textarea
-                      rows={3}
-                      className="w-full border mt-1 p-2 rounded-md text-md border-gray-300 "
-                      placeholder="Enter justification..."
-                    ></textarea>
+                  <span className="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full border border-green-200">
+                    {assetLocation}                  </span>
+                </div>
+                
+                <div className="mb-6">
+                  <p className="text-gray-600 text-sm">VIN</p>
+                  <p className="font-semibold text-gray-900">{asset.assetId}</p>
+                </div>
+
+                <button
+                  onClick={handleAssign}
+                  className="w-full bg-gray-900 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+                >
+                  Assign
+                </button>
+
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Justification
+                  </label>
+                  <textarea
+                    rows={3}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Answer the frequently asked question in a simple sentence, a longer paragraph, or even in a list."
+                    defaultValue={asset.justification || ""}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Features and Overview Section */}
+          <div className="px-8 pb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              {/* Features */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Features</h3>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <img src={MileageIcon} alt="Mileage" className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">Mileage</p>
+                      <p className="text-gray-600 text-sm">{asset.mileage || "N/A"}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <img src={DrivetrainIcon} alt="Drivetrain" className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">Drivetrain</p>
+                      <p className="text-gray-600 text-sm">{asset.drivetrain || "N/A"}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <img src={GearboxIcon} alt="Doors" className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">Doors</p>
+                      <p className="text-gray-600 text-sm">{asset.doorCount || "N/A"}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <img src={FuelIcon} alt="Max Seating" className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">Max Seating</p>
+                      <p className="text-gray-600 text-sm">{asset.seatingCapacity || "N/A"}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Overview */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Overview</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-sm">Make:</span>
+                    <span className="text-gray-900 text-sm font-medium">{asset.make || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-sm">Model:</span>
+                    <span className="text-gray-900 text-sm font-medium">{asset.model || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-sm">Year:</span>
+                    <span className="text-gray-900 text-sm font-medium">{asset.year || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-sm">Exterior colour:</span>
+                    <span className="text-gray-900 text-sm font-medium">{asset.exteriorColor || asset.exteriorColour || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-sm">Condition:</span>
+                    <span className="text-gray-900 text-sm font-medium">{asset.condition || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-sm">Doors:</span>
+                    <span className="text-gray-900 text-sm font-medium">{asset.doorCount || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-sm">Maximum seating:</span>
+                    <span className="text-gray-900 text-sm font-medium">{asset.seatingCapacity || "N/A"}</span>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-6">
-              <div>
-                <div>
-                  <h3 className="text-[21px] font-bold text-gray-700 mb-2">
-                    Features
-                  </h3>
-                  <div>
-                    <ul className="grid grid-cols-2 text-sm text-gray-600 space-y-1 gap-4">
-                      <li className="flex gap-2">
-                        <img src={Mileage} alt="" />
-                        <div>
-                          <strong>Mileage:</strong>
-                          <p>{asset?.mileage || "N/A"}</p>
-                        </div>
-                      </li>
-                      <li className="flex gap-2">
-                        <img src={Drivetrain} alt="" />
-                        <div className="">
-                          <strong>Drivetrain:</strong>
-                          <p> {asset?.drivetrain || "N/A"}</p>
-                        </div>
-                      </li>
-                      <li className="flex gap-2">
-                        <img src={Gearbox} alt="" />
-                        <div>
-                          <strong>Doors:</strong>
-                          <p>{asset?.doors || "N/A"}</p>
-                        </div>
-                      </li>
-                      <li className="flex gap-2">
-                        <img src={Fuel} alt="" />
-                        <div>
-                          <strong>Max Seating:</strong>
-                          <p>{asset?.maxSeating || "N/A"}</p>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
+          {/* Bottom Section */}
+          <div className="px-8 pb-8">
+            <div className="flex gap-12">
+              {/* Inspection Details */}
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Inspection Details</h3>
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Inspected by:</span> {asset.inspectedBy?.name || "Kofi Baah"}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Approved by:</span> {asset.approvedBy?.name || "Jordan Owusu"}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Date Uploaded:</span> {
+                      asset.dateUploaded 
+                        ? new Date(asset.dateUploaded).toLocaleDateString('en-US', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })
+                        : "18 June, 2025"
+                    }
+                  </p>
                 </div>
               </div>
-              <div>
-                <h3 className="text-md font-semibold text-gray-700 mb-2">
-                  Overview
-                </h3>
-                <div className="grid grid-cols-2">
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>
-                      <strong>Make:</strong> {asset?.make || "N/A"}
-                    </li>
-                    <li>
-                      <strong>Model:</strong> {asset?.model || "N/A"}
-                    </li>
-                    <li>
-                      <strong>Year:</strong> {asset?.year || "N/A"}
-                    </li>
-                    <li>
-                      <strong>Condition:</strong> {asset?.condition || "N/A"}
-                    </li>
-                    <li>
-                      <strong>Body Type:</strong> {asset?.bodyType || "N/A"}
-                    </li>
-                    <li>
-                      <strong>Color:</strong> {asset?.color || "N/A"}
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div className="flex">
-              <div className="mt-8 w-[444px]">
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                  Inspection Details
-                </h3>
-                <p className="text-md text-gray-600">Inspected by: Kofi Baah</p>
-                <p className="text-md text-gray-600">
-                  Approved by: Jordan Owusu
-                </p>
-                <p className="text-sm text-gray-600">
-                  Date Uploaded: 18 June, 2025
-                </p>
-              </div>
 
-              <div className="mt-8">
-                <h3 className="text-md font-semibold text-gray-700 mb-2">
-                  Similar Assets
-                </h3>
-                <div className="flex flex-col gap-4 text-sm text-gray-600">
-                  <div>
+              {/* Similar Assets */}
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Similar Assets</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
                     <img
-                      src="/car-placeholder.png"
-                      alt="Asset"
-                      className="w-28 h-16 rounded-md object-cover"
+                      src="/placeholder-car.jpg"
+                      alt="Similar Asset"
+                      className="w-20 h-12 object-cover rounded-md border border-gray-200"
                     />
-                    <p>2023 Toyota Corolla</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">2023 Toyota Camry</p>
+                      <p className="text-xs text-gray-500">Available</p>
+                    </div>
                   </div>
-                  <div>
+                  <div className="flex items-center gap-3">
                     <img
-                      src="/car-placeholder.png"
-                      alt="Asset"
-                      className="w-28 h-16 rounded-md object-cover"
+                      src="/placeholder-car.jpg"
+                      alt="Similar Asset"
+                      className="w-20 h-12 object-cover rounded-md border border-gray-200"
                     />
-                    <p>2022 Honda Civic</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">2022 Honda Accord</p>
+                      <p className="text-xs text-gray-500">Available</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -226,7 +353,7 @@ const ViewAsset = () => {
           </div>
         </div>
       </div>
-    // </div>
+    </div>
   );
 };
 

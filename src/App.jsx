@@ -38,20 +38,24 @@ const router = createBrowserRouter([
     element: <SearchPage />,
   },
   {
+    path: "view-asset/:id",
+    element: <ViewAsset />,
+  },
+  {
     path: "/search-result",
     element: <SearchResult />,
   },
 
-  {
-    path: "/add-user",
-    element: <AddUser />,
-  },
+  // {
+  //   path: "/add-user",
+  //   element: <AddUser />,
+  // },
 
   {
     path: "/add-asset",
     element: <AddAsset />,
   },
-  
+
   {
     path: "/overview",
     element: <AssetOverview />,
@@ -60,7 +64,7 @@ const router = createBrowserRouter([
     path: "/card-view",
     element: <AssetCardView />,
   },
-  
+
   {
     path: "/side-bar",
     element: <Sidebar1 />,
@@ -83,17 +87,25 @@ const router = createBrowserRouter([
         element: <AllAssets />,
       },
       {
-    path: "view-asset/:id",
-    element: <ViewAsset />,
-  },
+        path: "add-asset",
+        element: <AddAsset />,
+      },
+      {
+        path: "view-asset/:id",
+        element: <ViewAsset />,
+      },
       {
         path: "users",
         element: <AllUsers />,
       },
       {
-    path: "assigned",
-    element: <AssignedPage />,
-  },
+        path: "add-user",
+        element: <AddUser />,
+      },
+      {
+        path: "assigned",
+        element: <AssignedPage />,
+      },
       { path: "manage-location", element: <ManageStore /> },
     ],
   },
