@@ -3,6 +3,14 @@ import { Search, Settings, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { ClipboardCheck, Wrench, UserCircle } from "lucide-react";
+import { MdOutlineContactPage } from "react-icons/md";
+import { MdOutlineEmail } from "react-icons/md";
+import { MdOutlineLocationOn } from "react-icons/md";
+import { VscAccount } from "react-icons/vsc";
+import { MdOutlineSettings } from "react-icons/md";
+import { LuLogIn } from "react-icons/lu";
+import Icon from "../assets/images/Icon.png";
+import Icon2 from "../assets/images/Icon2.png";
 
 const SearchPage = () => {
   const [activeTab, setActiveTab] = useState("Assets");
@@ -13,19 +21,12 @@ const SearchPage = () => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState(null);
-  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
-const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-
+  const [notificationDropdownOpen, setNotificationDropdownOpen] =
+    useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
 
   const navigate = useNavigate();
-
-  const userInfo = {
-    name: "John Doe",
-    role: "Asset Manager",
-    contact: "+233 555 123 456",
-    email: "johndoe@example.com",
-    location: "Accra, Ghana",
-  };
 
   const dropdownRef = useRef();
 
@@ -270,7 +271,7 @@ const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   // Fetch assets and profile picture when component mounts
   useEffect(() => {
     fetchAssets();
-    fetchProfilePicture();
+    fetchUserInfo(); // now fetching full user info including profile picture
   }, []);
 
   // Filter assets based on search term (with safety check)
@@ -283,13 +284,55 @@ const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
       )
     : [];
 
+  const fetchUserInfo = async () => {
+    setProfileLoading(true);
+    setProfileError(null);
+
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("User not authenticated");
+      }
+
+      const response = await fetch(
+        "https://backend-ps-tali.onrender.com/users/me",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setUserInfo(data);
+
+      // If there's a profile picture, set it
+      const profilePic = data.profilePicture || data.avatar || null;
+      setProfilePicture(profilePic);
+    } catch (err) {
+      console.error("Error fetching user info:", err);
+      setProfileError("Failed to load user info");
+      setProfilePicture(null);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
   // Function to handle asset selection and navigation
   const handleAssetClick = (asset) => {
     // Store the complete asset data in sessionStorage for the view page
     sessionStorage.setItem("selectedAsset", JSON.stringify(asset));
 
     // Navigate to view page with asset ID
-    navigate(`/view-asset/${asset.id}`);
+    navigate(`/dashboard/view-asset/${asset.id}`);
   };
 
   const bellRef = useRef();
@@ -305,6 +348,18 @@ const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleLogout = () => {
+    // Clear localStorage and/or sessionStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    sessionStorage.clear(); // Optional: clears everything in sessionStorage
+
+    // Navigate to home page
+    navigate("/");
+  };
+
+  
+
   return (
     <div className="p-5 lg:px-8 xl:px-12 2xl:px-16 min-h-screen bg-[#051b34]">
       {/* Container for max width on very large screens */}
@@ -312,61 +367,113 @@ const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
         {/* User and Notification Icons */}
         <div className="flex justify-end mb-6 lg:mb-8">
           <div className="flex items-center gap-4">
-           <div className="relative" ref={bellRef}>
-  <div
-    className="flex items-center gap-2 mr-2 bg-white p-2 lg:p-3 rounded-full shadow-sm hover:shadow transition-shadow cursor-pointer"
-    onClick={() => {
-      setNotificationDropdownOpen((prev) => !prev);
-      setProfileDropdownOpen(false); // close profile if open
-    }}
-  >
-    <Bell className="text-gray-500" size={20} />
-  </div>
+            <div className="relative" ref={bellRef}>
+              <div
+                className="flex items-center gap-2 mr-2 bg-white p-2 lg:p-3 rounded-full shadow-sm hover:shadow transition-shadow cursor-pointer"
+                onClick={() => {
+                  setNotificationDropdownOpen((prev) => !prev);
+                  setProfileDropdownOpen(false); // close profile if open
+                }}
+              >
+                <Bell className="text-gray-500" size={20} />
+              </div>
 
-  {notificationDropdownOpen && (
-    <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4">
-      <p className="text-gray-800 font-semibold mb-2">Notifications</p>
-      <ul className="text-sm text-gray-700 space-y-2">
-        <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
-          <ClipboardCheck className="text-blue-500" size={18} />
-          <span>Pending Approvals</span>
-        </li>
-        <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
-          <Wrench className="text-green-500" size={18} />
-          <span>Asset Update</span>
-        </li>
-        <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
-          <UserCircle className="text-purple-500" size={18} />
-          <span>Profile Update</span>
-        </li>
-      </ul>
-    </div>
-  )}
-</div>
+              {notificationDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw]">
+                  <p className="text-gray-800 font-semibold mb-2 border-b-[0.5px] border-gray-200">
+                    Notifications
+                  </p>
+                  <ul className="text-md text-gray-700 space-y-2 ">
+                    <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
+                      <img src={Icon} alt="" />
+                      <span>Pending Approvals</span>
+                    </li>
+                    <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
+                      <img src={Icon} alt="" />
+                      <span>Asset Update</span>
+                    </li>
+                    <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
+                      <img src={Icon2} alt="" />
+                      <span>Profile Update</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
 
             <div className="flex items-center gap-2 relative" ref={dropdownRef}>
-  <div
-    className="relative h-10 w-10 lg:h-12 lg:w-12 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-    onClick={() => {
-      setProfileDropdownOpen((prev) => !prev);
-      setNotificationDropdownOpen(false); // close notification if open
-    }}
-  >
-    {/* ... profile image logic here ... */}
-  </div>
+              <div
+                className="relative h-10 w-10 lg:h-12 lg:w-12 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => {
+                  setProfileDropdownOpen((prev) => !prev);
+                  setNotificationDropdownOpen(false);
+                }}
+              >
+                {profileLoading ? (
+                  <div className="h-full w-full flex items-center justify-center text-xs text-gray-400">
+                    ...
+                  </div>
+                ) : profilePicture ? (
+                  <img
+                    src={profilePicture}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <UserCircle
+                    size={32}
+                    className="text-gray-500 mx-auto mt-[5px]"
+                  />
+                )}
+              </div>
 
-  {profileDropdownOpen && (
-    <div className="absolute right-0 mt-48 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4">
-      <p className="font-semibold text-gray-800">{userInfo.name}</p>
-      <p className="text-sm text-gray-600">{userInfo.role}</p>
-      <p className="text-sm text-gray-600 mt-2">{userInfo.email}</p>
-      <p className="text-sm text-gray-600">{userInfo.contact}</p>
-      <p className="text-sm text-gray-600">{userInfo.location}</p>
-      {/* ... Add actions like logout or settings if needed ... */}
-    </div>
-  )}
-</div>
-
+              {profileDropdownOpen && (
+                <div className="absolute right-0 mt-76 w-64 bg-white border border-gray-200 space-y-1 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw] space-y-1.5">
+                  {userInfo ? (
+                    <>
+                      <div className=" text-gray-800 font-bold">
+                        {userInfo.userName}
+                      </div>
+                      <div className="text-sm text-gray-600 border-b-[0.5px] border-gray-300">
+                        {userInfo.role}
+                      </div>
+                      
+                        <p className="flex items-center gap-1 text-sm">
+                          <MdOutlineEmail /> {userInfo.email}
+                        </p>
+                        <p className="flex items-center gap-1 text-sm">
+                          <MdOutlineContactPage /> {userInfo.phone}
+                        </p>
+                        <p className="flex items-center gap-1 text-sm">
+                          <MdOutlineLocationOn /> {userInfo.storeLocation}
+                        </p>
+                      
+                      <p className="border-b-[0.5px] border-gray-300"></p>
+                      <div className="flex text-sm gap-1">
+                        <p className="mt-1"><VscAccount /></p>
+                        <p>Account</p>
+                      </div>
+                      <div className="flex text-sm gap-1">
+                        <p className="mt-1"><MdOutlineSettings /></p>
+                        <p>Settings</p>
+                      </div>
+                      <p className="border-b-[0.5px] border-gray-300"></p>
+                      <button
+                        onClick={handleLogout}
+                        className=" w-full text-red-500 hover:text-red-600  px-4 py-2 rounded-md text-sm transition-colors"
+                      >
+                        <LuLogIn className="inline-block mr-1" />
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-600">
+                      User info not available
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -444,6 +551,7 @@ const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
             </div>
           )}
         </div>
+        
 
         {/* Tabs - Better spacing on larger screens */}
         <div className="flex justify-center mb-8 lg:mb-10">
@@ -454,7 +562,7 @@ const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
                 onClick={() => {
                   setActiveTab(tab);
                   if (tab === "Assets") {
-                    navigate("/assets");
+                    navigate("/dashboard/assets");
                   }
                 }}
                 className={`text-base lg:text-lg xl:text-xl font-medium cursor-pointer transition-colors hover:text-[#01fe9d] ${
@@ -470,12 +578,7 @@ const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
         </div>
 
         {/* Settings - Positioned better on larger screens */}
-        <div className="flex mt-16 lg:mt-24 xl:mt-32">
-          <p className="flex items-center gap-2 lg:gap-3 text-white cursor-pointer transition-colors hover:text-[#01fe9d] text-sm lg:text-base xl:text-lg">
-            <Settings size={18} className="lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
-            Settings
-          </p>
-        </div>
+        
       </div>
     </div>
   );
