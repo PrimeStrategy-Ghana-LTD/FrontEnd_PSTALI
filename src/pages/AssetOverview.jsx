@@ -4,7 +4,7 @@ import AssetSummaryChart from "./AssetSummaryChart";
 import AssetManagementGraph from "./AssetManagementGraph";
 
 // Import your existing images
-import Cars from "../assets/images/Cars.png";
+import Taxi from "../assets/images/local_taxi.png";
 import house from "../assets/images/house.png";
 import plane from "../assets/images/plane.png";
 import Cost from "../assets/images/Cost.png";
@@ -23,7 +23,7 @@ import Categories from "../assets/images/Categories.png";
 
 const AssetOverview = () => {
   const assetData = [
-    { icon: Cars, count: 823, label: "Cars" },
+    { icon: Taxi, count: 823, label: "Cars" },
     { icon: Goods, count: 423, label: "Goods" },
     { icon: Goods, count: 156, label: "Equipment" },
     { icon: Goods, count: 89, label: "Furniture" },
