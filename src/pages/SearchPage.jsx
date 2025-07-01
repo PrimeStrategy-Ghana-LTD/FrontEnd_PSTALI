@@ -9,8 +9,8 @@ import { MdOutlineLocationOn } from "react-icons/md";
 import { VscAccount } from "react-icons/vsc";
 import { MdOutlineSettings } from "react-icons/md";
 import { LuLogIn } from "react-icons/lu";
-import icon from "../assets/images/icon.png";
-import icon2 from "../assets/images/icon2.png";
+// import icon from "../assets/images/icon.png";
+// import icon2 from "../assets/images/icon2.png";
 
 const SearchPage = () => {
   const [activeTab, setActiveTab] = useState("Assets");
@@ -385,15 +385,15 @@ const SearchPage = () => {
                   </p>
                   <ul className="text-md text-gray-700 space-y-2 ">
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
-                      <img src={icon} alt="" />
+                      <img src="" alt="" />
                       <span>Pending Approvals</span>
                     </li>
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
-                      <img src={icon} alt="" />
+                      <img src="" alt="" />
                       <span>Asset Update</span>
                     </li>
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
-                      <img src={icon2} alt="" />
+                      <img src="" alt="" />
                       <span>Profile Update</span>
                     </li>
                   </ul>
