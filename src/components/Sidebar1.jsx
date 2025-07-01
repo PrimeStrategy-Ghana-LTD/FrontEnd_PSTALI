@@ -14,7 +14,7 @@ import Order from "../assets/images/Order.png";
 import Search from "../assets/images/Search.png";
 
 const topItems = [
-  { label: "Dashboard", icon: Home, path: "/dashboard" },
+  { label: "Dashboard", icon: Home, path: "/dashboard", exact: true },
   { label: "Assets", icon: Assets, path: "/dashboard/assets" },
   { label: "Reports", icon: Report, path: "/dashboard/reports" },
   { label: "Users", icon: Users, path: "/dashboard/users" },
@@ -61,6 +61,7 @@ const Sidebar1 = ({ setSidebarOpen }) => {
             <NavLink
               key={index}
               to={item.path}
+              end={item.exact} // Use end prop for exact matching when specified
               onClick={handleNavClick}
               className={({ isActive }) =>
                 `flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${

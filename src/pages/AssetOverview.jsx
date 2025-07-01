@@ -44,23 +44,23 @@ const AssetOverview = () => {
   ];
 
   return (
-    <div className="min-h-full bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div className="h-full bg-gray-50">
+      <div className="max-w-7xl mx-auto h-full">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 h-full">
           {/* Left Column - Main Content */}
-          <div className="xl:col-span-2 space-y-6">
+          <div className="xl:col-span-2 space-y-3">
             {/* Asset Overview Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Asset Overview</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+              <h2 className="text-base font-semibold text-gray-900 mb-3">Asset Overview</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {assetData.map((item, index) => (
                   <div key={index} className="flex flex-col items-center">
-                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
-                      <img src={item.icon} alt={item.label} className="w-6 h-6" />
+                    <div className="w-8 h-8 flex items-center justify-center mb-2">
+                      <img src={item.icon} alt={item.label} className="w-3 h-3" />
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-gray-900">{item.count}</p>
-                      <p className="text-sm text-gray-500">{item.label}</p>
+                      <p className="text-sm font-bold text-gray-900">{item.count}</p>
+                      <p className="text-xs text-gray-500">{item.label}</p>
                     </div>
                   </div>
                 ))}
@@ -68,17 +68,17 @@ const AssetOverview = () => {
             </div>
 
             {/* Assignments Overview Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Assignments Overview</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+              <h2 className="text-base font-semibold text-gray-900 mb-3">Assignments Overview</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {assignmentData.map((item, index) => (
                   <div key={index} className="flex flex-col items-center">
-                    <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mb-3">
-                      <img src={item.icon} alt={item.label} className="w-6 h-6" />
+                    <div className="w-8 h-8 flex items-center justify-center mb-2">
+                      <img src={item.icon} alt={item.label} className="w-3 h-3" />
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-gray-900">{item.count}</p>
-                      <p className="text-sm text-gray-500">{item.label}</p>
+                      <p className="text-sm font-bold text-gray-900">{item.count}</p>
+                      <p className="text-xs text-gray-500">{item.label}</p>
                     </div>
                   </div>
                 ))}
@@ -86,24 +86,24 @@ const AssetOverview = () => {
             </div>
 
             {/* Asset Management Graph */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 min-h-0">
               <AssetManagementGraph />
             </div>
           </div>
 
           {/* Right Column - Summary and Chart */}
-          <div className="space-y-6">
+          <div className="space-y-3">
             {/* Asset Summary Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Asset Summary</h2>
-              <div className="grid grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+              <h2 className="text-base font-semibold text-gray-900 mb-3">Asset Summary</h2>
+              <div className="grid grid-cols-2 gap-3">
                 {summaryData.map((item, index) => (
                   <div key={index} className="flex flex-col items-center">
-                    <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center mb-3">
-                      <img src={item.icon} alt={item.label} className="w-5 h-5" />
+                    <div className="w-6 h-6 flex items-center justify-center mb-2">
+                      <img src={item.icon} alt={item.label} className="w-3 h-3" />
                     </div>
                     <div className="text-center">
-                      <p className="text-xl font-bold text-gray-900">{item.count}</p>
+                      <p className="text-sm font-bold text-gray-900">{item.count}</p>
                       <p className="text-xs text-gray-500 text-center leading-tight">{item.label}</p>
                     </div>
                   </div>
@@ -112,7 +112,7 @@ const AssetOverview = () => {
             </div>
 
             {/* Asset Summary Chart */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 min-h-0">
               <AssetSummaryChart />
             </div>
           </div>
