@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiAddAsset, apiGetLocations } from "../servicess/tali";
+import { IoArrowBack } from "react-icons/io5";
 
 const AddAsset = () => {
   const navigate = useNavigate();
@@ -74,7 +75,10 @@ const AddAsset = () => {
     <div className="bg-[#f0f1f3] min-h-full p-4 space-y-5">
       <div className="bg-white p-6 rounded-md shadow-sm w-full border border-white">
         <div className="mb-6">
+          <div className="flex gap-2">
+            <Link to="/dashboard/assets" className="mt-2.5"><IoArrowBack /></Link>
           <h2 className="text-2xl font-semibold text-gray-800">Add New Asset</h2>
+          </div>
           <p className="text-gray-600 text-sm mt-1">
             Fill in the details to add a new asset to the system
           </p>
@@ -90,9 +94,9 @@ const AddAsset = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Section - Image & Basic Info */}
             <div className="col-span-1">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Asset Image *</label>
-                <div className="relative flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 hover:bg-gray-100 min-h-[200px]">
+              <div>  
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Asset Image</label>
+                <div className="relative flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 hover:bg-gray-100 min-h-[279px] w-[279px]">
                   <input
                     type="file"
                     name="assetImage"
@@ -160,7 +164,7 @@ const AddAsset = () => {
                   ].map(renderInputRow)}
 
                   <div className="flex items-center gap-4 mb-3">
-                    <label className="w-40 text-sm font-medium text-gray-700">Asset Location *</label>
+                    <label className="w-40 text-sm font-medium text-gray-700">Asset Location </label>
                     <select
                       name="assetLocation"
                       required
@@ -178,13 +182,13 @@ const AddAsset = () => {
               </div>
 
               <div className="mt-8">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Justification *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Justification </label>
                 <textarea
                   name="justification"
                   rows="4"
                   required
                   placeholder="Enter justification for adding this asset..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
+                  className="w-[428px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
                 ></textarea>
               </div>
             </div>
@@ -198,11 +202,11 @@ const AddAsset = () => {
               onClick={handleCancel}
               disabled={loading}
             >
-              Cancel
+              Save Draft
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              className="px-6 py-2 bg-[#051b34] text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium w-[303px]"
               disabled={loading}
             >
               {loading ? (

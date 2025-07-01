@@ -94,12 +94,12 @@ const AssetOverview = () => {
           {/* Right Column - Summary and Chart */}
           <div className="space-y-3">
             {/* Asset Summary Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[48%]">
               <h2 className="text-base font-semibold text-gray-900 mb-3">Asset Summary</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mt-9">
                 {summaryData.map((item, index) => (
                   <div key={index} className="flex flex-col items-center">
-                    <div className="w-6 h-6 flex items-center justify-center mb-2">
+                    <div className="w-6 h-6 flex items-center justify-center mb-3">
                       <img src={item.icon} alt={item.label} className="w-5 h-5" />
                     </div>
                     <div className="text-center">
