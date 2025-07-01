@@ -56,7 +56,7 @@ const AssetOverview = () => {
                 {assetData.map((item, index) => (
                   <div key={index} className="flex flex-col items-center">
                     <div className="w-8 h-8 flex items-center justify-center mb-2">
-                      <img src={item.icon} alt={item.label} className="w-3 h-3" />
+                      <img src={item.icon} alt={item.label} className="w-5 h-5" />
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-gray-900">{item.count}</p>
@@ -74,7 +74,7 @@ const AssetOverview = () => {
                 {assignmentData.map((item, index) => (
                   <div key={index} className="flex flex-col items-center">
                     <div className="w-8 h-8 flex items-center justify-center mb-2">
-                      <img src={item.icon} alt={item.label} className="w-3 h-3" />
+                      <img src={item.icon} alt={item.label} className="w-5 h-5" />
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-gray-900">{item.count}</p>
@@ -100,7 +100,7 @@ const AssetOverview = () => {
                 {summaryData.map((item, index) => (
                   <div key={index} className="flex flex-col items-center">
                     <div className="w-6 h-6 flex items-center justify-center mb-2">
-                      <img src={item.icon} alt={item.label} className="w-3 h-3" />
+                      <img src={item.icon} alt={item.label} className="w-5 h-5" />
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold text-gray-900">{item.count}</p>
