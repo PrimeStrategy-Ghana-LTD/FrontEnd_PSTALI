@@ -94,3 +94,17 @@ export const apiGetOneAsset = async (id) => {
     throw error;
   }
 };
+
+export const apiEditAsset = async (id, formData) => {
+  try {
+    const response = await apiClient.patch(`/assets/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating listing:', error);
+    throw error;
+  }
+};
