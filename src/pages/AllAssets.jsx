@@ -42,13 +42,18 @@ const AllAssets = () => {
         ...filters,
       };
       const response = await apiGetAllAssets(params);
-      
+
       // Handle different response structures
       const assetsData = response.data?.assets || response.data || [];
-      const totalCount = response.data?.totalCount || response.data?.length || assetsData.length || 0;
+      const totalCount =
+        response.data?.totalCount ||
+        response.data?.length ||
+        assetsData.length ||
+        0;
       const currentPageNum = response.data?.currentPage || page;
-      const totalPagesNum = response.data?.totalPages || Math.ceil(totalCount / itemsPerPage) || 1;
-      
+      const totalPagesNum =
+        response.data?.totalPages || Math.ceil(totalCount / itemsPerPage) || 1;
+
       setAssets(Array.isArray(assetsData) ? assetsData : []);
       setCurrentPage(currentPageNum);
       setTotalPages(totalPagesNum);
@@ -67,7 +72,9 @@ const AllAssets = () => {
   const getLocations = async () => {
     try {
       const response = await apiGetLocations();
-      setLocations(Array.isArray(response) ? response : response.locations || []);
+      setLocations(
+        Array.isArray(response) ? response : response.locations || []
+      );
     } catch (error) {
       console.error("Error fetching locations:", error);
     }
@@ -114,14 +121,22 @@ const AllAssets = () => {
     <div className="flex border border-gray-300 rounded-sm overflow-hidden">
       <button
         onClick={() => setViewMode("list")}
-        className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs sm:text-sm ${viewMode === "list" ? "bg-[#051b34] text-white" : "bg-white text-gray-600"}`}
+        className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs sm:text-sm ${
+          viewMode === "list"
+            ? "bg-[#051b34] text-white"
+            : "bg-white text-gray-600"
+        }`}
       >
         <FaListUl />
         <span className="hidden sm:inline">List</span>
       </button>
       <button
         onClick={() => setViewMode("grid")}
-        className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs sm:text-sm ${viewMode === "grid" ? "bg-[#051b34] text-white" : "bg-white text-gray-600"}`}
+        className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs sm:text-sm ${
+          viewMode === "grid"
+            ? "bg-[#051b34] text-white"
+            : "bg-white text-gray-600"
+        }`}
       >
         <FaTh />
         <span className="hidden sm:inline">Grid</span>
@@ -135,7 +150,9 @@ const AllAssets = () => {
         <p className="font-semibold text-base sm:text-[18px]">Assets</p>
 
         <div className="flex flex-col sm:flex-row sm:justify-between mb-3 gap-2 sm:gap-0">
-          <p className="text-xs sm:text-[13px] text-gray-500">View and Manage Assets</p>
+          <p className="text-xs sm:text-[13px] text-gray-500">
+            View and Manage Assets
+          </p>
           <div className="flex text-xs sm:text-[13px] gap-2 sm:gap-3">
             <button
               onClick={handleAddAssetClick}
@@ -192,8 +209,16 @@ const AllAssets = () => {
                   onChange={(e) => setLocationFilter(e.target.value)}
                 >
                   <option value="">All</option>
-                  {[...new Set(assets.map(asset => getLocationName(asset.assetLocation)))].map((location, index) => (
-                    <option key={index} value={location}>{location}</option>
+                  {[
+                    ...new Set(
+                      assets.map((asset) =>
+                        getLocationName(asset.assetLocation)
+                      )
+                    ),
+                  ].map((location, index) => (
+                    <option key={index} value={location}>
+                      {location}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -207,8 +232,8 @@ const AllAssets = () => {
           )}
 
           {viewMode === "list" ? (
-            <ListView 
-              assets={filteredAssets} 
+            <ListView
+              assets={filteredAssets}
               getLocationName={getLocationName}
               onAssignClick={(asset) => {
                 setSelectedAsset(asset);
@@ -216,8 +241,8 @@ const AllAssets = () => {
               }}
             />
           ) : (
-            <GridView 
-              assets={filteredAssets} 
+            <GridView
+              assets={filteredAssets}
               getLocationName={getLocationName}
               onAssignClick={(asset) => {
                 setSelectedAsset(asset);
@@ -257,27 +282,31 @@ const AllAssets = () => {
 const ListView = ({ assets, getLocationName, onAssignClick }) => (
   <div className="space-y-2">
     {/* Desktop Header - hidden on mobile */}
+    {/* Header Row */}
     <div className="hidden md:flex font-semibold text-sm text-gray-700 pb-2 border-b-2 border-gray-200">
-      <div className="w-[35%]">Name</div>
-      <div className="w-[15%]">VIN</div>
-      <div className="w-[15%]">Status</div>
-      <div className="w-[20%]">Location</div>
-      <div className="w-[15%] text-center">Assignments</div>
+      <div className="flex-[1.5]">Name</div>
+      <div className="flex-[2]">VIN</div>
+      <div className="flex-[1.5]">Status</div>
+      <div className="flex-[1.5]">Location</div>
+      <div className="flex-[1.5] text-center">Assignments</div>
     </div>
 
     {assets.map((item, index) => (
-      <div key={index} className="flex flex-col md:flex-row md:items-center text-xs sm:text-[13px] text-gray-600 py-3 border-b border-gray-200 gap-3 md:gap-0">
+      <div
+        key={index}
+        className="flex flex-col md:flex-row md:items-center text-xs sm:text-[13px] text-gray-600 py-3 border-b border-gray-200 gap-3 md:gap-0"
+      >
         {/* Mobile Layout */}
         <div className="md:hidden">
           <div className="flex items-center gap-3 mb-3">
-            <img 
-              src={item.assetImage} 
-              alt="" 
-              className="border-2 h-12 w-12 rounded-full border-transparent flex-shrink-0" 
+            <img
+              src={item.assetImage}
+              alt=""
+              className="border-2 h-12 w-12 rounded-full border-transparent flex-shrink-0"
             />
             <div className="flex-1 min-w-0">
-              <Link 
-                to={`/dashboard/view-asset/${item._id}`} 
+              <Link
+                to={`/dashboard/view-asset/${item._id}`}
                 className="block font-medium text-sm hover:text-blue-600 truncate"
               >
                 {item.assetName}
@@ -285,7 +314,7 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
               <p className="text-gray-400 text-xs">2025</p>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div>
               <span className="text-gray-500 font-medium">VIN:</span>
@@ -293,16 +322,24 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
             </div>
             <div>
               <span className="text-gray-500 font-medium">Status:</span>
-              <p className={`font-semibold ${item.status === "Available" ? "text-green-600" : "text-red-600"}`}>
+              <p
+                className={`font-semibold ${
+                  item.status === "Available"
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
                 {item.status}
               </p>
             </div>
             <div className="col-span-2">
               <span className="text-gray-500 font-medium">Location:</span>
-              <p className="text-gray-700">{getLocationName(item.assetLocation)}</p>
+              <p className="text-gray-700">
+                {getLocationName(item.assetLocation)}
+              </p>
             </div>
           </div>
-          
+
           <div className="mt-3">
             <button
               onClick={() => onAssignClick(item)}
@@ -315,28 +352,32 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
 
         {/* Desktop Layout */}
         <div className="hidden md:flex w-full items-center">
-          <div className="w-[35%] flex items-center gap-2">
-            <img 
-              src={item.assetImage} 
-              alt="" 
-              className="border-2 h-8 w-8 rounded-full border-transparent flex-shrink-0" 
+          <div className="flex-[1.5] truncate flex items-center gap-2">
+            <img
+              src={item.assetImage}
+              alt=""
+              className="border-2 h-8 w-8 rounded-full border-transparent flex-shrink-0"
             />
-            <div className="min-w-0 flex-1">
-              <Link 
-                to={`/dashboard/view-asset/${item._id}`} 
+            <div className="min-w-0">
+              <Link
+                to={`/dashboard/view-asset/${item._id}`}
                 className="block truncate hover:text-blue-600"
               >
                 {item.assetName}
               </Link>
-              <p className="text-gray-400">2025</p>
+              <p className="text-gray-400 text-xs">2025</p>
             </div>
           </div>
-          <div className="w-[15%]">{item.assetId}</div>
-          <div className={`w-[15%] font-semibold ${item.status === "Available" ? "text-green-600" : "text-red-600"}`}>
+          <div className="flex-[2] truncate">{item.assetId}</div>
+          <div
+            className={`flex-[1.5] font-semibold ${
+              item.status === "Available" ? "text-green-600" : "text-red-600"
+            }`}
+          >
             {item.status}
           </div>
-          <div className="w-[20%]">{getLocationName(item.assetLocation)}</div>
-          <div className="w-[15%] flex justify-center">
+          <div className="flex-[1.5]">{getLocationName(item.assetLocation)}</div>
+          <div className="flex-[1.5] flex justify-center">
             <button
               onClick={() => onAssignClick(item)}
               className="px-3 py-1 rounded-md bg-[#051b34] text-white text-xs hover:bg-[#051b34]/90"
@@ -354,14 +395,24 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
 const GridView = ({ assets, getLocationName, onAssignClick }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
     {assets.map((item, index) => (
-      <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+      <div
+        key={index}
+        className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+      >
         <div className="flex gap-4">
           <div className="flex-shrink-0">
-            <img src={item.assetImage} alt={item.assetName} className="w-20 h-20 rounded-lg object-cover" />
+            <img
+              src={item.assetImage}
+              alt={item.assetName}
+              className="w-20 h-20 rounded-lg object-cover"
+            />
           </div>
           <div className="flex-1 flex flex-col justify-between">
             <div className="mb-2">
-              <Link to={`/dashboard/view-asset/${item._id}`} className="font-semibold text-gray-800 hover:text-blue-600 text-sm">
+              <Link
+                to={`/dashboard/view-asset/${item._id}`}
+                className="font-semibold text-gray-800 hover:text-blue-600 text-sm"
+              >
                 {item.assetName}
               </Link>
               <p className="text-xs text-gray-500 mt-1">2025</p>
@@ -369,15 +420,25 @@ const GridView = ({ assets, getLocationName, onAssignClick }) => (
             <div className="space-y-1 mb-3">
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-500">VIN:</span>
-                <span className="text-xs text-gray-700 font-medium">{item.assetId}</span>
+                <span className="text-xs text-gray-700 font-medium">
+                  {item.assetId}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-500">Location:</span>
-                <span className="text-xs text-gray-700">{getLocationName(item.assetLocation)}</span>
+                <span className="text-xs text-gray-700">
+                  {getLocationName(item.assetLocation)}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-500">Status:</span>
-                <span className={`text-xs font-semibold ${item.status === "Available" ? "text-green-600" : "text-red-600"}`}>
+                <span
+                  className={`text-xs font-semibold ${
+                    item.status === "Available"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
                   {item.status}
                 </span>
               </div>
@@ -396,7 +457,13 @@ const GridView = ({ assets, getLocationName, onAssignClick }) => (
 );
 
 // Fixed Pagination Component
-const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPerPage }) => {
+const Pagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+  totalItems,
+  itemsPerPage,
+}) => {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -420,7 +487,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
   const safeItemsPerPage = Number(itemsPerPage) || 10;
   const safeTotalPages = Number(totalPages) || 1;
 
-  const startItem = Math.max(1, ((safeCurrentPage - 1) * safeItemsPerPage) + 1);
+  const startItem = Math.max(1, (safeCurrentPage - 1) * safeItemsPerPage + 1);
   const endItem = Math.min(safeCurrentPage * safeItemsPerPage, safeTotalItems);
 
   return (
@@ -435,7 +502,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
             onClick={() => onPageChange(safeCurrentPage - 1)}
             disabled={safeCurrentPage === 1}
             className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm ${
-              safeCurrentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-gray-600 hover:bg-gray-100"
+              safeCurrentPage === 1
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-gray-600 hover:bg-gray-100"
             }`}
           >
             <IoChevronBackOutline />
@@ -451,7 +520,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
                 >
                   1
                 </button>
-                {getPageNumbers()[0] > 2 && <span className="px-1 sm:px-2 py-1 text-gray-400 text-xs">...</span>}
+                {getPageNumbers()[0] > 2 && (
+                  <span className="px-1 sm:px-2 py-1 text-gray-400 text-xs">
+                    ...
+                  </span>
+                )}
               </>
             )}
 
@@ -460,7 +533,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
                 key={page}
                 onClick={() => onPageChange(page)}
                 className={`px-2 sm:px-3 py-1 rounded text-xs sm:text-sm ${
-                  page === safeCurrentPage ? "bg-[#1366d9] text-white" : "text-gray-600 hover:bg-gray-100"
+                  page === safeCurrentPage
+                    ? "bg-[#1366d9] text-white"
+                    : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
                 {page}
@@ -469,8 +544,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
 
             {getPageNumbers()[getPageNumbers().length - 1] < safeTotalPages && (
               <>
-                {getPageNumbers()[getPageNumbers().length - 1] < safeTotalPages - 1 && (
-                  <span className="px-1 sm:px-2 py-1 text-gray-400 text-xs">...</span>
+                {getPageNumbers()[getPageNumbers().length - 1] <
+                  safeTotalPages - 1 && (
+                  <span className="px-1 sm:px-2 py-1 text-gray-400 text-xs">
+                    ...
+                  </span>
                 )}
                 <button
                   onClick={() => onPageChange(safeTotalPages)}
@@ -486,7 +564,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
             onClick={() => onPageChange(safeCurrentPage + 1)}
             disabled={safeCurrentPage === safeTotalPages}
             className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm ${
-              safeCurrentPage === safeTotalPages ? "text-gray-400 cursor-not-allowed" : "text-gray-600 hover:bg-gray-100"
+              safeCurrentPage === safeTotalPages
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-gray-600 hover:bg-gray-100"
             }`}
           >
             <span className="hidden sm:inline">Next</span>

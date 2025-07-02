@@ -1,15 +1,36 @@
-// Searchbar.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, Menu, Bell, User } from 'lucide-react';
+import axios from 'axios';
 
 const Searchbar = ({ setSidebarOpen }) => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const response = await axios.get(
+          'https://backend-ps-tali.onrender.com/users/me',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`, // make sure token is stored in localStorage
+            },
+          }
+        );
+        setUser(response.data);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    fetchUsername();
+  }, []);
+
   return (
     <div className="bg-white shadow-sm border-b border-gray-200">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left side - Mobile menu button and search */}
           <div className="flex items-center flex-1">
-            {/* Mobile menu button */}
             <button
               className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
               onClick={() => setSidebarOpen && setSidebarOpen(true)}
@@ -37,7 +58,6 @@ const Searchbar = ({ setSidebarOpen }) => {
             {/* Notifications */}
             <button className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
               <Bell className="h-6 w-6" />
-              {/* Notification badge */}
               <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
             </button>
 
@@ -47,7 +67,9 @@ const Searchbar = ({ setSidebarOpen }) => {
                 <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
                   <User className="h-5 w-5 text-gray-600" />
                 </div>
-                <span className="hidden md:block text-gray-700 font-medium">John Doe</span>
+                <span className="hidden md:block text-gray-700 font-medium">
+                  {user ? user.fullName || user.userName : 'Loading...'}
+                </span>
               </button>
             </div>
           </div>
