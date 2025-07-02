@@ -53,6 +53,37 @@ export const apiGetLocations = async () => {
         throw error;
     }
 };
+
+export const apiAddLocation = async (locationData) => {
+  try {
+    const response = await apiClient.post('/locations', locationData);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding location:', error);
+    throw error;
+  }
+};
+
+export const apiEditLocation = async (id, updateData) => {
+  try {
+    const response = await apiClient.patch(`/locations/${id}`, updateData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating location:', error);
+    throw error;
+  }
+};
+
+export const apiGetOneLocation = async (id) => {
+  try {
+    const response = await apiClient.get(`/locations/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Location retrieval failed:", error);
+    throw error;
+  }
+};
+
 export const apiGetUsers = async () => {
     try {
         const response = await apiClient.get('/users');
