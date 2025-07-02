@@ -18,6 +18,7 @@ const ViewAsset = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [newLocation, setNewLocation] = useState("");
   const [justification, setJustification] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ const ViewAsset = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
         const assetData = await apiGetOneAsset(id);
         setAsset(assetData);
 
@@ -45,11 +48,11 @@ const ViewAsset = () => {
           setAssetLocation(matchedLocation.assetLocation || matchedLocation.name);
         }
 
-        setNewLocation(locationId); // Preselect current location
+        setNewLocation(locationId || ""); // Preselect current location
         setJustification(assetData.justification || "");
       } catch (err) {
         console.error("Error fetching data:", err);
-        setError(err.message);
+        setError(err.message || "Failed to load asset data");
       } finally {
         setLoading(false);
       }
@@ -62,54 +65,163 @@ const ViewAsset = () => {
 
   const handleDownload = () => {
     if (!asset) return;
-    const doc = new jsPDF();
-    doc.setFontSize(20);
-    doc.text("Asset Details", 20, 20);
-    doc.setFontSize(12);
-    doc.text(`Asset Name: ${asset.assetName || "N/A"}`, 20, 40);
-    doc.text(`VIN: ${asset.assetId || "N/A"}`, 20, 50);
-    doc.text(`Make: ${asset.make || "N/A"}`, 20, 60);
-    doc.text(`Model: ${asset.model || "N/A"}`, 20, 70);
-    doc.text(`Year: ${asset.year || "N/A"}`, 20, 80);
-    doc.text(`Condition: ${asset.condition || "N/A"}`, 20, 90);
-    doc.text(`Mileage: ${asset.mileage || "N/A"}`, 20, 100);
-    doc.text(`Drivetrain: ${asset.drivetrain || "N/A"}`, 20, 110);
-    doc.text(`Fuel Type: ${asset.fuelType || "N/A"}`, 20, 120);
-    doc.text(`Exterior Color: ${asset.exteriorColor || asset.exteriorColour || "N/A"}`, 20, 130);
-    doc.text(`Status: ${asset.status || "N/A"}`, 20, 140);
-    doc.text(`Location: ${assetLocation}`, 20, 150);
-    doc.save(`${asset.assetName || "asset"}_details.pdf`);
+    
+    try {
+      const doc = new jsPDF();
+      doc.setFontSize(20);
+      doc.text("Asset Details", 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Asset Name: ${asset.assetName || "N/A"}`, 20, 40);
+      doc.text(`VIN: ${asset.assetId || "N/A"}`, 20, 50);
+      doc.text(`Make: ${asset.make || "N/A"}`, 20, 60);
+      doc.text(`Model: ${asset.model || "N/A"}`, 20, 70);
+      doc.text(`Year: ${asset.year || "N/A"}`, 20, 80);
+      doc.text(`Condition: ${asset.condition || "N/A"}`, 20, 90);
+      doc.text(`Mileage: ${asset.mileage || "N/A"}`, 20, 100);
+      doc.text(`Drivetrain: ${asset.drivetrain || "N/A"}`, 20, 110);
+      doc.text(`Fuel Type: ${asset.fuelType || "N/A"}`, 20, 120);
+      doc.text(`Exterior Color: ${asset.exteriorColor || asset.exteriorColour || "N/A"}`, 20, 130);
+      doc.text(`Status: ${asset.status || "N/A"}`, 20, 140);
+      doc.text(`Location: ${assetLocation}`, 20, 150);
+      doc.text(`Justification: ${asset.justification || "N/A"}`, 20, 160);
+      doc.save(`${asset.assetName || "asset"}_details.pdf`);
+      
+      toast.success("PDF downloaded successfully");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate PDF");
+    }
   };
 
   const handleSaveChanges = async () => {
+    // Validation
+    if (!newLocation) {
+      toast.error("Please select a location");
+      return;
+    }
+
+    if (!justification.trim()) {
+      toast.error("Please provide a justification");
+      return;
+    }
+
     try {
-      await apiEditAsset(id, {
+      setIsUpdating(true);
+      
+      // Prepare the update data according to API spec
+      const updateData = {
         assetLocation: newLocation,
-        justification,
-      });
+        justification: justification.trim()
+      };
+
+      // Call the API
+      const updatedAsset = await apiEditAsset(id, updateData);
+      
+      // Update local state with the response
+      setAsset(prevAsset => ({
+        ...prevAsset,
+        ...updatedAsset,
+        assetLocation: newLocation,
+        justification: justification.trim()
+      }));
+      
+      // Update the displayed location
+      const selectedLocation = locations.find(
+        (loc) => (loc._id || loc.id) === newLocation
+      );
+      if (selectedLocation) {
+        setAssetLocation(selectedLocation.assetLocation || selectedLocation.name);
+      }
+
       toast.success("Asset updated successfully");
       setIsEditing(false);
+      
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to update asset");
+      console.error('Error updating asset:', error);
+      
+      // Handle different error scenarios
+      if (error.response?.status === 404) {
+        toast.error("Asset not found");
+      } else if (error.response?.status === 400) {
+        toast.error("Invalid data provided");
+      } else if (error.response?.status === 401) {
+        toast.error("Unauthorized. Please log in again.");
+      } else if (error.response?.status === 403) {
+        toast.error("You don't have permission to edit this asset");
+      } else {
+        toast.error("Failed to update asset. Please try again.");
+      }
+    } finally {
+      setIsUpdating(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Reset form fields to original values
+    const locationId = asset?.assetLocation?._id || asset?.assetLocation;
+    setNewLocation(locationId || "");
+    setJustification(asset?.justification || "");
+    setIsEditing(false);
   };
 
   const handleAssign = () => {
     // Add your assign logic here
     console.log("Assign button clicked");
+    toast.info("Assign functionality will be implemented");
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading asset details...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading asset details...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="flex items-center justify-center min-h-screen text-red-600">Error: {error}</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-red-600 mb-4">
+            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.966-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <p className="text-red-600 text-lg font-semibold">Error loading asset</p>
+          <p className="text-gray-600 mt-2">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (!asset) {
-    return <div className="flex items-center justify-center min-h-screen">Asset not found</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-gray-400 mb-4">
+            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <p className="text-gray-600 text-lg">Asset not found</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -120,7 +232,7 @@ const ViewAsset = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
             >
               <FiArrowLeft className="w-5 h-5" />
             </button>
@@ -132,7 +244,7 @@ const ViewAsset = () => {
             {!isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <FiEdit2 className="w-4 h-4" />
                 Edit
@@ -140,7 +252,7 @@ const ViewAsset = () => {
             )}
             <button
               onClick={handleDownload}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Download
             </button>
@@ -157,6 +269,9 @@ const ViewAsset = () => {
               src={asset.assetImage || "/placeholder-car.jpg"}
               className="w-full h-64 object-cover rounded-lg border"
               alt="Asset"
+              onError={(e) => {
+                e.target.src = "/placeholder-car.jpg";
+              }}
             />
             <div className="mt-6 text-sm space-y-1">
               <p><strong>Assigned By:</strong> Kojo Baah</p>
@@ -189,11 +304,14 @@ const ViewAsset = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">New Location</label>
+              <label className="block text-sm font-medium mb-1">
+                New Location <span className="text-red-500">*</span>
+              </label>
               <select
                 value={newLocation}
                 onChange={(e) => setNewLocation(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={isUpdating}
               >
                 <option value="">Select New Location</option>
                 {locations.map((loc) => (
@@ -205,27 +323,36 @@ const ViewAsset = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Justification</label>
+              <label className="block text-sm font-medium mb-1">
+                Justification <span className="text-red-500">*</span>
+              </label>
               <textarea
                 rows={3}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={justification}
                 onChange={(e) => setJustification(e.target.value)}
+                placeholder="Provide a reason for this change..."
+                disabled={isUpdating}
               />
             </div>
 
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setIsEditing(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+                onClick={handleCancelEdit}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                disabled={isUpdating}
               >
                 Discard
               </button>
               <button
                 onClick={handleSaveChanges}
-                className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+                className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                disabled={isUpdating}
               >
-                Add Asset
+                {isUpdating && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                )}
+                {isUpdating ? "Updating..." : "Update Asset"}
               </button>
             </div>
           </div>
@@ -243,6 +370,9 @@ const ViewAsset = () => {
                     src={asset.assetImage || "/placeholder-car.jpg"}
                     alt={asset.assetName}
                     className="w-96 h-64 object-cover rounded-lg border border-gray-200"
+                    onError={(e) => {
+                      e.target.src = "/placeholder-car.jpg";
+                    }}
                   />
                 </div>
 
@@ -273,12 +403,9 @@ const ViewAsset = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Justification
                     </label>
-                    <textarea
-                      rows={3}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Answer the frequently asked question in a simple sentence, a longer paragraph, or even in a list."
-                      defaultValue={asset.justification || ""}
-                    />
+                    <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-gray-50 min-h-[72px]">
+                      {asset.justification || "No justification provided"}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -406,6 +533,9 @@ const ViewAsset = () => {
                         src="/placeholder-car.jpg"
                         alt="Similar Asset"
                         className="w-20 h-12 object-cover rounded-md border border-gray-200"
+                        onError={(e) => {
+                          e.target.src = "/placeholder-car.jpg";
+                        }}
                       />
                       <div>
                         <p className="text-sm font-medium text-gray-900">2023 Toyota Camry</p>
@@ -417,6 +547,9 @@ const ViewAsset = () => {
                         src="/placeholder-car.jpg"
                         alt="Similar Asset"
                         className="w-20 h-12 object-cover rounded-md border border-gray-200"
+                        onError={(e) => {
+                          e.target.src = "/placeholder-car.jpg";
+                        }}
                       />
                       <div>
                         <p className="text-sm font-medium text-gray-900">2022 Honda Accord</p>

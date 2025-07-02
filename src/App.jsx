@@ -71,7 +71,7 @@ const router = createBrowserRouter([
         element: <AllAssets />,
       },
       {
-        path: "add-asset",
+        path: "assets/add-asset",
         element: <AddAsset />,
       },
       {

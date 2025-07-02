@@ -106,7 +106,7 @@ const AllAssets = () => {
 
   // Function to handle add asset button click
   const handleAddAssetClick = () => {
-    navigate('/dashboard/add-asset');
+    navigate('/dashboard/assets/add-asset');
   };
 
   // View toggle buttons

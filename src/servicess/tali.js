@@ -9,6 +9,25 @@ export const apiGetAllUsers = async () => {
         throw error;
     }
 };
+export const apiGetOneUser = async () => {
+    try {
+        const response = await apiClient.get('/users/me');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching locations:', error);
+        throw error;
+    }
+};
+
+export const apiCountAllUsers = async () => {
+    try {
+        const response = await apiClient.get('/assets/count');
+        return response.data;
+    } catch (error) {
+        console.error('Error counting assets:', error);
+        throw error;
+    }
+};
 
 export const apiGetAllAssets = async (params = {}) => {
     try {
@@ -95,16 +114,16 @@ export const apiGetOneAsset = async (id) => {
   }
 };
 
-export const apiEditAsset = async (id, formData) => {
+export const apiEditAsset = async (id, updateData) => {
   try {
-    const response = await apiClient.patch(`/assets/${id}`, formData, {
+    const response = await apiClient.patch(`/assets/${id}`, updateData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'application/json' // Changed from multipart/form-data to application/json
       }
     });
     return response.data;
   } catch (error) {
-    console.error('Error updating listing:', error);
+    console.error('Error updating asset:', error);
     throw error;
   }
 };
