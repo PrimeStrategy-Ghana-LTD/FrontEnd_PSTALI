@@ -54,7 +54,7 @@ const router = createBrowserRouter([
     element: <Sidebar1 />,
   },
   {
-    path: "/user-account",
+    path: "/user/:userId",
     element: <UserAccount />,
   },
 

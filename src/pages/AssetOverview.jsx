@@ -1,9 +1,8 @@
-// AssetOverview.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AssetSummaryChart from "./AssetSummaryChart";
 import AssetManagementGraph from "./AssetManagementGraph";
+import axios from "axios";
 
-// Import your existing images
 import Taxi from "../assets/images/local_taxi.png";
 import house from "../assets/images/house.png";
 import plane from "../assets/images/plane.png";
@@ -22,6 +21,25 @@ import Suppliers from "../assets/images/Suppliers.png";
 import Categories from "../assets/images/Categories.png";
 
 const AssetOverview = () => {
+  const [assetCount, setAssetCount] = useState(0);
+  const [assignmentCount, setAssignmentCount] = useState(0);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const assetRes = await axios.get("https://backend-ps-tali.onrender.com/assets/count");
+        const assignmentRes = await axios.get("https://backend-ps-tali.onrender.com/assignments/count");
+
+        setAssetCount(assetRes.data.count || 0);
+        setAssignmentCount(assignmentRes.data.count || 0);
+      } catch (error) {
+        console.error("Error fetching counts:", error);
+      }
+    };
+
+    fetchCounts();
+  }, []);
+
   const assetData = [
     { icon: Taxi, count: 823, label: "Cars" },
     { icon: Goods, count: 423, label: "Goods" },
@@ -32,12 +50,12 @@ const AssetOverview = () => {
   const assignmentData = [
     { icon: location, count: 82, label: "locations" },
     { icon: Pending, count: 56, label: "Pending Approvals" },
-    { icon: Total, count: 89, label: "Total Assets" },
+    { icon: Total, count: assetCount, label: "Total Assets" }, // updated
     { icon: Users, count: 43, label: "Users" },
   ];
 
   const summaryData = [
-    { icon: Way, count: 823, label: "Asset Assigned" },
+    { icon: Way, count: assignmentCount, label: "Asset Assigned" }, // updated
     { icon: Way, count: 423, label: "Asset In Store" },
     { icon: Way, count: 31, label: "Number of User" },
     { icon: Way, count: 26, label: "Number of Assigns" },
