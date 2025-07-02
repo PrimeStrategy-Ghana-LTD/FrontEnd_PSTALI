@@ -75,7 +75,7 @@ const router = createBrowserRouter([
         element: <AddAsset />,
       },
       {
-        path: "view-asset/:id",
+        path: "assets/view-asset/:id",
         element: <ViewAsset />,
       },
       {

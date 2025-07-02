@@ -306,7 +306,7 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
             />
             <div className="flex-1 min-w-0">
               <Link
-                to={`/dashboard/view-asset/${item._id}`}
+                to={`/dashboard/assets/view-asset/${item._id}`}
                 className="block font-medium text-sm hover:text-blue-600 truncate"
               >
                 {item.assetName}
@@ -360,7 +360,7 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
             />
             <div className="min-w-0">
               <Link
-                to={`/dashboard/view-asset/${item._id}`}
+                to={`/dashboard/assets/view-asset/${item._id}`}
                 className="block truncate hover:text-blue-600"
               >
                 {item.assetName}
