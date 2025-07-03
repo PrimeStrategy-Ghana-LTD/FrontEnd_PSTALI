@@ -4,21 +4,13 @@ import AssetManagementGraph from "./AssetManagementGraph";
 import axios from "axios";
 
 import Taxi from "../assets/images/local_taxi.png";
-import house from "../assets/images/house.png";
-import plane from "../assets/images/plane.png";
-import Cost from "../assets/images/Cost.png";
 import Way from "../assets/images/Way.png";
 import Users from "../assets/images/Users.png";
-import Cancel from "../assets/images/Cancel.png";
-import Goods from "../assets/images/Goods.png";
+import Goods from "../assets/images/quantity.png";
 import location from "../assets/images/location.png";
 import Pending from "../assets/images/Pending.png";
 import Total from "../assets/images/Total.png";
-import Profit from "../assets/images/Profit.png";
-import Quantity from "../assets/images/Quantity.png";
-import direction from "../assets/images/direction.png";
-import Suppliers from "../assets/images/Suppliers.png";
-import Categories from "../assets/images/Categories.png";
+
 
 const AssetOverview = () => {
   const [assetCount, setAssetCount] = useState(0);
