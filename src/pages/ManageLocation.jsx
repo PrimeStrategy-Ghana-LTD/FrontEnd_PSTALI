@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiGetLocations, apiEditLocation, apiAddLocation } from "../servicess/tali"; // Fixed import
 
-const ManageStore = () => {
+const ManageLocation = () => {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -91,12 +91,12 @@ const ManageStore = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-semibold">Manage Store</h2>
+        <h2 className="text-lg font-semibold">Manage Location</h2>
         <button
           onClick={handleAdd}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
-          Add Store
+          Add Location
         </button>
       </div>
 
@@ -162,7 +162,7 @@ const ManageStore = () => {
       )}
 
       {loading ? (
-        <div className="text-center text-gray-600 py-10">Loading stores...</div>
+        <div className="text-center text-gray-600 py-10">Loading locations...</div>
       ) : (
         <div className="space-y-4">
           {locations.map((store) => (
@@ -190,4 +190,4 @@ const ManageStore = () => {
   );
 };
 
-export default ManageStore;
+export default ManageLocation;

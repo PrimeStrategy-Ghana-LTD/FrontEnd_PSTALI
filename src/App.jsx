@@ -13,7 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Sidebar1 from "./components/Sidebar1";
 import AddUser from "./pages/AddUser";
 import AddAsset from "./pages/AddAsset";
-import ManageStore from "./pages/ManageStore";
+import ManageStore from "./pages/ManageLocation";
 import UserAccount from "./pages/UserAccount";
 import AllAssets from "./pages/AllAssets";
 import AllUsers from "./pages/AllUsers";
