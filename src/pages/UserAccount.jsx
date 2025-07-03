@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Pencil, ArrowLeft, Save, X } from "lucide-react";
-import axios from "axios";
+import { apiGetOneUser, apiUpdateUser } from "../servicess/tali"; 
 
 const UserAccount = () => {
-  const { userId } = useParams(); // ✅ Correct
+  const { userId } = useParams();
   const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -13,13 +13,12 @@ const UserAccount = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // ✅ Corrected useEffect dependency
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`https://backend-ps-tali.onrender.com/users/${userId}`);
-        setUser(response.data);
-        setEditedUser(response.data);
+        const data = await apiGetOneUser(userId);
+        setUser(data);
+        setEditedUser(data);
       } catch (err) {
         console.error("Failed to fetch user", err);
         setError("User not found.");
@@ -29,19 +28,24 @@ const UserAccount = () => {
     };
 
     fetchUser();
-  }, [userId]); // ✅ Correct dependency
+  }, [userId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditedUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    // Here you can send a PATCH/PUT request to save the updated user
-    console.log("Saved changes:", editedUser);
+  const handleSave = async () => {
+  try {
+    const updated = await apiUpdateUser(userId, editedUser);
+    setUser(updated); // refresh state with latest server data
     setIsEditing(false);
-    setUser(editedUser); // Update local user state
-  };
+  } catch (err) {
+    console.error("Failed to update user", err);
+    alert("Failed to save changes.");
+  }
+};
+
 
   const handleDiscard = () => {
     setEditedUser(user);
@@ -54,7 +58,7 @@ const UserAccount = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-md w-full max-w-2xl relative overflow-hidden">
-        {/* Top wave background and icons */}
+        {/* Top */}
         <div className="bg-[#eef2f6] h-50">
           <button
             onClick={() => navigate(-1)}
@@ -76,7 +80,10 @@ const UserAccount = () => {
         {/* Profile Content */}
         <div className="flex flex-col items-center -mt-20 pb-10 px-4">
           <img
-            src={user?.profile_picture || "https://randomuser.me/api/portraits/women/44.jpg"}
+            src={
+              user?.profile_picture ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.userName)}&background=random`
+            }
             alt="Profile"
             className="w-32 h-32 object-cover rounded-full border-4 border-white shadow-md"
           />

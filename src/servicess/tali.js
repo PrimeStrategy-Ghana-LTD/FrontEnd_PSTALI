@@ -9,15 +9,28 @@ export const apiGetAllUsers = async () => {
         throw error;
     }
 };
-export const apiGetOneUser = async () => {
-    try {
-        const response = await apiClient.get('/users/me');
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching locations:', error);
-        throw error;
-    }
+
+export const apiGetOneUser = async (userId) => {
+  try {
+    const response = await apiClient.get(`/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
 };
+
+// PATCH update user by ID
+export const apiUpdateUser = async (userId, data) => {
+  try {
+    const response = await apiClient.patch(`/users/${userId}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+};
+
 
 export const apiCountAllUsers = async () => {
     try {

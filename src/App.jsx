@@ -53,10 +53,6 @@ const router = createBrowserRouter([
     path: "/side-bar",
     element: <Sidebar1 />,
   },
-  {
-    path: "/user/:userId",
-    element: <UserAccount />,
-  },
 
   {
     path: "/dashboard",
@@ -81,6 +77,10 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: <AllUsers />,
+      },
+      {
+        path: "users/:userId",
+        element: <UserAccount />,
       },
       {
         path: "users/add-user",
