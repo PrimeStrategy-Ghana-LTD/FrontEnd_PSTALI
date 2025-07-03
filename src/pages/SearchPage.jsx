@@ -428,7 +428,7 @@ const SearchPage = () => {
               </div>
 
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-76 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw] space-y-1.5">
+                <div className="absolute right-0 mt-76 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[43vh] w-[15vw] space-y-1.5">
                   {userInfo ? (
                     <>
                       <div className=" text-gray-800 font-bold">
