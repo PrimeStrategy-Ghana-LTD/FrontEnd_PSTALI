@@ -64,67 +64,6 @@ const AssetAssignmentModal = ({ isOpen, onClose, asset }) => {
     }
   };
 
-//  const handleSubmit = async (event) => {
-//   event.preventDefault();
-//   setLoading(true);
-//   setError('');
-
-//   try {
-//     // Create FormData manually instead of from form
-//     const formData = new FormData();
-
-//     // Add all required fields manually
-//     if (asset && asset._id) {
-//       formData.append('asset', asset._id);
-//     }
-
-//     if (selectedUser && selectedUser.id) {
-//       formData.append('userName', selectedUser.id);
-//     }
-
-//     // Get other form values manually
-//     const form = event.target;
-//     const assetLocation = form.assetLocation.value;
-//     const durationDays = form.durationDays.value;
-//     const assignmentImage = form.assignmentImage.files[0];
-
-//     if (assetLocation) {
-//       formData.append('assetLocation', assetLocation);
-//     }
-    
-//     if (durationDays) {
-//       formData.append('durationDays', durationDays);
-//     }
-
-//     if (assignmentImage) {
-//       formData.append('assignmentImage', assignmentImage);
-//     }
-
-//     // Add current date as assignedAt
-//     formData.append('assignedAt', new Date().toISOString());
-
-//     // Debug log
-//     console.log("FormData contents:");
-//     for (let [key, value] of formData.entries()) {
-//       console.log(`${key}:`, value);
-//     }
-
-//     const response = await apiClient.post('/assignments', formData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data'
-//       }
-//     });
-
-//     console.log("Asset assigned successfully:", response.data);
-//     onClose();
-//     navigate('/assignments');
-//   } catch (error) {
-//     console.error("Error assigning asset:", error);
-//     setError(error.response?.data?.message || 'Failed to assign asset. Please try again.');
-//   } finally {
-//     setLoading(false);
-//   }
-// };
 
 const handleSubmit = async (event) => {
   event.preventDefault();
@@ -178,7 +117,7 @@ const handleSubmit = async (event) => {
 
     console.log("Success:", response.data);
     onClose();
-    navigate('/assigned');
+    navigate('/dashboard/assigned');
   } catch (error) {
     console.error("Error:", error.response?.data);
     setError(error.response?.data?.message || 'Failed to assign asset');
