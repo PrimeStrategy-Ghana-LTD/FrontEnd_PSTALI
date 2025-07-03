@@ -6,7 +6,7 @@ import axios from "axios";
 import Taxi from "../assets/images/local_taxi.png";
 import Way from "../assets/images/Way.png";
 import Users from "../assets/images/Users.png";
-import Goods from "../assets/images/quantity.png";
+import Goods from "../assets/images/Quantity.png";
 import location from "../assets/images/location.png";
 import Pending from "../assets/images/Pending.png";
 import Total from "../assets/images/Total.png";
