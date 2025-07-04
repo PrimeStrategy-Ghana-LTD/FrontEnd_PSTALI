@@ -27,50 +27,57 @@ const Settings = () => {
 
   return (
     <div className="p-6 space-y-8 bg-gray-100 min-h-screen">
+      <div className="flex justify-end gap-2">
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" className="sr-only peer" />
+          <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600" />
+          <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+        </label>
+        <span className="text-sm font-semibold">Dark Mode</span>
+      </div>
       {/* Profile & Password */}
       <div className="flex flex-wrap gap-6">
         {/* Profile Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 w-[35%]">
-  <h2 className="text-lg font-semibold mb-4">Profile</h2>
-  <div className="flex items-center gap-4 mb-6">
-    <div className="h-14 w-14 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center">
-      {user && user.profilePicture ? (
-        <img
-          src={user.profilePicture}
-          alt="Profile"
-          className="h-full w-full object-cover"
-        />
-      ) : (
-        <span className="text-gray-500 text-xl">👤</span>
-      )}
-    </div>
-    <p className="font-medium">
-      {user ? user.userName || "No Name" : "Loading..."}
-    </p>
-  </div>
-  <div className="text-sm space-y-3 text-gray-700">
-    <div className="flex justify-between">
-      <span className="font-semibold">Role:</span>
-      <span>{user ? user.role || "N/A" : "Loading..."}</span>
-    </div>
-    <div className="flex justify-between">
-      <span className="font-semibold">Store Location:</span>
-      <span>{user ? user.storeLocation || "N/A" : "Loading..."}</span>
-    </div>
-    <div className="flex justify-between">
-      <span className="font-semibold">Phone Number:</span>
-      <span>{user ? user.phone || "N/A" : "Loading..."}</span>
-    </div>
-    <div className="flex justify-between">
-      <span className="font-semibold">Email:</span>
-      <span>{user ? user.email || "N/A" : "Loading..."}</span>
-    </div>
-  </div>
-</div>
-
+        <div className="bg-white rounded-sm shadow-sm p-6 w-[35%]">
+          <h2 className="text-lg font-semibold mb-4">Profile</h2>
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-14 w-14 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center">
+              {user && user.profilePicture ? (
+                <img
+                  src={user.profilePicture}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-gray-500 text-xl">👤</span>
+              )}
+            </div>
+            <p className="font-medium">
+              {user ? user.userName || "No Name" : "Loading..."}
+            </p>
+          </div>
+          <div className="text-sm space-y-3 text-gray-700">
+            <div className="flex justify-between">
+              <span className="font-semibold">Role:</span>
+              <span>{user ? user.role || "N/A" : "Loading..."}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-semibold">Store Location:</span>
+              <span>{user ? user.storeLocation || "N/A" : "Loading..."}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-semibold">Phone Number:</span>
+              <span>{user ? user.phone || "N/A" : "Loading..."}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-semibold">Email:</span>
+              <span>{user ? user.email || "N/A" : "Loading..."}</span>
+            </div>
+          </div>
+        </div>
 
         {/* Change Password Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 w-[45%]">
+        <div className="bg-white rounded-sm shadow-sm p-6 w-[45%]">
           <h2 className="text-lg font-semibold mb-4">Change Password</h2>
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -108,10 +115,10 @@ const Settings = () => {
 
       {/* Security Card */}
       <div className="w-full flex justify-center">
-        <div className="bg-white rounded-lg shadow-md p-6 w-full md:w-[55%]">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white rounded-sm shadow-sm p-6 w-full md:w-[55%]">
+          <div className=" items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Security</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-12 mt-3">
               <span className="text-sm">Two Factor Authentication</span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" />
@@ -141,7 +148,7 @@ const Settings = () => {
                   className="border border-gray-400 px-4 py-2 rounded-md flex-1 w-[]"
                   placeholder="Enter your email"
                 />
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
                   Send
                 </button>
               </div>
