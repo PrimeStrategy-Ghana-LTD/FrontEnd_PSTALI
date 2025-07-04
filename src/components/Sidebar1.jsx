@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { X } from 'lucide-react';
-import logo from "../assets/images/logo.png";
+import logo from "../assets/images/white-tali-logo.png";
 import Home from "../assets/images/Home.png";
 import Assets from "../assets/images/Assets.png";
 import Report from "../assets/images/Report.png";
@@ -41,7 +41,7 @@ const Sidebar1 = ({ setSidebarOpen }) => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 lg:justify-center">
         <Link to="/" onClick={handleNavClick}>
-          <img src={logo} alt="Logo" className="h-10 w-auto" />
+          <img src={logo} alt="Logo" className="h-14 w-auto" />
         </Link>
         
         {/* Close button for mobile */}
