@@ -19,6 +19,7 @@ import AllAssets from "./pages/AllAssets";
 import AllUsers from "./pages/AllUsers";
 import ViewAsset from "./pages/ViewAsset";
 import AssignedPage from "./pages/AssignedPage";
+import Settings from "./pages/Settings";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -90,7 +91,12 @@ const router = createBrowserRouter([
         path: "assigned",
         element: <AssignedPage />,
       },
-      { path: "manage-location", element: <ManageStore /> },
+      { path: "manage-location", 
+        element: <ManageStore /> },
+      {
+        path: "settings",
+        element: <Settings />,
+      },
     ],
   },
 ]);
