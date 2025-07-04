@@ -1,4 +1,3 @@
-// Sidebar1.jsx
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { X } from 'lucide-react';
@@ -23,17 +22,19 @@ const topItems = [
   { label: "Search", icon: Search, path: "/search" },
 ];
 
-const bottomItems = [
-  { label: "Settings", icon: Settings, path: "/settings" },
-  { label: "Log Out", icon: Log, path: "/" },
-];
-
 const Sidebar1 = ({ setSidebarOpen }) => {
   const handleNavClick = () => {
-    // Close sidebar on mobile when navigating
     if (setSidebarOpen) {
       setSidebarOpen(false);
     }
+  };
+
+  const handleLogout = () => {
+    // Clear auth token and user info
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    // Redirect to login
+    window.location.href = "/";
   };
 
   return (
@@ -43,7 +44,7 @@ const Sidebar1 = ({ setSidebarOpen }) => {
         <Link to="/" onClick={handleNavClick}>
           <img src={logo} alt="Logo" className="h-14 w-auto" />
         </Link>
-        
+
         {/* Close button for mobile */}
         <button
           className="lg:hidden p-2 rounded-md text-white hover:bg-gray-700"
@@ -61,12 +62,12 @@ const Sidebar1 = ({ setSidebarOpen }) => {
             <NavLink
               key={index}
               to={item.path}
-              end={item.exact} // Use end prop for exact matching when specified
+              end={item.exact}
               onClick={handleNavClick}
               className={({ isActive }) =>
                 `flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                  isActive 
-                    ? 'bg-blue-600 text-white' 
+                  isActive
+                    ? 'bg-blue-600 text-white'
                     : 'text-gray-300 hover:text-white hover:bg-gray-700'
                 }`
               }
@@ -76,7 +77,7 @@ const Sidebar1 = ({ setSidebarOpen }) => {
                 alt={item.label}
                 className="w-5 h-5 mr-3 flex-shrink-0"
                 style={{
-                  filter: 'brightness(0) saturate(100%) invert(100%)'
+                  filter: 'brightness(0) saturate(100%) invert(100%)',
                 }}
               />
               <span className="truncate">{item.label}</span>
@@ -86,30 +87,44 @@ const Sidebar1 = ({ setSidebarOpen }) => {
 
         {/* Bottom navigation items */}
         <div className="space-y-2">
-          {bottomItems.map((item, index) => (
-            <NavLink
-              key={index}
-              to={item.path}
-              onClick={handleNavClick}
-              className={({ isActive }) =>
-                `flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                  isActive 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                }`
-              }
-            >
-              <img
-                src={item.icon}
-                alt={item.label}
-                className="w-5 h-5 mr-3 flex-shrink-0"
-                style={{
-                  filter: 'brightness(0) saturate(100%) invert(100%)'
-                }}
-              />
-              <span className="truncate">{item.label}</span>
-            </NavLink>
-          ))}
+          {/* Settings link */}
+          <NavLink
+            to="/dashboard/settings"
+            onClick={handleNavClick}
+            className={({ isActive }) =>
+              `flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                isActive
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
+              }`
+            }
+          >
+            <img
+              src={Settings}
+              alt="Settings"
+              className="w-5 h-5 mr-3 flex-shrink-0"
+              style={{
+                filter: 'brightness(0) saturate(100%) invert(100%)',
+              }}
+            />
+            <span className="truncate">Settings</span>
+          </NavLink>
+
+          {/* Logout button */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center w-full px-3 py-3 text-sm font-medium text-left text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors duration-200"
+          >
+            <img
+              src={Log}
+              alt="Log Out"
+              className="w-5 h-5 mr-3 flex-shrink-0"
+              style={{
+                filter: 'brightness(0) saturate(100%) invert(100%)',
+              }}
+            />
+            <span className="truncate">Log Out</span>
+          </button>
         </div>
       </nav>
     </div>

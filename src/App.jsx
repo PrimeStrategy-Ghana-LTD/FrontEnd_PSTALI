@@ -20,6 +20,7 @@ import AllUsers from "./pages/AllUsers";
 import ViewAsset from "./pages/ViewAsset";
 import AssignedPage from "./pages/AssignedPage";
 import Settings from "./pages/Settings";
+import Report from "./pages/Report";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
       {
         path: "users/:userId",
         element: <UserAccount />,
+      },
+      {
+        path: "reports",
+        element: <Report />,
       },
       {
         path: "users/add-user",
