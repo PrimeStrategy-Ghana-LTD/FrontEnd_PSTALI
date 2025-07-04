@@ -113,7 +113,7 @@ const AllAssets = () => {
 
   // Function to handle add asset button click
   const handleAddAssetClick = () => {
-    navigate('/dashboard/assets/add-asset');
+    navigate("/dashboard/assets/add-asset");
   };
 
   // View toggle buttons
@@ -286,7 +286,7 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
     <div className="hidden md:flex font-semibold text-sm text-gray-700 pb-2 border-b-2 border-gray-200">
       <div className="flex-[1.5]">Name</div>
       <div className="flex-[2]">VIN</div>
-      <div className="flex-[1.5]">Status</div>
+      <div className="flex-[1.5]">Origin</div>
       <div className="flex-[1.5]">Location</div>
       <div className="flex-[1.5] text-center">Assignments</div>
     </div>
@@ -321,15 +321,11 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
               <p className="text-gray-700">{item.assetId}</p>
             </div>
             <div>
-              <span className="text-gray-500 font-medium">Status:</span>
+              <span className="text-gray-500 font-medium">Origin:</span>
               <p
-                className={`font-semibold ${
-                  item.status === "Available"
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
+                className="font-semibold"
               >
-                {item.status}
+                {item.origin}
               </p>
             </div>
             <div className="col-span-2">
@@ -370,13 +366,13 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
           </div>
           <div className="flex-[2] truncate">{item.assetId}</div>
           <div
-            className={`flex-[1.5] font-semibold ${
-              item.status === "Available" ? "text-green-600" : "text-red-600"
-            }`}
+            className="flex-[1.5] font-semibold" 
           >
-            {item.status}
+            {item.origin}
           </div>
-          <div className="flex-[1.5]">{getLocationName(item.assetLocation)}</div>
+          <div className="flex-[1.5]">
+            {getLocationName(item.assetLocation)}
+          </div>
           <div className="flex-[1.5] flex justify-center">
             <button
               onClick={() => onAssignClick(item)}
@@ -393,62 +389,59 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
 
 // Grid View Component
 const GridView = ({ assets, getLocationName, onAssignClick }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xlg:grid-cols-3 gap-4 mt-6 ml-20">
     {assets.map((item, index) => (
       <div
         key={index}
-        className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+        className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow h-[243px] w-[348px]"
       >
-        <div className="flex gap-4">
+        <button
+          onClick={() => onAssignClick(item)}
+          className="py-1.5 text-xs bg-[#051b34] text-white rounded-md hover:bg-[#0a2a4a] w-[64px]"
+        >
+          Assign
+        </button>
+        <p className="border-b-[0.5px] mt-2 border-gray-300"></p>
+        <div className="flex gap-4 mt-2">
           <div className="flex-shrink-0">
             <img
               src={item.assetImage}
               alt={item.assetName}
-              className="w-20 h-20 rounded-lg object-cover"
+              className="w-[149px] h-[149px]  object-cover"
             />
           </div>
           <div className="flex-1 flex flex-col justify-between">
-            <div className="mb-2">
+            <div className="">
               <Link
                 to={`/dashboard/view-asset/${item._id}`}
                 className="font-semibold text-gray-800 hover:text-blue-600 text-sm"
               >
                 {item.assetName}
               </Link>
-              <p className="text-xs text-gray-500 mt-1">2025</p>
+              <p className="text-xs text-gray-500 ">2025</p>
             </div>
-            <div className="space-y-1 mb-3">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500">VIN:</span>
-                <span className="text-xs text-gray-700 font-medium">
-                  {item.assetId}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500">Location:</span>
-                <span className="text-xs text-gray-700">
-                  {getLocationName(item.assetLocation)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500">Status:</span>
-                <span
-                  className={`text-xs font-semibold ${
-                    item.status === "Available"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {item.status}
-                </span>
-              </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-500">Location:</span>
+              <span className="text-xs text-gray-700">
+                {getLocationName(item.assetLocation)}
+              </span>
             </div>
-            <button
-              onClick={() => onAssignClick(item)}
-              className="py-1.5 text-xs bg-[#051b34] text-white rounded-md hover:bg-[#0a2a4a]"
-            >
-              Assign Asset
-            </button>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-500">VIN:</span>
+              <span className="text-xs text-gray-700 font-medium">
+                {item.assetId}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-500">Origin</span>
+              <span
+                className= "text-xs font-semibold text-gray-700"
+              >
+                {item.origin}
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -358,14 +358,12 @@ const SearchPage = () => {
     navigate("/");
   };
 
-  
-
   return (
     <div className="p-5 lg:px-8 xl:px-12 2xl:px-16 min-h-screen bg-[#051b34]">
       {/* Container for max width on very large screens */}
       <div className="mx-auto max-w-7xl">
         {/* User and Notification Icons */}
-        <div className="flex justify-end mb-6 lg:mb-8">
+        <div className="fixed top-0 right-0 z-50 flex items-center gap-4 p-2 bg-[#051b34]">
           <div className="flex items-center gap-4">
             <div className="relative" ref={bellRef}>
               <div
@@ -437,24 +435,28 @@ const SearchPage = () => {
                       <div className="text-sm text-gray-600 border-b-[0.5px] border-gray-300">
                         {userInfo.role}
                       </div>
-                      
-                        <p className="flex items-center gap-1 text-sm">
-                          <MdOutlineEmail /> {userInfo.email}
-                        </p>
-                        <p className="flex items-center gap-1 text-sm">
-                          <MdOutlineContactPage /> {userInfo.phone}
-                        </p>
-                        <p className="flex items-center gap-1 text-sm">
-                          <MdOutlineLocationOn /> {userInfo.storeLocation}
-                        </p>
-                      
+
+                      <p className="flex items-center gap-1 text-sm">
+                        <MdOutlineEmail /> {userInfo.email}
+                      </p>
+                      <p className="flex items-center gap-1 text-sm">
+                        <MdOutlineContactPage /> {userInfo.phone}
+                      </p>
+                      <p className="flex items-center gap-1 text-sm">
+                        <MdOutlineLocationOn /> {userInfo.storeLocation}
+                      </p>
+
                       <p className="border-b-[0.5px] border-gray-300"></p>
                       <div className="flex text-sm gap-1">
-                        <p className="mt-1"><VscAccount /></p>
+                        <p className="mt-1">
+                          <VscAccount />
+                        </p>
                         <p>Account</p>
                       </div>
                       <div className="flex text-sm gap-1">
-                        <p className="mt-1"><MdOutlineSettings /></p>
+                        <p className="mt-1">
+                          <MdOutlineSettings />
+                        </p>
                         <p>Settings</p>
                       </div>
                       <p className="border-b-[0.5px] border-gray-300"></p>
@@ -478,107 +480,107 @@ const SearchPage = () => {
         </div>
 
         {/* Logo - Responsive sizing */}
-        <div className="flex flex-row items-center justify-center mt-12 lg:mt-16 xl:mt-20 2xl:mt-24">
-          <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-extrabold text-white">
-            TALI
-          </p>
-          <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold text-[#01fe9d]">
-            .
-          </p>
-        </div>
-
-        {/* Search Bar - Better responsive behavior */}
-        <div className="relative flex justify-center mb-8 lg:mb-12 mt-8 lg:mt-12">
-          <div className="border-2 border-white w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl h-12 lg:h-14 xl:h-16 rounded-4xl flex flex-row items-center px-4 lg:px-6 gap-2 lg:gap-3 focus-within:shadow-md transition-all bg-white relative z-10">
-            <Search className="text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder={loading ? "Loading assets..." : "Search Assets"}
-              className="flex-1 bg-transparent border-none outline-none text-gray-700 text-sm lg:text-base xl:text-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              disabled={loading}
-            />
+        <div className="">
+          <div className="flex flex-row items-center justify-center mt-12 lg:mt-16 xl:mt-20 2xl:mt-24">
+            <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-extrabold text-white">
+              TALI
+            </p>
+            <p className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold text-[#01fe9d]">
+              .
+            </p>
           </div>
 
-          {/* Suggestions Box - Matching search bar width */}
-          {searchTerm && filteredAssets.length > 0 && (
-            <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-2">
-              {filteredAssets.slice(0, 8).map((asset, idx) => (
-                <div
-                  key={asset.id || idx}
-                  onClick={() => handleAssetClick(asset)}
-                  className="p-2 lg:p-3 hover:bg-gray-100 rounded-md cursor-pointer text-gray-700 text-sm lg:text-base border-b border-gray-100 last:border-b-0"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">{asset.name}</span>
-                    {asset.category && (
-                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                        {asset.category}
-                      </span>
+          {/* Search Bar - Better responsive behavior */}
+          <div className="relative flex justify-center mb-8 lg:mb-12 mt-8 lg:mt-12">
+            <div className="border-2 border-white w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl h-12 lg:h-14 xl:h-16 rounded-4xl flex flex-row items-center px-4 lg:px-6 gap-2 lg:gap-3 focus-within:shadow-md transition-all bg-white relative z-10">
+              <Search className="text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder={loading ? "Loading assets..." : "Search Assets"}
+                className="flex-1 bg-transparent border-none outline-none text-gray-700 text-sm lg:text-base xl:text-lg"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            {/* Suggestions Box - Matching search bar width */}
+            {searchTerm && filteredAssets.length > 0 && (
+              <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-2">
+                {filteredAssets.slice(0, 8).map((asset, idx) => (
+                  <div
+                    key={asset.id || idx}
+                    onClick={() => handleAssetClick(asset)}
+                    className="p-2 lg:p-3 hover:bg-gray-100 rounded-md cursor-pointer text-gray-700 text-sm lg:text-base border-b border-gray-100 last:border-b-0"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">{asset.name}</span>
+                      {asset.category && (
+                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                          {asset.category}
+                        </span>
+                      )}
+                    </div>
+                    {asset.status && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Status: {asset.status}
+                      </div>
                     )}
                   </div>
-                  {asset.status && (
-                    <div className="text-xs text-gray-500 mt-1">
-                      Status: {asset.status}
-                    </div>
-                  )}
-                </div>
+                ))}
+                {filteredAssets.length > 8 && (
+                  <div className="p-2 lg:p-3 text-gray-500 text-xs lg:text-sm text-center border-t">
+                    +{filteredAssets.length - 8} more results
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* No results message */}
+            {searchTerm && filteredAssets.length === 0 && !loading && (
+              <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-4">
+                <p className="text-gray-500 text-sm lg:text-base text-center">
+                  No assets found
+                </p>
+              </div>
+            )}
+
+            {/* Error message */}
+            {error && (
+              <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-4">
+                <p className="text-red-500 text-sm lg:text-base text-center">
+                  {error}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Tabs - Better spacing on larger screens */}
+          <div className="flex justify-center mb-8 lg:mb-10">
+            <div className="flex space-x-8 lg:space-x-16 xl:space-x-20">
+              {["Assets", "Advanced Search"].map((tab) => (
+                <p
+                  key={tab}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    if (tab === "Assets") {
+                      navigate("/dashboard/assets");
+                    }
+                  }}
+                  className={`text-base lg:text-lg xl:text-xl font-medium cursor-pointer transition-colors hover:text-[#01fe9d] ${
+                    activeTab === tab
+                      ? "text-white pb-1 border-b-2 border-white"
+                      : "text-white"
+                  }`}
+                >
+                  {tab}
+                </p>
               ))}
-              {filteredAssets.length > 8 && (
-                <div className="p-2 lg:p-3 text-gray-500 text-xs lg:text-sm text-center border-t">
-                  +{filteredAssets.length - 8} more results
-                </div>
-              )}
             </div>
-          )}
-
-          {/* No results message */}
-          {searchTerm && filteredAssets.length === 0 && !loading && (
-            <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-4">
-              <p className="text-gray-500 text-sm lg:text-base text-center">
-                No assets found
-              </p>
-            </div>
-          )}
-
-          {/* Error message */}
-          {error && (
-            <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-4">
-              <p className="text-red-500 text-sm lg:text-base text-center">
-                {error}
-              </p>
-            </div>
-          )}
-        </div>
-        
-
-        {/* Tabs - Better spacing on larger screens */}
-        <div className="flex justify-center mb-8 lg:mb-10">
-          <div className="flex space-x-8 lg:space-x-16 xl:space-x-20">
-            {["Assets", "Advanced Search"].map((tab) => (
-              <p
-                key={tab}
-                onClick={() => {
-                  setActiveTab(tab);
-                  if (tab === "Assets") {
-                    navigate("/dashboard/assets");
-                  }
-                }}
-                className={`text-base lg:text-lg xl:text-xl font-medium cursor-pointer transition-colors hover:text-[#01fe9d] ${
-                  activeTab === tab
-                    ? "text-white pb-1 border-b-2 border-white"
-                    : "text-white"
-                }`}
-              >
-                {tab}
-              </p>
-            ))}
           </div>
         </div>
 
         {/* Settings - Positioned better on larger screens */}
-        
       </div>
     </div>
   );

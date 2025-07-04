@@ -45,7 +45,7 @@ const LoginPage = () => {
         {/* Form Section */}
         <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 xl:px-16 2xl:px-24">
           <div className="w-full max-w-md">
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-8 hidden lg:flex ">
               <img src={logo} alt="Company Logo" className="h-16" />
             </div>
 
