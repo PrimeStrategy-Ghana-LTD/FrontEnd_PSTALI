@@ -21,6 +21,7 @@ import ViewAsset from "./pages/ViewAsset";
 import AssignedPage from "./pages/AssignedPage";
 import Settings from "./pages/Settings";
 import Report from "./pages/Report";
+import AssignLocationPage from "./pages/AssignLocationPage";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -76,6 +77,11 @@ const router = createBrowserRouter([
         path: "assets/view-asset/:id",
         element: <ViewAsset />,
       },
+      { 
+        path: "assign-location/:id",
+        element: <AssignLocationPage />,
+      },
+
       {
         path: "users",
         element: <AllUsers />,
@@ -96,8 +102,7 @@ const router = createBrowserRouter([
         path: "assigned",
         element: <AssignedPage />,
       },
-      { path: "manage-location", 
-        element: <ManageStore /> },
+      { path: "manage-location", element: <ManageStore /> },
       {
         path: "settings",
         element: <Settings />,

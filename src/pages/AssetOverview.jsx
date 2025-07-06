@@ -56,9 +56,9 @@ const AssetOverview = () => {
   return (
     <div className="h-full bg-gray-50">
       <div className="max-w-7xl mx-auto h-full">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 h-full">
+        <div className="flex flex-col lg:flex-row gap-3 h-full">
           {/* Left Column - Main Content */}
-          <div className="xl:col-span-2 space-y-3">
+          <div className="w-full lg:w-2/3 space-y-3">
             {/* Asset Overview Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
               <h2 className="text-base font-semibold text-gray-900 mb-3">Asset Overview</h2>
@@ -102,7 +102,7 @@ const AssetOverview = () => {
           </div>
 
           {/* Right Column - Summary and Chart */}
-          <div className="space-y-3">
+          <div className="w-full lg:w-1/3 space-y-3">
             {/* Asset Summary Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[48%]">
               <h2 className="text-base font-semibold text-gray-900 mb-3">Asset Summary</h2>

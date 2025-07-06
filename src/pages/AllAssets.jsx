@@ -235,19 +235,11 @@ const AllAssets = () => {
             <ListView
               assets={filteredAssets}
               getLocationName={getLocationName}
-              onAssignClick={(asset) => {
-                setSelectedAsset(asset);
-                setIsAssignModalOpen(true);
-              }}
             />
           ) : (
             <GridView
               assets={filteredAssets}
               getLocationName={getLocationName}
-              onAssignClick={(asset) => {
-                setSelectedAsset(asset);
-                setIsAssignModalOpen(true);
-              }}
             />
           )}
 
@@ -322,11 +314,7 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
             </div>
             <div>
               <span className="text-gray-500 font-medium">Origin:</span>
-              <p
-                className="font-semibold"
-              >
-                {item.origin}
-              </p>
+              <p className="font-semibold">{item.origin}</p>
             </div>
             <div className="col-span-2">
               <span className="text-gray-500 font-medium">Location:</span>
@@ -337,12 +325,14 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
           </div>
 
           <div className="mt-3">
-            <button
-              onClick={() => onAssignClick(item)}
-              className="w-full px-3 py-2 rounded-md bg-[#051b34] text-white text-xs hover:bg-[#051b34]/90"
-            >
-              Assign Asset
-            </button>
+            <div className="flex-[1.5] text-center">
+              <Link
+                to={`/dashboard/assign-location/${item._id}`}
+                className="text-blue-600 hover:underline text-sm"
+              >
+                Assign
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -365,21 +355,20 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
             </div>
           </div>
           <div className="flex-[2] truncate">{item.assetId}</div>
-          <div
-            className="flex-[1.5] font-semibold" 
-          >
-            {item.origin}
-          </div>
+          <div className="flex-[1.5] font-semibold">{item.origin}</div>
           <div className="flex-[1.5]">
             {getLocationName(item.assetLocation)}
           </div>
           <div className="flex-[1.5] flex justify-center">
-            <button
-              onClick={() => onAssignClick(item)}
-              className="px-3 py-1 rounded-md bg-[#051b34] text-white text-xs hover:bg-[#051b34]/90"
-            >
-              Assign to
-            </button>
+            <div className="flex-[1.5] text-center">
+  <Link
+    to={`/dashboard/assign-location/${item._id}`}
+    className="text-blue-600 hover:underline text-sm"
+  >
+    Assign
+  </Link>
+</div>
+
           </div>
         </div>
       </div>
@@ -395,12 +384,13 @@ const GridView = ({ assets, getLocationName, onAssignClick }) => (
         key={index}
         className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow h-[243px] w-[348px]"
       >
-        <button
-          onClick={() => onAssignClick(item)}
-          className="py-1.5 text-xs bg-[#051b34] text-white rounded-md hover:bg-[#0a2a4a] w-[64px]"
+        <Link
+          to={`/dashboard/assign-location/${item._id}`}
+          className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
         >
           Assign
-        </button>
+        </Link>
+
         <p className="border-b-[0.5px] mt-2 border-gray-300"></p>
         <div className="flex gap-4 mt-2">
           <div className="flex-shrink-0">
@@ -436,9 +426,7 @@ const GridView = ({ assets, getLocationName, onAssignClick }) => (
 
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-500">Origin</span>
-              <span
-                className= "text-xs font-semibold text-gray-700"
-              >
+              <span className="text-xs font-semibold text-gray-700">
                 {item.origin}
               </span>
             </div>

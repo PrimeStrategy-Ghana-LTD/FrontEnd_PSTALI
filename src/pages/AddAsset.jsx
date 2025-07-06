@@ -58,26 +58,56 @@ const AddAsset = () => {
     navigate("/dashboard/assets");
   };
 
-  const renderInputRow = ({ label, name, type = "text", placeholder }) => (
-    <div key={name} className="flex items-center mb-3 gap-4">
-      <label className="w-40 text-sm font-medium text-gray-700">{label}</label>
-      <input
-        name={name}
-        type={type}
-        required
-        placeholder={placeholder}
-        className="w-[250px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-      />
-    </div>
-  );
+  const renderInputRow = ({ label, name, type = "text", placeholder }) => {
+    if (name === "year") {
+      const currentYear = new Date().getFullYear();
+      const years = Array.from({ length: currentYear - 1990 + 1 }, (_, i) => currentYear - i);
+
+      return (
+        <div key={name} className="flex items-center mb-3 gap-4">
+          <label className="w-40 text-sm font-medium text-gray-700">{label}</label>
+          <select
+            name={name}
+            required
+            className="w-[250px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          >
+            <option value="">Select year</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+
+    return (
+      <div key={name} className="flex items-center mb-3 gap-4">
+    <label className="w-40 text-sm font-medium text-gray-700">{label}</label>
+    <input
+      name={name}
+      type={type}
+      required
+      placeholder={placeholder}
+      className={`w-[250px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${
+        name === "mileage" ? "remove-spinner" : ""
+      }`}
+      inputMode={name === "mileage" ? "numeric" : undefined}
+    />
+  </div>
+    );
+  };
 
   return (
     <div className="bg-[#f0f1f3] min-h-full p-4 space-y-5">
       <div className="bg-white p-6 rounded-md shadow-sm w-full border border-white">
         <div className="mb-6">
           <div className="flex gap-2">
-            <Link to="/dashboard/assets" className="mt-2.5"><IoArrowBack /></Link>
-          <h2 className="text-2xl font-semibold text-gray-800">Add New Asset</h2>
+            <Link to="/dashboard/assets" className="mt-2.5">
+              <IoArrowBack />
+            </Link>
+            <h2 className="text-2xl font-semibold text-gray-800">Add New Asset</h2>
           </div>
           <p className="text-gray-600 text-sm mt-1">
             Fill in the details to add a new asset to the system
@@ -92,10 +122,10 @@ const AddAsset = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Section - Image & Basic Info */}
+            {/* Left Section */}
             <div className="col-span-1">
-              <div>  
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Asset Image</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Asset Image</label>
                 <div className="relative flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 hover:bg-gray-100 min-h-[279px] w-[279px]">
                   <input
                     type="file"
@@ -106,7 +136,12 @@ const AddAsset = () => {
                     required
                   />
                   <div className="text-center">
-                    <svg className="mx-auto h-12 w-12 text-gray-400 mb-3" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400 mb-3"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                    >
                       <path
                         d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                         strokeWidth="2"
@@ -117,9 +152,7 @@ const AddAsset = () => {
                     <p className="text-sm text-blue-600 font-medium">Click to upload or drag and drop</p>
                     <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
                     {selectedImageName && (
-                      <p className="text-xs text-gray-600 mt-2 font-medium">
-                        Selected: {selectedImageName}
-                      </p>
+                      <p className="text-xs text-gray-600 mt-2 font-medium">Selected: {selectedImageName}</p>
                     )}
                   </div>
                   {imagePreview && (
@@ -133,14 +166,16 @@ const AddAsset = () => {
               </div>
 
               <div className="mt-10">
-                <h3 className="text-lg font-medium text-gray-800 mb-4 border-b border-gray-200 pb-2">Basic Information</h3>
+                <h3 className="text-lg font-medium text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                  Basic Information
+                </h3>
                 <div>
                   {[
                     { label: "Asset Name", name: "assetName", placeholder: "Enter asset name" },
                     { label: "Asset ID/VIN", name: "assetId", placeholder: "Enter asset ID or VIN" },
                     { label: "Make", name: "make", placeholder: "Enter make" },
                     { label: "Model", name: "model", placeholder: "Enter model" },
-                    { label: "Year", name: "year", type: "number", placeholder: "Enter year" },
+                    { label: "Year", name: "year" },
                     { label: "Mileage", name: "mileage", type: "number", placeholder: "Enter mileage" },
                     { label: "Exterior Colour", name: "exteriorColour", placeholder: "Enter exterior colour" },
                   ].map(renderInputRow)}
@@ -148,10 +183,12 @@ const AddAsset = () => {
               </div>
             </div>
 
-            {/* Right Section - Technical Details */}
+            {/* Right Section */}
             <div className="col-span-1">
               <div>
-                <h3 className="text-lg font-medium text-gray-800 mb-4 border-b border-gray-200 pb-2">Technical Details</h3>
+                <h3 className="text-lg font-medium text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                  Technical Details
+                </h3>
                 <div>
                   {[
                     { label: "Variant", name: "variant", placeholder: "Enter variant" },
@@ -164,7 +201,7 @@ const AddAsset = () => {
                   ].map(renderInputRow)}
 
                   <div className="flex items-center gap-4 mb-3">
-                    <label className="w-40 text-sm font-medium text-gray-700">Asset Location </label>
+                    <label className="w-40 text-sm font-medium text-gray-700">Asset Location</label>
                     <select
                       name="assetLocation"
                       required
@@ -182,7 +219,7 @@ const AddAsset = () => {
               </div>
 
               <div className="mt-8">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Justification </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Justification</label>
                 <textarea
                   name="justification"
                   rows="4"
@@ -194,7 +231,7 @@ const AddAsset = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Buttons */}
           <div className="flex justify-end gap-4 mt-10 pt-6 border-t border-gray-200">
             <button
               type="button"

@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+/* Hide number input spinners for mileage */
+input.remove-spinner::-webkit-outer-spin-button,
+input.remove-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input.remove-spinner[type='number'] {
+  -moz-appearance: textfield; /* Firefox */
+}

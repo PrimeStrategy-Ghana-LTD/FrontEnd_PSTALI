@@ -165,11 +165,11 @@ const ViewAsset = () => {
   };
 
   const handleAssign = () => {
-    // Add your assign logic here
-    console.log("Assign button clicked");
-    toast.info("Assign functionality will be implemented");
+    if (id) {
+      navigate(`/dashboard/assign-location/${id}`);
+    }
   };
-
+  
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
