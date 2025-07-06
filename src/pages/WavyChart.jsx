@@ -76,7 +76,7 @@ const WavyChart = () => {
 
   return (
     <div >
-      <div className="bg-white rounded-lg p-4 shadow-md w-full">
+      <div className="bg-white rounded-lg p-4 shadow-md w-[97%] ml-4">
         <div className="flex items-center justify-between mb-2">
         <p className="font-semibold text-gray-700">Assets Assignment</p>
         <p className="text-sm bg-gray-100 px-2 py-1 rounded-md">Weekly</p>

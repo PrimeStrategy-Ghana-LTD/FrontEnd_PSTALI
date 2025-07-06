@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Search, Settings, Bell } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { ClipboardCheck, Wrench, UserCircle } from "lucide-react";
 import { MdOutlineContactPage } from "react-icons/md";
@@ -451,13 +451,13 @@ const SearchPage = () => {
                         <p className="mt-1">
                           <VscAccount />
                         </p>
-                        <p>Account</p>
+                        <Link>Account</Link>
                       </div>
                       <div className="flex text-sm gap-1">
                         <p className="mt-1">
                           <MdOutlineSettings />
                         </p>
-                        <p>Settings</p>
+                        <Link to='/dashboard/settings'>Settings</Link>
                       </div>
                       <p className="border-b-[0.5px] border-gray-300"></p>
                       <button

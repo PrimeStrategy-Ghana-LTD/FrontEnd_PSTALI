@@ -36,7 +36,7 @@ const Settings = () => {
         <span className="text-sm font-semibold">Dark Mode</span>
       </div>
       {/* Profile & Password */}
-      <div className="flex flex-wrap gap-6">
+      <div className="flex flex-wrap gap-6 justify-center">
         {/* Profile Card */}
         <div className="bg-white rounded-sm shadow-sm p-6 w-[35%]">
           <h2 className="text-lg font-semibold mb-4">Profile</h2>

@@ -114,9 +114,9 @@ const Report = () => {
         </div>
       </div>
       <WavyChart />
-      <div className="border-2 bg-white border-white p-4 rounded-md shadow-sm mt-5">
+      <div className="border-2 bg-white border-white p-4 rounded-md shadow-sm mt-5 w-[97%] ml-4">
       <div className="flex flex-row justify-between mb-2">
-        <p className="font-semibold">Recently Added</p>
+        <p className="font-semibold">Assignments</p>
         <p className="border-[0.05px] border-gray-400 py-1 px-5 rounded-sm text-[14px] text-gray-600">Latest</p>
       </div>
 

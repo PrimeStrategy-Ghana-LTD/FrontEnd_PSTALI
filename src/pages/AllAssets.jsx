@@ -8,6 +8,7 @@ import { FaListUl, FaTh } from "react-icons/fa";
 import AssetAssignmentModal from "./AssetAssignmentModal";
 import { Link, useNavigate } from "react-router-dom";
 import { apiGetAllAssets, apiGetLocations } from "../servicess/tali";
+import { FiSearch } from "react-icons/fi";
 
 const AllAssets = () => {
   const navigate = useNavigate();
@@ -19,6 +20,9 @@ const AllAssets = () => {
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [assets, setAssets] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [sortOption, setSortOption] = useState("recent"); // default is recently added
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -85,6 +89,22 @@ const AllAssets = () => {
     getLocations();
   }, [viewMode]);
 
+  const sortAssets = (assets, option) => {
+    switch (option) {
+      case "alphabetical":
+        return [...assets].sort((a, b) =>
+          a.assetName.localeCompare(b.assetName)
+        );
+      case "reverse":
+        return [...assets].sort((a, b) =>
+          b.assetName.localeCompare(a.assetName)
+        );
+      case "recent":
+      default:
+        return [...assets]; // Assuming the API returns in most recent order
+    }
+  };
+
   useEffect(() => {
     setCurrentPage(1);
     const filters = {};
@@ -93,13 +113,21 @@ const AllAssets = () => {
     getAssets(1, filters);
   }, [availabilityFilter, locationFilter]);
 
-  const filteredAssets = assets.filter((item) => {
-    const locationName = getLocationName(item.assetLocation);
-    return (
-      (availabilityFilter === "" || item.status === availabilityFilter) &&
-      (locationFilter === "" || locationName === locationFilter)
-    );
-  });
+  const filteredAssets = sortAssets(
+    assets.filter((item) => {
+      const locationName = getLocationName(item.assetLocation);
+      const matchesAvailability =
+        availabilityFilter === "" || item.status === availabilityFilter;
+      const matchesLocation =
+        locationFilter === "" || locationName === locationFilter;
+      const matchesSearch =
+        searchTerm === "" ||
+        item.assetName?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return matchesAvailability && matchesLocation && matchesSearch;
+    }),
+    sortOption
+  );
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages && page !== currentPage) {
@@ -180,6 +208,57 @@ const AllAssets = () => {
                 <IoFilterOutline />
                 <span>Filters</span>
               </button>
+              <div className="relative">
+                <button
+                  className="px-4 py-2 border border-gray-300 text-gray-600 rounded-sm hover:bg-gray-50 transition-colors"
+                  onClick={() => setShowSortDropdown((prev) => !prev)}
+                >
+                  Sort
+                </button>
+                {showSortDropdown && (
+                  <div className="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-200 shadow-md rounded-sm text-sm">
+                    <button
+                      onClick={() => {
+                        setSortOption("recent");
+                        setShowSortDropdown(false);
+                      }}
+                      className={`block px-4 py-2 text-left w-full hover:bg-gray-100 ${
+                        sortOption === "recent"
+                          ? "font-semibold text-[#051b34]"
+                          : ""
+                      }`}
+                    >
+                      Recently Added
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSortOption("alphabetical");
+                        setShowSortDropdown(false);
+                      }}
+                      className={`block px-4 py-2 text-left w-full hover:bg-gray-100 ${
+                        sortOption === "alphabetical"
+                          ? "font-semibold text-[#051b34]"
+                          : ""
+                      }`}
+                    >
+                      Alphabetical (A-Z)
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSortOption("reverse");
+                        setShowSortDropdown(false);
+                      }}
+                      className={`block px-4 py-2 text-left w-full hover:bg-gray-100 ${
+                        sortOption === "reverse"
+                          ? "font-semibold text-[#051b34]"
+                          : ""
+                      }`}
+                    >
+                      Alphabetical (Z-A)
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -224,6 +303,32 @@ const AllAssets = () => {
               </div>
             </div>
           )}
+
+          <div className="w-full flex justify-end mb-4">
+  <div className="relative flex items-center border border-gray-300 rounded-md text-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent px-3 py-2 sm:w-64">
+    <svg
+      className="w-4 h-4 text-gray-400 mr-2"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+    <input
+      type="text"
+      placeholder="Search assets..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="w-full focus:outline-none"
+    />
+  </div>
+</div>
+
 
           {loading && (
             <div className="flex justify-center items-center py-8">
@@ -361,14 +466,13 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
           </div>
           <div className="flex-[1.5] flex justify-center">
             <div className="flex-[1.5] text-center">
-  <Link
-    to={`/dashboard/assign-location/${item._id}`}
-    className="text-blue-600 hover:underline text-sm"
-  >
-    Assign
-  </Link>
-</div>
-
+              <Link
+                to={`/dashboard/assign-location/${item._id}`}
+                className="text-blue-600 hover:underline text-sm"
+              >
+                Assign
+              </Link>
+            </div>
           </div>
         </div>
       </div>

@@ -11,6 +11,8 @@ const AllUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sortDropdownVisible, setSortDropdownVisible] = useState(false);
+  const [sortOption, setSortOption] = useState("");
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -138,6 +140,20 @@ const AllUsers = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+  useEffect(() => {
+    let sortedUsers = [...filteredUsers];
+
+    if (sortOption === "recent") {
+      sortedUsers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // most recent first
+    } else if (sortOption === "az") {
+      sortedUsers.sort((a, b) => a.userName?.localeCompare(b.userName));
+    } else if (sortOption === "za") {
+      sortedUsers.sort((a, b) => b.userName?.localeCompare(a.userName));
+    }
+
+    setFilteredUsers(sortedUsers);
+  }, [sortOption]);
+
   const handleAddUser = () => {
     navigate("add-user");
   };
@@ -230,9 +246,46 @@ const AllUsers = () => {
                 </svg>
                 Filter
               </button>
-              <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-                Sort
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setSortDropdownVisible(!sortDropdownVisible)}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  Sort
+                </button>
+
+                {sortDropdownVisible && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                    <button
+                      onClick={() => {
+                        setSortOption("recent");
+                        setSortDropdownVisible(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Recently Added
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSortOption("az");
+                        setSortDropdownVisible(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      A - Z
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSortOption("za");
+                        setSortDropdownVisible(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Z - A
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -381,7 +434,9 @@ const AllUsers = () => {
                     </td>
                     <td className="py-4 px-6">
                       <button
-                        onClick={() => navigate(`/dashboard/users/${user.id || user._id}`)}
+                        onClick={() =>
+                          navigate(`/dashboard/users/${user.id || user._id}`)
+                        }
                         className="px-3 py-1 text-xs font-medium text-white bg-gray-800 rounded-md hover:bg-gray-700 transition-colors"
                       >
                         Manage
@@ -417,7 +472,9 @@ const AllUsers = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => navigate(`/dashboard/users/${user.id || user._id}`)}
+                    onClick={() =>
+                      navigate(`/dashboard/users/${user.id || user._id}`)
+                    }
                     className="px-3 py-1 text-xs font-medium text-white bg-gray-800 rounded-md"
                   >
                     Manage
