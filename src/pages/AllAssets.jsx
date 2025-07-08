@@ -492,7 +492,7 @@ const ListView = ({ assets, getLocationName }) => (
       <div className="flex-[2]">VIN</div>
       <div className="flex-[1.5]">Origin</div>
       <div className="flex-[1.5]">Location</div>
-      <div className="flex-[1.5] text-center">Assignments</div>
+      <div className="flex-[1.5] text-center">Assignment</div>
     </div>
 
     {assets.map((item, index) => (
@@ -541,7 +541,7 @@ const ListView = ({ assets, getLocationName }) => (
                 to={`/dashboard/assign-location/${item._id}`}
                 className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
               >
-                Assign
+                Assign To
               </Link>
             </div>
           </div>
@@ -574,7 +574,7 @@ const ListView = ({ assets, getLocationName }) => (
               to={`/dashboard/assign-location/${item._id}`}
               className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
             >
-              Assign
+              Assign To
             </Link>
           </div>
         </div>
@@ -595,7 +595,7 @@ const GridView = ({ assets, getLocationName }) => (
           to={`/dashboard/assign-location/${item._id}`}
           className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
         >
-          Assign
+          Assign To
         </Link>
 
         <p className="border-b-[0.5px] mt-2 border-gray-300"></p>
