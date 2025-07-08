@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Pencil, ArrowLeft, Save, X } from "lucide-react";
-import { apiGetOneUser, apiUpdateUser } from "../servicess/tali";
+import { apiGetOneUser, apiUpdateUser, apiGetLocations } from "../servicess/tali";
 
 const UserAccount = () => {
   const { userId } = useParams();
@@ -14,24 +14,37 @@ const UserAccount = () => {
   const [previewImageUrl, setPreviewImageUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [locations, setLocations] = useState([]);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
-        const data = await apiGetOneUser(userId);
-        setUser(data);
-        setEditedUser(data);
-        setPreviewImageUrl(data.profilePicture || data.profile_picture || "");
+        setLoading(true);
+        // Fetch user data
+        const userData = await apiGetOneUser(userId);
+        setUser(userData);
+        setEditedUser(userData);
+        setPreviewImageUrl(userData.profilePicture || userData.profile_picture || "");
+        
+        // Fetch locations data
+        const locationsData = await apiGetLocations();
+        setLocations(Array.isArray(locationsData) ? locationsData : locationsData.locations || []);
       } catch (err) {
-        console.error("Failed to fetch user", err);
-        setError("User not found.");
+        console.error("Failed to fetch data", err);
+        setError("Failed to load data.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
+    fetchData();
   }, [userId]);
+
+  // Helper function to get location name by ID
+  const getLocationName = (locationId) => {
+    const location = locations.find((loc) => loc._id === locationId);
+    return location ? location.assetLocation : locationId;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -127,7 +140,7 @@ const UserAccount = () => {
 
           {isEditing ? (
             <div className="w-full max-w-md mt-6 space-y-4">
-              {["userName", "email", "phone", "storeLocation"].map((field) => (
+              {["userName", "email", "phone"].map((field) => (
                 <div key={field}>
                   <label className="block text-sm font-medium text-gray-700">
                     {field === "userName" ? "Name" : field.charAt(0).toUpperCase() + field.slice(1)}
@@ -142,6 +155,24 @@ const UserAccount = () => {
                 </div>
               ))}
 
+              {/* Location Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Location</label>
+                <select
+                  name="storeLocation"
+                  value={editedUser.storeLocation || ""}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white"
+                >
+                  <option value="">Select location</option>
+                  {locations.map((location) => (
+                    <option key={location._id} value={location._id}>
+                      {location.assetLocation}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Role Dropdown */}
               <div>
                 <label className="block text-sm font-medium text-gray-700">Role</label>
@@ -152,9 +183,9 @@ const UserAccount = () => {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white"
                 >
                   <option value="">Select role</option>
-                  <option value="user">User</option>
-                  <option value="administrator">Administrator</option>
-                  <option value="asset manager">Asset Manager</option>
+                  <option value="user">user</option>
+                  <option value="administrator">administrator</option>
+                  <option value="asset manager">asset manager</option>
                 </select>
               </div>
 
@@ -191,7 +222,7 @@ const UserAccount = () => {
                   <span className="font-semibold">Role:</span> {user.role}
                 </p>
                 <p>
-                  <span className="font-semibold">Location:</span> {user.storeLocation}
+                  <span className="font-semibold">Location:</span> {getLocationName(user.storeLocation)}
                 </p>
               </div>
             </div>
