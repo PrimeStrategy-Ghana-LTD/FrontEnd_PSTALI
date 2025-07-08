@@ -140,6 +140,35 @@ const AllUsers = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+  // New component to render user avatar
+  const UserAvatar = ({ user, size = "w-10 h-10" }) => {
+    const [imageError, setImageError] = useState(false);
+    
+    const handleImageError = () => {
+      setImageError(true);
+    };
+
+    if (user.profilePicture && !imageError) {
+      return (
+        <img
+          src={user.profilePicture}
+          alt={`${user.userName}'s profile`}
+          className={`${size} rounded-full object-cover mr-3`}
+          onError={handleImageError}
+        />
+      );
+    }
+
+    // Fallback to initials with colored background
+    return (
+      <div
+        className={`${size} rounded-full ${getRandomColor()} flex items-center justify-center text-white font-medium text-sm mr-3`}
+      >
+        {getUserInitials(user.userName)}
+      </div>
+    );
+  };
+
   useEffect(() => {
     let sortedUsers = [...filteredUsers];
 
@@ -406,11 +435,7 @@ const AllUsers = () => {
                   >
                     <td className="py-4 px-6">
                       <div className="flex items-center">
-                        <div
-                          className={`w-10 h-10 rounded-full ${getRandomColor()} flex items-center justify-center text-white font-medium text-sm mr-3`}
-                        >
-                          {getUserInitials(user.userName)}
-                        </div>
+                        <UserAvatar user={user} />
                         <div>
                           <div className="text-sm font-medium text-gray-900">
                             {user.userName}
@@ -457,11 +482,7 @@ const AllUsers = () => {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center">
-                    <div
-                      className={`w-12 h-12 rounded-full ${getRandomColor()} flex items-center justify-center text-white font-medium mr-3`}
-                    >
-                      {getUserInitials(user.userName)}
-                    </div>
+                    <UserAvatar user={user} size="w-12 h-12" />
                     <div>
                       <h3 className="font-medium text-gray-900">
                         {user.userName}
