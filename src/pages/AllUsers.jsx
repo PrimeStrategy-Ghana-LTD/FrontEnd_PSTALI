@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiGetAllUsers } from "../servicess/tali";
+import { apiGetAllUsers, apiGetLocations } from "../servicess/tali";
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
+   const [locations, setLocations] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -22,6 +23,7 @@ const AllUsers = () => {
 
   useEffect(() => {
     fetchUsers();
+    fetchLocations();
   }, []);
 
   const fetchUsers = async () => {
@@ -37,6 +39,20 @@ const AllUsers = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchLocations = async () => {
+    try {
+      const response = await apiGetLocations();
+      setLocations(Array.isArray(response) ? response : response.locations || []);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+    }
+  };
+
+  const getLocationName = (locationId) => {
+    const location = locations.find((loc) => loc._id === locationId);
+    return location ? location.assetLocation : locationId;
   };
 
   useEffect(() => {
@@ -57,8 +73,13 @@ const AllUsers = () => {
     setCurrentPage(1); // Reset to first page when filtering
   }, [selectedRole, selectedLocation, users, searchTerm]);
 
-  const uniqueRoles = [...new Set(users.map((u) => u.role))];
-  const uniqueLocations = [...new Set(users.map((u) => u.storeLocation))];
+   const uniqueRoles = [...new Set(users.map((u) => u.role))];
+  const uniqueLocations = [...new Set(
+    users.map((u) => {
+      const location = locations.find(loc => loc._id === u.storeLocation);
+      return location ? location.assetLocation : u.storeLocation;
+    })
+  )];
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
@@ -362,45 +383,46 @@ const AllUsers = () => {
 
           {/* Filters */}
           {showFilters && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Role
-                  </label>
-                  <select
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">All Roles</option>
-                    {uniqueRoles.map((role, idx) => (
-                      <option key={idx} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Location
-                  </label>
-                  <select
-                    value={selectedLocation}
-                    onChange={(e) => setSelectedLocation(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">All Locations</option>
-                    {uniqueLocations.map((loc, idx) => (
-                      <option key={idx} value={loc}>
-                        {loc}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
+    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Role
+          </label>
+          <select
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Roles</option>
+            {uniqueRoles.map((role, idx) => (
+              <option key={idx} value={role}>
+                {role}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Location
+          </label>
+          <select
+            value={selectedLocation}
+            onChange={(e) => setSelectedLocation(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Locations</option>
+            {locations.map((location) => (
+              <option key={location._id} value={location._id}>
+                {location.assetLocation}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </div>
+  )}
+
         </div>
 
         {/* Table */}
@@ -450,7 +472,7 @@ const AllUsers = () => {
                       {user.phone}
                     </td>
                     <td className="py-4 px-6 text-sm text-gray-900">
-                      {user.storeLocation}
+                      {getLocationName(user.storeLocation)}
                     </td>
                     <td className="py-4 px-6">
                       <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
@@ -509,7 +531,7 @@ const AllUsers = () => {
                   <div>
                     <span className="text-gray-500">Location:</span>
                     <span className="ml-1 text-gray-900">
-                      {user.storeLocation}
+                     {getLocationName(user.storeLocation)}
                     </span>
                   </div>
                   <div className="col-span-2">
