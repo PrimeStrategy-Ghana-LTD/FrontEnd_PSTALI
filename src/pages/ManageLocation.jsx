@@ -89,7 +89,7 @@ const ManageLocation = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
+    <div className="max-w-8xl mx-auto p-6 bg-white rounded-lg shadow">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold">Manage Location</h2>
         <button

@@ -7,7 +7,7 @@ import MileageIcon from "../assets/images/Mileage.png";
 import DrivetrainIcon from "../assets/images/Drivetrain.png";
 import GearboxIcon from "../assets/images/Gearbox.png";
 import FuelIcon from "../assets/images/Fuel.png";
-import { apiGetOneAsset, apiGetLocations, apiEditAsset } from "../servicess/tali";
+import { apiGetOneAsset, apiGetLocations, apiEditAsset, apiGetSimilarAssets } from "../servicess/tali";
 
 const ViewAsset = () => {
   const [asset, setAsset] = useState(null);
@@ -19,6 +19,8 @@ const ViewAsset = () => {
   const [newLocation, setNewLocation] = useState("");
   const [justification, setJustification] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [similarAssets, setSimilarAssets] = useState([]);
+  const [similarAssetsLoading, setSimilarAssetsLoading] = useState(false);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -62,6 +64,26 @@ const ViewAsset = () => {
       fetchData();
     }
   }, [id]);
+
+  // Fetch similar assets
+  useEffect(() => {
+    const fetchSimilarAssets = async () => {
+      if (!asset?.assetId) return;
+      
+      try {
+        setSimilarAssetsLoading(true);
+        const response = await apiGetSimilarAssets(asset.assetId);
+        setSimilarAssets(response.results || []);
+      } catch (error) {
+        console.error("Error fetching similar assets:", error);
+        // Don't show error toast for similar assets as it's not critical
+      } finally {
+        setSimilarAssetsLoading(false);
+      }
+    };
+
+    fetchSimilarAssets();
+  }, [asset?.assetId]);
 
   const handleDownload = () => {
     if (!asset) return;
@@ -168,6 +190,11 @@ const ViewAsset = () => {
     if (id) {
       navigate(`/dashboard/assign-location/${id}`);
     }
+  };
+
+  const handleSimilarAssetClick = (similarAsset) => {
+    // Navigate to the similar asset's detail page
+    navigate(`/dashboard/assets/view-asset/${similarAsset._id}`);
   };
   
   if (loading) {
@@ -524,39 +551,78 @@ const ViewAsset = () => {
                   </div>
                 </div>
 
-                {/* Similar Assets */}
+              {/* Similar Assets */}
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Similar Assets</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src="/placeholder-car.jpg"
-                        alt="Similar Asset"
-                        className="w-20 h-12 object-cover rounded-md border border-gray-200"
-                        onError={(e) => {
-                          e.target.src = "/placeholder-car.jpg";
-                        }}
-                      />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">2023 Toyota Camry</p>
-                        <p className="text-xs text-gray-500">Available</p>
-                      </div>
+                  {/* <div className="border-2 border-blue-400 rounded-lg p-4 bg-gray-50"> */}
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                      Similar Asset
+                      {similarAssetsLoading && (
+                        <span className="ml-2 text-sm text-gray-500">Loading...</span>
+                      )}
+                    </h3>
+                    <div className="space-y-6">
+                      {similarAssetsLoading ? (
+                        <div className="animate-pulse space-y-6">
+                          <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+                            <div className="flex-1">
+                              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                              <div className="h-3 bg-gray-200 rounded w-1/2 mt-2"></div>
+                              <div className="h-3 bg-gray-200 rounded w-2/3 mt-1"></div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+                            <div className="flex-1">
+                              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                              <div className="h-3 bg-gray-200 rounded w-1/2 mt-2"></div>
+                              <div className="h-3 bg-gray-200 rounded w-2/3 mt-1"></div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : similarAssets.length > 0 ? (
+                        similarAssets.slice(0, 3).map((similarAsset) => (
+                          <div 
+                            key={similarAsset._id}
+                            className="flex items-center gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                            onClick={() => handleSimilarAssetClick(similarAsset)}
+                          >
+                            <img
+                              src={similarAsset.assetImage || "/placeholder-car.jpg"}
+                              alt={similarAsset.assetName}
+                              className="w-16 h-16 object-cover rounded-full border-2 border-gray-200"
+                              onError={(e) => {
+                                e.target.src = "/placeholder-car.jpg";
+                              }}
+                            />
+                            <div className="flex-1">
+                              <p className="text-base font-semibold text-gray-900 mb-1">
+                                {similarAsset.year} {similarAsset.make} {similarAsset.model}
+                              </p>
+                              <p className="text-sm text-gray-600 mb-1">
+                                VIN: <span className="ml-8">{similarAsset.assetId}</span>
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                Location: <span className="ml-2">{similarAsset.assetLocation}</span>
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-gray-500 text-sm">No similar assets found</p>
+                        </div>
+                      )}
+                      
+                      {similarAssets.length > 3 && (
+                        <div className="text-center pt-2">
+                          <button className="text-sm text-blue-600 hover:text-blue-800">
+                            View all {similarAssets.length} similar assets
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-3">
-                      <img
-                        src="/placeholder-car.jpg"
-                        alt="Similar Asset"
-                        className="w-20 h-12 object-cover rounded-md border border-gray-200"
-                        onError={(e) => {
-                          e.target.src = "/placeholder-car.jpg";
-                        }}
-                      />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">2022 Honda Accord</p>
-                        <p className="text-xs text-gray-500">Available</p>
-                      </div>
-                    </div>
-                  </div>
+                  {/* </div> */}
                 </div>
               </div>
             </div>

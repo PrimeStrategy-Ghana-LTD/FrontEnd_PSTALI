@@ -32,7 +32,7 @@ export const apiUpdateUser = async (userId, data) => {
 };
 
 
-export const apiCountAllUsers = async () => {
+export const apiCountAllAssets = async () => {
     try {
         const response = await apiClient.get('/assets/count');
         return response.data;
@@ -56,6 +56,15 @@ export const apiGetAllAssets = async (params = {}) => {
     }
 };
 
+export const apiGetSimilarAssets = async (assetId) => {
+  try {
+    const response = await apiClient.get(`/${assetId}/similar`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching similar assets:', error);
+    throw error;
+  }
+};
 
 export const apiGetLocations = async () => {
     try {
@@ -110,6 +119,13 @@ export const apiGetUsers = async () => {
 
 export const apiAddAsset = (formData) =>                          
   apiClient.post('/assets', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+export const apiImportAssetSheet = (formData) =>                          
+  apiClient.post('/import-assets', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

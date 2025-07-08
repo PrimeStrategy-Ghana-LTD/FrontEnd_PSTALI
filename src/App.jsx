@@ -22,6 +22,7 @@ import AssignedPage from "./pages/AssignedPage";
 import Settings from "./pages/Settings";
 import Report from "./pages/Report";
 import AssignLocationPage from "./pages/AssignLocationPage";
+import ImportAssetsPage from "./pages/ImportAssetsPage";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -77,7 +78,11 @@ const router = createBrowserRouter([
         path: "assets/view-asset/:id",
         element: <ViewAsset />,
       },
-      { 
+      {
+        path: "assets/import-assets",
+        element: <ImportAssetsPage />,
+      },
+      {
         path: "assign-location/:id",
         element: <AssignLocationPage />,
       },

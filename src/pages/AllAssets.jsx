@@ -3,26 +3,30 @@ import {
   IoFilterOutline,
   IoChevronBackOutline,
   IoChevronForwardOutline,
+  IoCloudUploadOutline,
 } from "react-icons/io5";
 import { FaListUl, FaTh } from "react-icons/fa";
 import AssetAssignmentModal from "./AssetAssignmentModal";
 import { Link, useNavigate } from "react-router-dom";
-import { apiGetAllAssets, apiGetLocations } from "../servicess/tali";
+import { apiGetAllAssets, apiGetLocations, apiCountAllAssets } from "../servicess/tali";
 import { FiSearch } from "react-icons/fi";
+import ImportAssetsModal from "./ImportAssetsPage";
 
 const AllAssets = () => {
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState("list"); // 'list' or 'grid'
+  const [viewMode, setViewMode] = useState("list");
   const [showFilters, setShowFilters] = useState(false);
   const [availabilityFilter, setAvailabilityFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [assets, setAssets] = useState([]);
   const [locations, setLocations] = useState([]);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [sortOption, setSortOption] = useState("recent"); // default is recently added
+  const [sortOption, setSortOption] = useState("recent");
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState(""); // For debouncing
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,45 +35,78 @@ const AllAssets = () => {
   const [loading, setLoading] = useState(false);
   const itemsPerPage = viewMode === "list" ? 10 : 12;
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   // Helper function to get location name by ID
   const getLocationName = (locationId) => {
     const location = locations.find((loc) => loc._id === locationId);
     return location ? location.assetLocation : locationId;
   };
 
-  const getAssets = async (page = 1, filters = {}) => {
+  const getAssets = async (page = 1, resetPagination = false) => {
     try {
       setLoading(true);
-      const params = {
-        page: page,
+      
+      // Build filters object for API
+      const filters = {
+        page: resetPagination ? 1 : page,
         limit: itemsPerPage,
-        ...filters,
       };
-      const response = await apiGetAllAssets(params);
 
-      // Handle different response structures
+      // Add server-side filters
+      if (availabilityFilter) {
+        filters.status = availabilityFilter;
+      }
+      if (locationFilter) {
+        filters.location = locationFilter;
+      }
+      if (searchTerm.trim()) {
+        filters.search = searchTerm.trim();
+      }
+      if (sortOption !== "recent") {
+        filters.sort = sortOption;
+      }
+
+      const response = await apiGetAllAssets(filters);
+
       const assetsData = response.data?.assets || response.data || [];
-      const totalCount =
-        response.data?.totalCount ||
-        response.data?.length ||
-        assetsData.length ||
-        0;
-      const currentPageNum = response.data?.currentPage || page;
-      const totalPagesNum =
-        response.data?.totalPages || Math.ceil(totalCount / itemsPerPage) || 1;
+      const totalCount = response.data?.totalCount || response.data?.total || 0;
+      const currentPageNum = response.data?.currentPage || (resetPagination ? 1 : page);
+      const totalPagesNum = response.data?.totalPages || Math.ceil(totalCount / itemsPerPage) || 1;
 
       setAssets(Array.isArray(assetsData) ? assetsData : []);
       setCurrentPage(currentPageNum);
       setTotalPages(totalPagesNum);
       setTotalAssets(totalCount);
+      
+      if (resetPagination) {
+        setCurrentPage(1);
+      }
     } catch (error) {
       console.error("Error fetching assets:", error);
-      // Set defaults in case of error
       setAssets([]);
       setTotalAssets(0);
       setTotalPages(1);
+      setCurrentPage(1);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getTotalAssetsCount = async () => {
+    try {
+      const response = await apiCountAllAssets();
+      const count = response.count || response.total || 0;
+      setTotalAssets(count);
+    } catch (error) {
+      console.error("Error fetching total assets count:", error);
     }
   };
 
@@ -84,64 +121,50 @@ const AllAssets = () => {
     }
   };
 
+  // Initial load
   useEffect(() => {
     getAssets(1);
     getLocations();
+    getTotalAssetsCount();
   }, [viewMode]);
 
-  const sortAssets = (assets, option) => {
-    switch (option) {
-      case "alphabetical":
-        return [...assets].sort((a, b) =>
-          a.assetName.localeCompare(b.assetName)
-        );
-      case "reverse":
-        return [...assets].sort((a, b) =>
-          b.assetName.localeCompare(a.assetName)
-        );
-      case "recent":
-      default:
-        return [...assets]; // Assuming the API returns in most recent order
-    }
-  };
-
+  // Handle filter changes - reset to page 1 and refetch
   useEffect(() => {
-    setCurrentPage(1);
-    const filters = {};
-    if (availabilityFilter) filters.status = availabilityFilter;
-    if (locationFilter) filters.location = locationFilter;
-    getAssets(1, filters);
-  }, [availabilityFilter, locationFilter]);
-
-  const filteredAssets = sortAssets(
-    assets.filter((item) => {
-      const locationName = getLocationName(item.assetLocation);
-      const matchesAvailability =
-        availabilityFilter === "" || item.status === availabilityFilter;
-      const matchesLocation =
-        locationFilter === "" || locationName === locationFilter;
-      const matchesSearch =
-        searchTerm === "" ||
-        item.assetName?.toLowerCase().includes(searchTerm.toLowerCase());
-
-      return matchesAvailability && matchesLocation && matchesSearch;
-    }),
-    sortOption
-  );
+    getAssets(1, true);
+  }, [availabilityFilter, locationFilter, searchTerm, sortOption, itemsPerPage]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages && page !== currentPage) {
-      setCurrentPage(page);
-      const filters = {};
-      if (availabilityFilter) filters.status = availabilityFilter;
-      if (locationFilter) filters.location = locationFilter;
-      getAssets(page, filters);
+      getAssets(page);
     }
   };
 
-  // Function to handle add asset button click
   const handleAddAssetClick = () => {
     navigate("/dashboard/assets/add-asset");
+  };
+
+  const handleImportSuccess = () => {
+    setIsImportModalOpen(false);
+    // Refresh the assets list and total count after successful import
+    getAssets(1, true);
+    getTotalAssetsCount();
+  };
+
+  const handleSortChange = (newSortOption) => {
+    setSortOption(newSortOption);
+    setShowSortDropdown(false);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  const clearFilters = () => {
+    setAvailabilityFilter("");
+    setLocationFilter("");
+    setSearchInput("");
+    setSearchTerm("");
+    setSortOption("recent");
   };
 
   // View toggle buttons
@@ -188,6 +211,15 @@ const AllAssets = () => {
             >
               Add Asset
             </button>
+            
+            <button
+              onClick={() => navigate("/dashboard/assets/import-assets")}
+              className="flex items-center gap-1 px-2 py-1 rounded-sm bg-blue-600 text-white border border-blue-600 text-xs sm:text-sm hover:bg-blue-700 transition-colors"
+            >
+              <IoCloudUploadOutline />
+              <span className="hidden sm:inline">Import</span>
+            </button>
+
             <ViewToggle />
           </div>
         </div>
@@ -197,8 +229,16 @@ const AllAssets = () => {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3 sm:gap-0">
             <div className="flex items-center gap-4">
               <p className="font-semibold text-sm sm:text-base">
-                Total Assets: {totalAssets || 0}
+                Total Assets: {totalAssets}
               </p>
+              {(availabilityFilter || locationFilter || searchTerm) && (
+                <button
+                  onClick={clearFilters}
+                  className="text-sm text-blue-600 hover:text-blue-800 underline"
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
             <div className="flex gap-3 text-xs sm:text-[13px]">
               <button
@@ -218,10 +258,7 @@ const AllAssets = () => {
                 {showSortDropdown && (
                   <div className="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-200 shadow-md rounded-sm text-sm">
                     <button
-                      onClick={() => {
-                        setSortOption("recent");
-                        setShowSortDropdown(false);
-                      }}
+                      onClick={() => handleSortChange("recent")}
                       className={`block px-4 py-2 text-left w-full hover:bg-gray-100 ${
                         sortOption === "recent"
                           ? "font-semibold text-[#051b34]"
@@ -231,10 +268,7 @@ const AllAssets = () => {
                       Recently Added
                     </button>
                     <button
-                      onClick={() => {
-                        setSortOption("alphabetical");
-                        setShowSortDropdown(false);
-                      }}
+                      onClick={() => handleSortChange("alphabetical")}
                       className={`block px-4 py-2 text-left w-full hover:bg-gray-100 ${
                         sortOption === "alphabetical"
                           ? "font-semibold text-[#051b34]"
@@ -244,10 +278,7 @@ const AllAssets = () => {
                       Alphabetical (A-Z)
                     </button>
                     <button
-                      onClick={() => {
-                        setSortOption("reverse");
-                        setShowSortDropdown(false);
-                      }}
+                      onClick={() => handleSortChange("reverse")}
                       className={`block px-4 py-2 text-left w-full hover:bg-gray-100 ${
                         sortOption === "reverse"
                           ? "font-semibold text-[#051b34]"
@@ -288,15 +319,9 @@ const AllAssets = () => {
                   onChange={(e) => setLocationFilter(e.target.value)}
                 >
                   <option value="">All</option>
-                  {[
-                    ...new Set(
-                      assets.map((asset) =>
-                        getLocationName(asset.assetLocation)
-                      )
-                    ),
-                  ].map((location, index) => (
-                    <option key={index} value={location}>
-                      {location}
+                  {locations.map((location) => (
+                    <option key={location._id} value={location.assetLocation}>
+                      {location.assetLocation}
                     </option>
                   ))}
                 </select>
@@ -305,30 +330,40 @@ const AllAssets = () => {
           )}
 
           <div className="w-full flex justify-end mb-4">
-  <div className="relative flex items-center border border-gray-300 rounded-md text-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent px-3 py-2 sm:w-64">
-    <svg
-      className="w-4 h-4 text-gray-400 mr-2"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-      />
-    </svg>
-    <input
-      type="text"
-      placeholder="Search assets..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      className="w-full focus:outline-none"
-    />
-  </div>
-</div>
-
+            <div className="relative flex items-center border border-gray-300 rounded-md text-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent px-3 py-2 sm:w-64">
+              <svg
+                className="w-4 h-4 text-gray-400 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search assets..."
+                value={searchInput}
+                onChange={handleSearchChange}
+                className="w-full focus:outline-none"
+              />
+              {searchInput && (
+                <button
+                  onClick={() => {
+                    setSearchInput("");
+                    setSearchTerm("");
+                  }}
+                  className="ml-2 text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
 
           {loading && (
             <div className="flex justify-center items-center py-8">
@@ -336,22 +371,30 @@ const AllAssets = () => {
             </div>
           )}
 
-          {viewMode === "list" ? (
-            <ListView
-              assets={filteredAssets}
-              getLocationName={getLocationName}
-            />
-          ) : (
-            <GridView
-              assets={filteredAssets}
-              getLocationName={getLocationName}
-            />
-          )}
+          {!loading && (
+            <>
+              {viewMode === "list" ? (
+                <ListView
+                  assets={assets}
+                  getLocationName={getLocationName}
+                />
+              ) : (
+                <GridView
+                  assets={assets}
+                  getLocationName={getLocationName}
+                />
+              )}
 
-          {!loading && filteredAssets.length === 0 && (
-            <div className="flex justify-center items-center py-8">
-              <div className="text-gray-600">No assets found</div>
-            </div>
+              {assets.length === 0 && (
+                <div className="flex justify-center items-center py-8">
+                  <div className="text-gray-600">
+                    {searchTerm || availabilityFilter || locationFilter
+                      ? "No assets found matching your criteria"
+                      : "No assets found"}
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {totalPages > 1 && (
@@ -375,11 +418,9 @@ const AllAssets = () => {
   );
 };
 
-// Responsive List View Component
-const ListView = ({ assets, getLocationName, onAssignClick }) => (
+// ListView Component
+const ListView = ({ assets, getLocationName }) => (
   <div className="space-y-2">
-    {/* Desktop Header - hidden on mobile */}
-    {/* Header Row */}
     <div className="hidden md:flex font-semibold text-sm text-gray-700 pb-2 border-b-2 border-gray-200">
       <div className="flex-[1.5]">Name</div>
       <div className="flex-[2]">VIN</div>
@@ -390,10 +431,9 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
 
     {assets.map((item, index) => (
       <div
-        key={index}
+        key={item._id || index}
         className="flex flex-col md:flex-row md:items-center text-xs sm:text-[13px] text-gray-600 py-3 border-b border-gray-200 gap-3 md:gap-0"
       >
-        {/* Mobile Layout */}
         <div className="md:hidden">
           <div className="flex items-center gap-3 mb-3">
             <img
@@ -441,7 +481,6 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
           </div>
         </div>
 
-        {/* Desktop Layout */}
         <div className="hidden md:flex w-full items-center">
           <div className="flex-[1.5] truncate flex items-center gap-2">
             <img
@@ -465,14 +504,12 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
             {getLocationName(item.assetLocation)}
           </div>
           <div className="flex-[1.5] flex justify-center">
-            <div className="flex-[1.5] text-center">
-              <Link
-                to={`/dashboard/assign-location/${item._id}`}
-                className="text-blue-600 hover:underline text-sm"
-              >
-                Assign
-              </Link>
-            </div>
+            <Link
+              to={`/dashboard/assign-location/${item._id}`}
+              className="text-blue-600 hover:underline text-sm"
+            >
+              Assign
+            </Link>
           </div>
         </div>
       </div>
@@ -480,12 +517,12 @@ const ListView = ({ assets, getLocationName, onAssignClick }) => (
   </div>
 );
 
-// Grid View Component
-const GridView = ({ assets, getLocationName, onAssignClick }) => (
+// GridView Component
+const GridView = ({ assets, getLocationName }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xlg:grid-cols-3 gap-4 mt-6 ml-20">
     {assets.map((item, index) => (
       <div
-        key={index}
+        key={item._id || index}
         className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow h-[243px] w-[348px]"
       >
         <Link
@@ -501,18 +538,18 @@ const GridView = ({ assets, getLocationName, onAssignClick }) => (
             <img
               src={item.assetImage}
               alt={item.assetName}
-              className="w-[149px] h-[149px]  object-cover"
+              className="w-[149px] h-[149px] object-cover"
             />
           </div>
           <div className="flex-1 flex flex-col justify-between">
-            <div className="">
+            <div>
               <Link
-                to={`/dashboard/view-asset/${item._id}`}
+                to={`/dashboard/assets/view-asset/${item._id}`}
                 className="font-semibold text-gray-800 hover:text-blue-600 text-sm"
               >
                 {item.assetName}
               </Link>
-              <p className="text-xs text-gray-500 ">2025</p>
+              <p className="text-xs text-gray-500">2025</p>
             </div>
 
             <div className="flex justify-between items-center">
@@ -541,7 +578,7 @@ const GridView = ({ assets, getLocationName, onAssignClick }) => (
   </div>
 );
 
-// Fixed Pagination Component
+// Pagination Component
 const Pagination = ({
   currentPage,
   totalPages,
@@ -566,7 +603,6 @@ const Pagination = ({
     return pages;
   };
 
-  // Ensure we have valid numbers
   const safeCurrentPage = Number(currentPage) || 1;
   const safeTotalItems = Number(totalItems) || 0;
   const safeItemsPerPage = Number(itemsPerPage) || 10;
