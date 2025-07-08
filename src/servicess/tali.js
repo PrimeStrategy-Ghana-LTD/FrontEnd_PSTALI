@@ -76,6 +76,16 @@ export const apiGetLocations = async () => {
     }
 };
 
+export const apiFilterAssetsByLocations = async (locationId) => {
+    try {
+        const response = await apiClient.get(`/assets?assetLocation=${locationId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching assets by location:', error);
+        throw error;
+    }
+};
+
 export const apiAddLocation = async (locationData) => {
   try {
     const response = await apiClient.post('/locations', locationData);

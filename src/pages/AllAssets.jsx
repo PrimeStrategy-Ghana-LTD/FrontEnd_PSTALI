@@ -22,6 +22,7 @@ const AllAssets = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [assets, setAssets] = useState([]);
+  const [allAssets, setAllAssets] = useState([]); // Store all assets for client-side filtering
   const [locations, setLocations] = useState([]);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [sortOption, setSortOption] = useState("recent");
@@ -50,61 +51,117 @@ const AllAssets = () => {
     return location ? location.assetLocation : locationId;
   };
 
-  const getAssets = async (page = 1, resetPagination = false) => {
+  // Client-side filtering and sorting function
+  const filterAndSortAssets = (assetsToFilter) => {
+    let filteredAssets = [...assetsToFilter];
+
+    // Apply filters
+    if (availabilityFilter) {
+      filteredAssets = filteredAssets.filter(asset => asset.status === availabilityFilter);
+    }
+
+    if (locationFilter) {
+      filteredAssets = filteredAssets.filter(asset => 
+        asset.assetLocation === locationFilter || 
+        getLocationName(asset.assetLocation) === locationFilter
+      );
+    }
+
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
+      filteredAssets = filteredAssets.filter(asset =>
+        asset.assetName?.toLowerCase().includes(searchLower) ||
+        asset.assetId?.toLowerCase().includes(searchLower) ||
+        asset.category?.toLowerCase().includes(searchLower) ||
+        asset.make?.toLowerCase().includes(searchLower) ||
+        asset.model?.toLowerCase().includes(searchLower) ||
+        getLocationName(asset.assetLocation)?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply sorting
+    switch (sortOption) {
+      case "recent":
+        filteredAssets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+      case "alphabetical":
+        filteredAssets.sort((a, b) => (a.assetName || '').localeCompare(b.assetName || ''));
+        break;
+      case "reverse":
+        filteredAssets.sort((a, b) => (b.assetName || '').localeCompare(a.assetName || ''));
+        break;
+      default:
+        filteredAssets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    return filteredAssets;
+  };
+
+  // Paginate filtered assets
+  const paginateAssets = (filteredAssets, page) => {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedAssets = filteredAssets.slice(startIndex, endIndex);
+    
+    const totalCount = filteredAssets.length;
+    const totalPagesCount = Math.ceil(totalCount / itemsPerPage) || 1;
+    
+    return {
+      assets: paginatedAssets,
+      totalCount,
+      totalPages: totalPagesCount,
+      currentPage: page
+    };
+  };
+
+  // Fetch all assets from API
+  const getAllAssets = async () => {
     try {
       setLoading(true);
       
-      // Build filters object for API
-      const filters = {
-        page: resetPagination ? 1 : page,
-        limit: itemsPerPage,
-      };
-
-      // Add server-side filters
-      if (availabilityFilter) {
-        filters.status = availabilityFilter;
-      }
-      if (locationFilter) {
-        filters.location = locationFilter;
-      }
-      if (searchTerm.trim()) {
-        filters.search = searchTerm.trim();
-      }
-      if (sortOption !== "recent") {
-        filters.sort = sortOption;
-      }
-
-      const response = await apiGetAllAssets(filters);
-
-      const assetsData = response.data?.assets || response.data || [];
-      const totalCount = response.data?.totalCount || response.data?.total || 0;
-      const currentPageNum = response.data?.currentPage || (resetPagination ? 1 : page);
-      const totalPagesNum = response.data?.totalPages || Math.ceil(totalCount / itemsPerPage) || 1;
-
-      setAssets(Array.isArray(assetsData) ? assetsData : []);
-      setCurrentPage(currentPageNum);
-      setTotalPages(totalPagesNum);
-      setTotalAssets(totalCount);
+      // Fetch all assets without pagination for client-side filtering
+      const response = await apiGetAllAssets({ limit: 100 }); // Large limit to get all assets
       
-      if (resetPagination) {
-        setCurrentPage(1);
-      }
+      const assetsData = response.data?.assets || response.data || [];
+      setAllAssets(Array.isArray(assetsData) ? assetsData : []);
+      
+      // Apply filtering and pagination
+      const filteredAssets = filterAndSortAssets(Array.isArray(assetsData) ? assetsData : []);
+      const paginatedResult = paginateAssets(filteredAssets, currentPage);
+      
+      setAssets(paginatedResult.assets);
+      setTotalAssets(paginatedResult.totalCount);
+      setTotalPages(paginatedResult.totalPages);
+      
     } catch (error) {
       console.error("Error fetching assets:", error);
       setAssets([]);
+      setAllAssets([]);
       setTotalAssets(0);
       setTotalPages(1);
-      setCurrentPage(1);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Apply filters and pagination to existing assets
+  const applyFiltersAndPagination = (page = 1, resetPagination = false) => {
+    const filteredAssets = filterAndSortAssets(allAssets);
+    const targetPage = resetPagination ? 1 : page;
+    const paginatedResult = paginateAssets(filteredAssets, targetPage);
+    
+    setAssets(paginatedResult.assets);
+    setTotalAssets(paginatedResult.totalCount);
+    setTotalPages(paginatedResult.totalPages);
+    setCurrentPage(paginatedResult.currentPage);
   };
 
   const getTotalAssetsCount = async () => {
     try {
       const response = await apiCountAllAssets();
       const count = response.count || response.total || 0;
-      setTotalAssets(count);
+      // Note: This will show the total count from API, not filtered count
+      // If you want to show filtered count, remove this function and rely on client-side counting
     } catch (error) {
       console.error("Error fetching total assets count:", error);
     }
@@ -123,19 +180,27 @@ const AllAssets = () => {
 
   // Initial load
   useEffect(() => {
-    getAssets(1);
+    getAllAssets();
     getLocations();
-    getTotalAssetsCount();
-  }, [viewMode]);
+  }, []);
 
-  // Handle filter changes - reset to page 1 and refetch
+  // Handle filter changes - reset to page 1 and reapply filters
   useEffect(() => {
-    getAssets(1, true);
-  }, [availabilityFilter, locationFilter, searchTerm, sortOption, itemsPerPage]);
+    if (allAssets.length > 0) {
+      applyFiltersAndPagination(1, true);
+    }
+  }, [availabilityFilter, locationFilter, searchTerm, sortOption, itemsPerPage, viewMode]);
+
+  // Handle pagination changes
+  useEffect(() => {
+    if (allAssets.length > 0) {
+      applyFiltersAndPagination(currentPage, false);
+    }
+  }, [currentPage]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages && page !== currentPage) {
-      getAssets(page);
+      setCurrentPage(page);
     }
   };
 
@@ -145,9 +210,8 @@ const AllAssets = () => {
 
   const handleImportSuccess = () => {
     setIsImportModalOpen(false);
-    // Refresh the assets list and total count after successful import
-    getAssets(1, true);
-    getTotalAssetsCount();
+    // Refresh the assets list after successful import
+    getAllAssets();
   };
 
   const handleSortChange = (newSortOption) => {
@@ -165,6 +229,7 @@ const AllAssets = () => {
     setSearchInput("");
     setSearchTerm("");
     setSortOption("recent");
+    setCurrentPage(1);
   };
 
   // View toggle buttons
@@ -253,7 +318,8 @@ const AllAssets = () => {
                   className="px-4 py-2 border border-gray-300 text-gray-600 rounded-sm hover:bg-gray-50 transition-colors"
                   onClick={() => setShowSortDropdown((prev) => !prev)}
                 >
-                  Sort
+                  Sort: {sortOption === "recent" ? "Recently Added" : 
+                         sortOption === "alphabetical" ? "A-Z" : "Z-A"}
                 </button>
                 {showSortDropdown && (
                   <div className="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-200 shadow-md rounded-sm text-sm">
@@ -473,7 +539,7 @@ const ListView = ({ assets, getLocationName }) => (
             <div className="flex-[1.5] text-center">
               <Link
                 to={`/dashboard/assign-location/${item._id}`}
-                className="text-blue-600 hover:underline text-sm"
+                className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
               >
                 Assign
               </Link>
@@ -506,7 +572,7 @@ const ListView = ({ assets, getLocationName }) => (
           <div className="flex-[1.5] flex justify-center">
             <Link
               to={`/dashboard/assign-location/${item._id}`}
-              className="text-blue-600 hover:underline text-sm"
+              className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
             >
               Assign
             </Link>
@@ -527,7 +593,7 @@ const GridView = ({ assets, getLocationName }) => (
       >
         <Link
           to={`/dashboard/assign-location/${item._id}`}
-          className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+          className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
         >
           Assign
         </Link>
