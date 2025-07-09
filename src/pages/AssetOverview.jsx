@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCar } from "@fortawesome/free-solid-svg-icons";
 import Taxi from "../assets/images/local_taxi.png";
 import loc from "../assets/images/loc.svg";
-import group from "../assets/images/Group.svg";
+import group from "../assets/images/group.svg";
 import houses from "../assets/images/Houses.svg";
 import location from "../assets/images/location.png";
 import cancel from "../assets/images/cancel.svg";
