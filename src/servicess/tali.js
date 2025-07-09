@@ -21,16 +21,29 @@ export const apiGetOneUser = async (userId) => {
 };
 
 // PATCH update user by ID
-export const apiUpdateUser = async (userId, data) => {
+// export const apiUpdateUser = async (userId, data) => {
+//   try {
+//     const response = await apiClient.patch(`/users/${userId}`, data);
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error updating user:', error);
+//     throw error;
+//   }
+// };
+
+export const apiUpdateUser = async (id, data) => {
   try {
-    const response = await apiClient.patch(`/users/${userId}`, data);
+    const response = await apiClient.patch(`/users/${id}`, data, {
+      headers: {
+        'Content-Type': 'application/json' // Changed from multipart/form-data to application/json
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error updating user:', error);
     throw error;
   }
 };
-
 
 export const apiCountAllAssets = async () => {
     try {

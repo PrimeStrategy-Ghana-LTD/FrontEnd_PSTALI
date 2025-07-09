@@ -332,7 +332,7 @@ const SearchPage = () => {
     sessionStorage.setItem("selectedAsset", JSON.stringify(asset));
 
     // Navigate to view page with asset ID
-    navigate(`/dashboard/view-asset/${asset.id}`);
+    navigate(`/view-asset/${asset.id}`);
   };
 
   const bellRef = useRef();

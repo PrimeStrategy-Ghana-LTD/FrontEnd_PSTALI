@@ -60,26 +60,43 @@ const UserAccount = () => {
   };
 
   const handleSave = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("userName", editedUser.userName);
-      formData.append("email", editedUser.email);
-      formData.append("phone", editedUser.phone);
-      formData.append("role", editedUser.role);
-      formData.append("storeLocation", editedUser.storeLocation);
-      if (profileImageFile) {
-        formData.append("profilePicture", profileImageFile);
-      }
-
-      const updated = await apiUpdateUser(userId, formData);
-      setUser(updated);
-      setIsEditing(false);
-    } catch (err) {
-      console.error("Failed to update user", err);
-      alert("Failed to save changes.");
+  try {
+    // Validate required fields on frontend
+    if (!editedUser.userName || !editedUser.email || !editedUser.phone) {
+      alert("Please fill in all required fields (Name, Email, Phone)");
+      return;
     }
-  };
 
+    const formData = new FormData();
+    
+    // Always include all fields, even if empty
+    formData.append("userName", editedUser.userName || "");
+    formData.append("email", editedUser.email || "");
+    formData.append("phone", editedUser.phone || "");
+    formData.append("role", editedUser.role || "user");
+    formData.append("storeLocation", editedUser.storeLocation || "");
+    
+    if (profileImageFile) {
+      formData.append("profilePicture", profileImageFile);
+    }
+
+    const updated = await apiUpdateUser(userId, formData);
+    setUser(updated);
+    setEditedUser(updated);
+    setIsEditing(false);
+    setProfileImageFile(null);
+  } catch (err) {
+    console.error("Failed to update user", err);
+    
+    // Better error handling
+    if (err.response?.data?.details) {
+      const errorMessages = err.response.data.details.map(detail => detail.message).join(", ");
+      alert(`Validation error: ${errorMessages}`);
+    } else {
+      alert("Failed to save changes. Please try again.");
+    }
+  }
+};
   const handleDiscard = () => {
     setEditedUser(user);
     setPreviewImageUrl(user.profilePicture || user.profile_picture || "");
