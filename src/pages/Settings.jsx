@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import useLocationName from "../hooks/useLocationName";
 
 const Settings = () => {
   const [user, setUser] = useState(null);
+  const { getLocationName } = useLocationName();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -63,7 +65,7 @@ const Settings = () => {
             </div>
             <div className="flex justify-between">
               <span className="font-semibold">Store Location:</span>
-              <span>{user ? user.storeLocation || "N/A" : "Loading..."}</span>
+              <span>{getLocationName(user ? user.storeLocation || "N/A" : "Loading...")}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-semibold">Phone Number:</span>

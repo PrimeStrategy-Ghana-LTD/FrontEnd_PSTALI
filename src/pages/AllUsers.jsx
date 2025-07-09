@@ -430,21 +430,21 @@ const AllUsers = () => {
           {/* Desktop Table */}
           <div className="hidden lg:block flex-1 overflow-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 border-b border-gray-200 font-semibold text-sm text-gray-700">
                 <tr>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left py-3 px-6 text-md font-medium text-gray-500 tracking-wider">
                     Contact
                   </th>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left py-3 px-6 text-md font-medium text-gray-500 tracking-wider">
                     Phone
                   </th>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left py-3 px-6 text-md font-medium text-gray-500 tracking-wider">
                     Location
                   </th>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left py-3 px-6 text-md font-medium text-gray-500 tracking-wider">
                     Role
                   </th>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left py-3 px-6 text-md font-medium text-gray-500 tracking-wider">
                     Actions
                   </th>
                 </tr>

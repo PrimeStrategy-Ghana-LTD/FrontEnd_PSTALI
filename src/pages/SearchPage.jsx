@@ -11,6 +11,7 @@ import { MdOutlineSettings } from "react-icons/md";
 import { LuLogIn } from "react-icons/lu";
 import icon from "../assets/images/icon.png";
 import icon2 from "../assets/images/Icon2.png";
+import useLocationName from "../hooks/useLocationName";
 
 const SearchPage = () => {
   const [activeTab, setActiveTab] = useState("Assets");
@@ -25,6 +26,8 @@ const SearchPage = () => {
     useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const { getLocationName } = useLocationName();
+
 
   const navigate = useNavigate();
 
@@ -443,7 +446,7 @@ const SearchPage = () => {
                         <MdOutlineContactPage /> {userInfo.phone}
                       </p>
                       <p className="flex items-center gap-1 text-sm">
-                        <MdOutlineLocationOn /> {userInfo.storeLocation}
+                        <MdOutlineLocationOn /> {getLocationName(userInfo.storeLocation)}
                       </p>
 
                       <p className="border-b-[0.5px] border-gray-300"></p>
