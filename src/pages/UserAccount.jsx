@@ -1,7 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Pencil, ArrowLeft, Save, X } from "lucide-react";
+import { Pencil, ArrowLeft, Save, X, CheckCircle, AlertCircle } from "lucide-react";
 import { apiGetOneUser, apiUpdateUser, apiGetLocations } from "../servicess/tali";
+
+// Toast Component
+const Toast = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+      type === 'success' 
+        ? 'bg-green-50 border border-green-200' 
+        : 'bg-red-50 border border-red-200'
+    }`}>
+      <div className="flex items-center">
+        {type === 'success' ? (
+          <CheckCircle className="text-green-600 mr-2" size={20} />
+        ) : (
+          <AlertCircle className="text-red-600 mr-2" size={20} />
+        )}
+        <span className={`text-sm font-medium ${
+          type === 'success' ? 'text-green-800' : 'text-red-800'
+        }`}>
+          {message}
+        </span>
+        <button
+          onClick={onClose}
+          className={`ml-2 ${
+            type === 'success' ? 'text-green-600 hover:text-green-800' : 'text-red-600 hover:text-red-800'
+          }`}
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const UserAccount = () => {
   const { userId } = useParams();
@@ -15,16 +54,37 @@ const UserAccount = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [locations, setLocations] = useState([]);
+  const [toast, setToast] = useState(null);
+
+  // Show toast notification
+  const showToast = (message, type) => {
+    setToast({ message, type });
+  };
+
+  // Close toast
+  const closeToast = () => {
+    setToast(null);
+  };
+
+  // Fetch user data
+  const fetchUserData = async () => {
+    try {
+      const userData = await apiGetOneUser(userId);
+      setUser(userData);
+      setEditedUser(userData);
+      setPreviewImageUrl(userData.profilePicture || userData.profile_picture || "");
+    } catch (err) {
+      console.error("Failed to fetch user data", err);
+      showToast("Failed to load user data", "error");
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         // Fetch user data
-        const userData = await apiGetOneUser(userId);
-        setUser(userData);
-        setEditedUser(userData);
-        setPreviewImageUrl(userData.profilePicture || userData.profile_picture || "");
+        await fetchUserData();
         
         // Fetch locations data
         const locationsData = await apiGetLocations();
@@ -32,6 +92,7 @@ const UserAccount = () => {
       } catch (err) {
         console.error("Failed to fetch data", err);
         setError("Failed to load data.");
+        showToast("Failed to load data", "error");
       } finally {
         setLoading(false);
       }
@@ -60,48 +121,54 @@ const UserAccount = () => {
   };
 
   const handleSave = async () => {
-  try {
-    // Validate required fields on frontend
-    if (!editedUser.userName || !editedUser.email || !editedUser.phone) {
-      alert("Please fill in all required fields (Name, Email, Phone)");
-      return;
-    }
+    try {
+      // Validate required fields on frontend
+      if (!editedUser.userName || !editedUser.email || !editedUser.phone) {
+        showToast("Please fill in all required fields (Name, Email, Phone)", "error");
+        return;
+      }
 
-    const formData = new FormData();
-    
-    // Always include all fields, even if empty
-    formData.append("userName", editedUser.userName || "");
-    formData.append("email", editedUser.email || "");
-    formData.append("phone", editedUser.phone || "");
-    formData.append("role", editedUser.role || "user");
-    formData.append("storeLocation", editedUser.storeLocation || "");
-    
-    if (profileImageFile) {
-      formData.append("profilePicture", profileImageFile);
-    }
+      const formData = new FormData();
+      
+      // Always include all fields, even if empty
+      formData.append("userName", editedUser.userName || "");
+      formData.append("email", editedUser.email || "");
+      formData.append("phone", editedUser.phone || "");
+      formData.append("role", editedUser.role || "user");
+      formData.append("storeLocation", editedUser.storeLocation || "");
+      
+      if (profileImageFile) {
+        formData.append("profilePicture", profileImageFile);
+      }
 
-    const updated = await apiUpdateUser(userId, formData);
-    setUser(updated);
-    setEditedUser(updated);
-    setIsEditing(false);
-    setProfileImageFile(null);
-  } catch (err) {
-    console.error("Failed to update user", err);
-    
-    // Better error handling
-    if (err.response?.data?.details) {
-      const errorMessages = err.response.data.details.map(detail => detail.message).join(", ");
-      alert(`Validation error: ${errorMessages}`);
-    } else {
-      alert("Failed to save changes. Please try again.");
+      const updated = await apiUpdateUser(userId, formData);
+      
+      // Re-fetch user data to ensure we have the latest data
+      await fetchUserData();
+      
+      setIsEditing(false);
+      setProfileImageFile(null);
+      showToast("User updated successfully!", "success");
+      
+    } catch (err) {
+      console.error("Failed to update user", err);
+      
+      // Better error handling
+      if (err.response?.data?.details) {
+        const errorMessages = err.response.data.details.map(detail => detail.message).join(", ");
+        showToast(`Validation error: ${errorMessages}`, "error");
+      } else {
+        showToast("Failed to save changes. Please try again.", "error");
+      }
     }
-  }
-};
+  };
+
   const handleDiscard = () => {
     setEditedUser(user);
     setPreviewImageUrl(user.profilePicture || user.profile_picture || "");
     setProfileImageFile(null);
     setIsEditing(false);
+    showToast("Changes discarded", "success");
   };
 
   if (loading) return <div className="text-center p-10">Loading...</div>;
@@ -109,6 +176,15 @@ const UserAccount = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+        />
+      )}
+
       <div className="bg-white w-full max-w-4xl rounded-lg relative overflow-hidden">
         {/* Top */}
         <div className="bg-gray-100 h-40">
@@ -229,17 +305,17 @@ const UserAccount = () => {
             </div>
           ) : (
             <div className="text-center mt-4">
-              <h2 className="text-xl font-semibold">{user.userName}</h2>
+              <h2 className="text-xl font-semibold">{user?.userName || "User"}</h2>
               <p className="text-sm text-gray-500 mt-1">
-                {user.email} | {user.phone}
+                {user?.email || "No email"} | {user?.phone || "No phone"}
               </p>
 
               <div className="mt-6 space-y-2 text-center">
                 <p>
-                  <span className="font-semibold">Role:</span> {user.role}
+                  <span className="font-semibold">Role:</span> {user?.role || "No role"}
                 </p>
                 <p>
-                  <span className="font-semibold">Location:</span> {getLocationName(user.storeLocation)}
+                  <span className="font-semibold">Location:</span> {user?.storeLocation ? getLocationName(user.storeLocation) : "No location"}
                 </p>
               </div>
             </div>
