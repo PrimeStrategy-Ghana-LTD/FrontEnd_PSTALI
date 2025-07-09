@@ -175,6 +175,7 @@ const AddAsset = () => {
                     { label: "Asset ID/VIN", name: "assetId", placeholder: "Enter asset ID or VIN" },
                     { label: "Make", name: "make", placeholder: "Enter make" },
                     { label: "Model", name: "model", placeholder: "Enter model" },
+                    { label: "Origin", name: "origin", placeholder: "Enter origin" },
                     { label: "Year", name: "year" },
                     { label: "Mileage", name: "mileage", type: "number", placeholder: "Enter mileage" },
                     { label: "Exterior Colour", name: "exteriorColour", placeholder: "Enter exterior colour" },

@@ -211,9 +211,9 @@ const AssignLocationPage = () => {
             </div>
 
             <div className="flex gap-4">
-              <button className="px-5 py-2 border border-gray-400 text-gray-600 rounded hover:bg-gray-100 text-sm">
+              {/* <button className="px-5 py-2 border border-gray-400 text-gray-600 rounded hover:bg-gray-100 text-sm">
                 Save Draft
-              </button>
+              </button> */}
               <button
                 className="px-6 py-2 bg-[#0A2343] text-white rounded hover:opacity-90 text-sm"
                 onClick={handleAssign}

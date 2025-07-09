@@ -24,7 +24,7 @@ const WavyChart = () => {
     labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
     datasets: [
       {
-        label: 'Revenue',
+        label: 'Location',
         data: [25000, 32000, 50000, 60000, 58000, 66000, 42000],
         fill: false,
         borderColor: '#3B82F6',
@@ -35,7 +35,7 @@ const WavyChart = () => {
         pointHoverRadius: 7,
       },
       {
-        label: 'Profit',
+        label: 'Number of Assets',
         data: [40000, 38000, 42000, 48000, 50000, 46000, 45000],
         fill: false,
         borderColor: '#FACC15',
