@@ -8,6 +8,7 @@ import DrivetrainIcon from "../assets/images/Drivetrain.png";
 import GearboxIcon from "../assets/images/Gearbox.png";
 import FuelIcon from "../assets/images/Fuel.png";
 import { apiGetOneAsset, apiGetLocations, apiEditAsset, apiGetSimilarAssets } from "../servicess/tali";
+import useLocationName from "../hooks/useLocationName";
 
 const ViewAsset = () => {
   const [asset, setAsset] = useState(null);
@@ -21,6 +22,7 @@ const ViewAsset = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [similarAssets, setSimilarAssets] = useState([]);
   const [similarAssetsLoading, setSimilarAssetsLoading] = useState(false);
+  const { getLocationName } = useLocationName();
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -603,7 +605,7 @@ const ViewAsset = () => {
                                 VIN: <span className="ml-8">{similarAsset.assetId}</span>
                               </p>
                               <p className="text-sm text-gray-600">
-                                Location: <span className="ml-2">{similarAsset.assetLocation}</span>
+                                Location: <span className="ml-2">{getLocationName(similarAsset.assetLocation)}</span>
                               </p>
                             </div>
                           </div>

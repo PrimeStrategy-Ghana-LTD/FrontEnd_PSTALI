@@ -47,7 +47,7 @@ const AssetManagementTable = () => {
             <thead className="text-gray-600">
               <tr>
                 <th className="py-1 pr-4">Asset Name</th>
-                <th className="py-1 pr-4">Category</th>
+                <th className="py-1 pr-4">Status</th>
                 <th className="py-1 pr-4">Location</th>
                 <th className="py-1">Asset ID</th>
               </tr>
@@ -56,7 +56,7 @@ const AssetManagementTable = () => {
               {recentAssets.map((item, index) => (
                 <tr key={index} className="border-t border-gray-100">
                   <td className="py-1 pr-4">{item.assetName || "—"}</td>
-                  <td className="py-1 pr-4">{item.category || "—"}</td>
+                  <td className="py-1 pr-4">{item.status || "—"}</td>
                   <td className="py-1 pr-4">{getLocationName(item.assetLocation) || "—"}</td>
                   <td className="py-1">{item.assetId || "—"}</td>
                 </tr>
