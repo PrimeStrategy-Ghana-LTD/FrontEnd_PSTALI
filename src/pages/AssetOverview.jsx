@@ -141,7 +141,7 @@ const AssetOverview = () => {
           {/* Right Column - Summary and Chart */}
           <div className="w-full lg:w-1/3 space-y-3">
             {/* Asset Summary Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[48%]">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[45%]">
               <h2 className="text-base font-semibold text-gray-900 mb-3">
                 Location
               </h2>
