@@ -11,6 +11,7 @@ import {
 } from "chart.js";
 import { Doughnut, Bar } from "react-chartjs-2";
 import { ChevronDown } from "lucide-react";
+import WavyChart from "./WavyChart";
 
 ChartJS.register(
   ArcElement,
@@ -53,17 +54,29 @@ const Report = () => {
         },
       ],
     };
-    
+
     // Modify data based on period if needed
-    switch(period) {
+    switch (period) {
       case "Daily":
-        return { ...baseData, datasets: [{ ...baseData.datasets[0], data: [80, 20] }] };
+        return {
+          ...baseData,
+          datasets: [{ ...baseData.datasets[0], data: [80, 20] }],
+        };
       case "Weekly":
-        return { ...baseData, datasets: [{ ...baseData.datasets[0], data: [70, 30] }] };
+        return {
+          ...baseData,
+          datasets: [{ ...baseData.datasets[0], data: [70, 30] }],
+        };
       case "Monthly":
-        return { ...baseData, datasets: [{ ...baseData.datasets[0], data: [75, 25] }] };
+        return {
+          ...baseData,
+          datasets: [{ ...baseData.datasets[0], data: [75, 25] }],
+        };
       case "Yearly":
-        return { ...baseData, datasets: [{ ...baseData.datasets[0], data: [85, 15] }] };
+        return {
+          ...baseData,
+          datasets: [{ ...baseData.datasets[0], data: [85, 15] }],
+        };
       default:
         return baseData;
     }
@@ -74,14 +87,14 @@ const Report = () => {
       Daily: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
       Weekly: ["Week 1", "Week 2", "Week 3", "Week 4"],
       Monthly: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-      Yearly: ["2020", "2021", "2022", "2023", "2024"]
+      Yearly: ["2020", "2021", "2022", "2023", "2024"],
     };
 
     const baseData = {
       Daily: [15, 25, 35, 20, 30, 25, 18],
       Weekly: [45, 52, 38, 61],
       Monthly: [20, 50, 30, 20, 15, 10],
-      Yearly: [150, 200, 180, 220, 190]
+      Yearly: [150, 200, 180, 220, 190],
     };
 
     return {
@@ -128,14 +141,34 @@ const Report = () => {
   const getAssignmentData = (period) => {
     const baseData = [
       { name: "Car SI", quantity: "@gmail", location: "Tema", assigned: "8" },
-      { name: "Boat WD", quantity: "@gmail", location: "Takoradi", assigned: "10000" },
-      { name: "CAR TF", quantity: "@gmail", location: "Location 2", assigned: "2839" },
-      { name: "House IK", quantity: "@gmail", location: "Location 2", assigned: "7393" },
-      { name: "House SD", quantity: "@gmail", location: "Location 1", assigned: "739292" },
+      {
+        name: "Boat WD",
+        quantity: "@gmail",
+        location: "Takoradi",
+        assigned: "10000",
+      },
+      {
+        name: "CAR TF",
+        quantity: "@gmail",
+        location: "Location 2",
+        assigned: "2839",
+      },
+      {
+        name: "House IK",
+        quantity: "@gmail",
+        location: "Location 2",
+        assigned: "7393",
+      },
+      {
+        name: "House SD",
+        quantity: "@gmail",
+        location: "Location 1",
+        assigned: "739292",
+      },
     ];
 
     // You can filter or modify data based on period
-    switch(period) {
+    switch (period) {
       case "This Week":
         return baseData.slice(0, 3);
       case "This Month":
@@ -216,7 +249,7 @@ const Report = () => {
           <Bar data={getBarData(categoriesTimePeriod)} options={barOptions} />
         </div>
       </div>
-
+      <WavyChart />
       <div className="border-2 bg-white border-white p-4 rounded-md shadow-sm mt-5 w-[97%] ml-4">
         <div className="flex flex-row justify-between mb-2">
           <p className="font-semibold">Assignments</p>
@@ -258,7 +291,8 @@ const Report = () => {
         {/* Optional custom legend-like footer */}
         <div className="flex gap-6 mt-3 px-4">
           <span className="text-sm text-gray-500">
-            Table shows {getAssignmentData(assignmentsTimePeriod).length} most recent assets for {assignmentsTimePeriod.toLowerCase()}
+            Table shows {getAssignmentData(assignmentsTimePeriod).length} most
+            recent assets for {assignmentsTimePeriod.toLowerCase()}
           </span>
         </div>
       </div>
