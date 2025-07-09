@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import AssetSummaryChart from "./AssetSummaryChart";
 import AssetManagementGraph from "./AssetManagementGraph";
 import axios from "axios";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCar } from "@fortawesome/free-solid-svg-icons";
 import Taxi from "../assets/images/local_taxi.png";
-import Way from "../assets/images/Way.png";
-import Users from "../assets/images/Users.png";
-import Goods from "../assets/images/Quantity.png";
+import loc from "../assets/images/loc.svg";
+import group from "../assets/images/group.svg";
+import houses from "../assets/images/houses.svg";
 import location from "../assets/images/location.png";
-import Pending from "../assets/images/Pending.png";
-import Total from "../assets/images/Total.png";
-
+import cancel from "../assets/images/cancel.svg";
+import profit from "../assets/images/profit.svg";
 
 const AssetOverview = () => {
   const [assetCount, setAssetCount] = useState(0);
@@ -19,8 +19,12 @@ const AssetOverview = () => {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        const assetRes = await axios.get("https://backend-ps-tali.onrender.com/assets/count");
-        const assignmentRes = await axios.get("https://backend-ps-tali.onrender.com/assignments/count");
+        const assetRes = await axios.get(
+          "https://backend-ps-tali.onrender.com/assets/count"
+        );
+        const assignmentRes = await axios.get(
+          "https://backend-ps-tali.onrender.com/assignments/count"
+        );
 
         setAssetCount(assetRes.data.count || 0);
         setAssignmentCount(assignmentRes.data.count || 0);
@@ -33,24 +37,24 @@ const AssetOverview = () => {
   }, []);
 
   const assetData = [
-    { icon: Taxi, count: 823, label: "Cars" },
-    { icon: Goods, count: 423, label: "Goods" },
-    { icon: Goods, count: 156, label: "Equipment" },
-    { icon: Goods, count: 89, label: "Furniture" },
+    { icon: <FontAwesomeIcon icon={faCar} />, count: 300, label: "Cars" },
+    { icon: houses, count: 300, label: "Goods 1" },
+    { icon: houses, count: 300, label: "Goods 2" },
+    { icon: houses, count: 300, label: "Goods 3" },
   ];
 
   const assignmentData = [
-    { icon: location, count: 82, label: "locations" },
-    { icon: Pending, count: 56, label: "Pending Approvals" },
-    { icon: Total, count: assetCount, label: "Total Assets" }, // updated
-    { icon: Users, count: 43, label: "Users" },
+    { icon: loc, count: 4, label: "locations" },
+    { icon: cancel, count: 5, label: "Pending Approvals" },
+    { icon: profit, count: assetCount, label: "Total Assets" }, // updated
+    { icon: group, count: 10, label: "Users" },
   ];
 
   const summaryData = [
-    { icon: Way, count: assignmentCount, label: "Asset Assigned" }, // updated
-    { icon: Way, count: 423, label: "Asset In Store" },
-    { icon: Way, count: 31, label: "Number of User" },
-    { icon: Way, count: 26, label: "Number of Assigns" },
+    { icon: loc, count: 200, label: "Tema" }, // updated
+    { icon: loc, count: 200, label: "Takoradi" },
+    { icon: loc, count: 200, label: "Location 1" },
+    { icon: loc, count: 200, label: "Location 2" },
   ];
 
   return (
@@ -60,16 +64,36 @@ const AssetOverview = () => {
           {/* Left Column - Main Content */}
           <div className="w-full lg:w-2/3 space-y-3">
             {/* Asset Overview Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-              <h2 className="text-base font-semibold text-gray-900 mb-3">Asset Overview</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[22vh]">
+              <h2 className="text-base font-semibold text-gray-900 mb-3">
+                Asset Overview
+              </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {assetData.map((item, index) => (
-                  <div key={index} className="flex flex-col items-center">
+                  <div
+                    key={index}
+                    className={`flex flex-col items-center ${
+                      (index + 1) % 4 !== 0
+                        ? "border-r border-gray-200 pr-4"
+                        : ""
+                    }`}
+                  >
                     <div className="w-8 h-8 flex items-center justify-center mb-2">
-                      <img src={item.icon} alt={item.label} className="w-5 h-5" />
+                      {typeof item.icon === "string" ? (
+                        <img
+                          src={item.icon}
+                          alt={item.label}
+                          className="w-8 h-8"
+                        />
+                      ) : (
+                        item.icon
+                      )}
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm font-bold text-gray-900">{item.count}</p>
+
+                    <div className="text-center flex gap-2">
+                      <p className="text-sm font-bold text-gray-900">
+                        {item.count}
+                      </p>
                       <p className="text-xs text-gray-500">{item.label}</p>
                     </div>
                   </div>
@@ -78,16 +102,29 @@ const AssetOverview = () => {
             </div>
 
             {/* Assignments Overview Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-              <h2 className="text-base font-semibold text-gray-900 mb-3">Assignments Overview</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[22vh]">
+              <h2 className="text-base font-semibold text-gray-900 mb-3"></h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
                 {assignmentData.map((item, index) => (
-                  <div key={index} className="flex flex-col items-center">
+                  <div
+                    key={index}
+                    className={`flex flex-col items-center ${
+                      (index + 1) % 4 !== 0
+                        ? "border-r border-gray-200 pr-4"
+                        : ""
+                    }`}
+                  >
                     <div className="w-8 h-8 flex items-center justify-center mb-2">
-                      <img src={item.icon} alt={item.label} className="w-5 h-5" />
+                      <img
+                        src={item.icon}
+                        alt={item.label}
+                        className="w-8 h-8"
+                      />
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm font-bold text-gray-900">{item.count}</p>
+                    <div className="text-center flex gap-2">
+                      <p className="text-sm font-bold text-gray-900">
+                        {item.count}
+                      </p>
                       <p className="text-xs text-gray-500">{item.label}</p>
                     </div>
                   </div>
@@ -105,16 +142,30 @@ const AssetOverview = () => {
           <div className="w-full lg:w-1/3 space-y-3">
             {/* Asset Summary Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[48%]">
-              <h2 className="text-base font-semibold text-gray-900 mb-3">Asset Summary</h2>
-              <div className="grid grid-cols-2 gap-3 mt-9">
+              <h2 className="text-base font-semibold text-gray-900 mb-3">
+                Location
+              </h2>
+              <div className="grid grid-cols-2 mt-9 ">
                 {summaryData.map((item, index) => (
-                  <div key={index} className="flex flex-col items-center">
+                  <div
+                    key={index}
+                    className={`flex flex-col items-center justify-center p-4 border-gray-200
+                      ${index % 2 === 0 ? "border-r" : ""}
+                     ${index < 2 ? "border-b" : ""}
+                     `}
+                  >
                     <div className="w-6 h-6 flex items-center justify-center mb-3">
-                      <img src={item.icon} alt={item.label} className="w-5 h-5" />
+                      <img
+                        src={item.icon}
+                        alt={item.label}
+                        className="w-8 h-8"
+                      />
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-gray-900">{item.count}</p>
-                      <p className="text-xs text-gray-500 text-center leading-tight">{item.label}</p>
+                      <p className="text-sm text-gray-900">{item.count}</p>
+                      <p className="text-xs text-gray-500 text-center leading-tight">
+                        {item.label}
+                      </p>
                     </div>
                   </div>
                 ))}
