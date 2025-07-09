@@ -210,3 +210,13 @@ export const apiEditAsset = async (id, updateData) => {
     throw error;
   }
 };
+
+const fetchDataForPeriod = async (period, chartType) => {
+  try {
+    const response = await fetch(`/api/${chartType}?period=${period}`);
+    const data = await response.json();
+    // Update your state with the fetched data
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
