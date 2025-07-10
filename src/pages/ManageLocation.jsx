@@ -182,7 +182,7 @@ const ManageLocation = () => {
                   <div className="flex-1 p-6">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <div className="text-gray-900 font-medium mb-1">Lisy Store</div>
+                        {/* <div className="text-gray-900 font-medium mb-1">Lisy Store</div> */}
                         <div className="text-gray-600 text-sm mb-1">{store.street}</div>
                         <div className="text-gray-600 text-sm mb-1">{store.address}</div>
                         <div className="text-gray-600 text-sm">{store.number}</div>

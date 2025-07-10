@@ -335,7 +335,7 @@ const SearchPage = () => {
     sessionStorage.setItem("selectedAsset", JSON.stringify(asset));
 
     // Navigate to view page with asset ID
-    navigate(`/view-asset/${asset.id}`);
+    navigate(`/dashboard/assets/view-asset/${asset.id}`);
   };
 
   const profileRef = useRef();
