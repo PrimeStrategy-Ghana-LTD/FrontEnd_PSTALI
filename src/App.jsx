@@ -23,6 +23,7 @@ import Settings from "./pages/Settings";
 import Report from "./pages/Report";
 import AssignLocationPage from "./pages/AssignLocationPage";
 import ImportAssetsPage from "./pages/ImportAssetsPage";
+import AssetManagementTable from "./pages/AssetManagementGraph";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
   {
     path: "/add-asset",
     element: <AddAsset />,
+  },
+  {
+    path:"/assetchart",
+    element: <AssetManagementTable />
   },
 
   {

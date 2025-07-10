@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import useLocationName from "../hooks/useLocationName"; // adjust path if needed
-
-
+import useLocationName from "../hooks/useLocationName"; // Adjust path if needed
+import { apiGetAllAssets } from "../servicess/tali"; // Adjust import path if needed
 
 const AssetManagementTable = () => {
   const [recentAssets, setRecentAssets] = useState([]);
@@ -10,22 +8,27 @@ const AssetManagementTable = () => {
   const [error, setError] = useState(null);
   const { getLocationName } = useLocationName();
 
-
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchRecentAssets = async () => {
       try {
-        const response = await axios.get("https://backend-ps-tali.onrender.com/dashboard/get");
-        const recent = response.data?.recentlyAdded || []; // Corrected key name
-        setRecentAssets(recent.slice(0, 5)); // Only 5 most recent
+        const response = await apiGetAllAssets();
+        const allAssets = response.data.assets || [];
+console.log("API response:", response.data);
+        // Ensure assets have a createdAt field and sort by it
+        const sortedAssets = allAssets.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setRecentAssets(sortedAssets.slice(0, 5)); // Get only the last 5
       } catch (err) {
-        console.error("Failed to fetch dashboard data:", err);
+        console.error("Failed to fetch assets:", err);
         setError("Failed to load recent assets.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDashboardData();
+    fetchRecentAssets();
   }, []);
 
   return (
