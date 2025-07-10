@@ -338,18 +338,33 @@ const SearchPage = () => {
     navigate(`/view-asset/${asset.id}`);
   };
 
-  const bellRef = useRef();
+  const profileRef = useRef();
+const bellRef = useRef();
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (bellRef.current && !bellRef.current.contains(e.target)) {
-        setDropdownOpen(false);
-      }
-    };
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    // If click is outside both profile and bell dropdowns
+    if (
+      profileRef.current &&
+      !profileRef.current.contains(e.target) &&
+      profileDropdownOpen
+    ) {
+      setProfileDropdownOpen(false);
+    }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    if (
+      bellRef.current &&
+      !bellRef.current.contains(e.target) &&
+      notificationDropdownOpen
+    ) {
+      setNotificationDropdownOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [profileDropdownOpen, notificationDropdownOpen]);
+
 
   const handleLogout = () => {
     // Clear localStorage and/or sessionStorage
@@ -402,7 +417,8 @@ const SearchPage = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-2 relative" ref={dropdownRef}>
+            <div className="flex items-center gap-2 relative" ref={profileRef}>
+
               <div
                 className="relative h-10 w-10 lg:h-12 lg:w-12 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => {

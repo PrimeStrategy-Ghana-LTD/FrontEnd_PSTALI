@@ -14,14 +14,24 @@ const AssignedPage = () => {
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
-        const response = await fetch('https://backend-ps-tali.onrender.com/assets/location-assignments');
+        const token = localStorage.getItem('token');
+        const response = await fetch('https://backend-ps-tali.onrender.com/assets/location-assignments', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
+
         const data = await response.json();
-        setAssignments(data.data);
-        setFilteredAssignments(data.data);
+        const cleanData = data.data || [];
+
+        setAssignments(data.assets);
+        setFilteredAssignments(data.assets);
       } catch (error) {
         console.error('Error fetching assignments:', error);
       }
@@ -42,20 +52,23 @@ const AssignedPage = () => {
   }, []);
 
   const handleFilter = () => {
-    const filtered = assignments.filter((item) => {
-      const locationMatch = filterLocation ? item.assetLocation?.assetLocation === filterLocation : true;
-      const assetMatch = filterAsset
-        ? item.asset?.asset?.toLowerCase().includes(filterAsset.toLowerCase())
-        : true;
-      return locationMatch && assetMatch;
-    });
-    setFilteredAssignments(filtered);
-  };
+  const filtered = assignments.filter((item) => {
+    const locationMatch = filterLocation
+      ? item.assetLocation?.assetLocation === filterLocation
+      : true;
+    const assetMatch = filterAsset
+      ? item.assetName?.toLowerCase().includes(filterAsset.toLowerCase())
+      : true;
+    return locationMatch && assetMatch;
+  });
+  setFilteredAssignments(data.assets);
+};
+
 
   const handleReset = () => {
     setFilterLocation('');
     setFilterAsset('');
-    setFilteredAssignments(assignments);
+    setFilteredAssignments(data.assets);
   };
 
   return (
@@ -65,7 +78,6 @@ const AssignedPage = () => {
         <div className="bg-white p-4 rounded-md shadow-sm w-full border border-white">
           <p className="font-semibold mb-4">Assets</p>
           <div className="flex flex-wrap gap-6 justify-between">
-            {/* Replace these static numbers with dynamic ones if needed */}
             <div>
               <p className="mb-1 font-semibold text-[#1570ef]">Total Entries</p>
               <p className="text-[13px] mb-1 font-semibold">67</p>
@@ -124,7 +136,9 @@ const AssignedPage = () => {
               >
                 Filter
               </button>
-              <button className="px-2 py-1 rounded-sm border border-gray-300 text-gray-600">Download All</button>
+              <button className="px-2 py-1 rounded-sm border border-gray-300 text-gray-600">
+                Download All
+              </button>
             </div>
           </div>
 
@@ -174,19 +188,22 @@ const AssignedPage = () => {
 
           {/* Table Rows */}
           {filteredAssignments.length > 0 ? (
-            filteredAssignments.map((item, index) => (
-              <div
-                key={index}
-                className="flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200"
-              >
-                <p className="w-1/3">{item.asset?.asset || '—'}</p>
-                <p className="w-1/3">{item.assetLocation?.assetLocation || '—'}</p>
-                <p className="w-1/3">{item.vin || '—'}</p>
-              </div>
-            ))
-          ) : (
-            <div className="text-center text-sm text-gray-400 py-4">No assignments found.</div>
-          )}
+  filteredAssignments.map((item, index) => (
+    <div
+      key={index}
+      className="flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200"
+    >
+      <p className="w-1/3">{item.assetName || '—'}</p>
+      <p className="w-1/3">{item.assetLocation?.assetLocation || '—'}</p>
+      <p className="w-1/3">{item.assetId || '—'}</p>
+    </div>
+  ))
+) : (
+  <div className="text-center text-sm text-gray-400 py-4">
+    No assignments found.
+  </div>
+)}
+
         </div>
       </div>
     </div>
