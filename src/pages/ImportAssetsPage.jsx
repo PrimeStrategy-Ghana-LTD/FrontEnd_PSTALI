@@ -601,10 +601,11 @@ const ImportAssetsPage = () => {
                 <p><strong>Two ways to add images:</strong></p>
                 <div className="ml-4 space-y-1">
                   <p>1. <strong>Direct embedding:</strong> Copy and paste images directly into Excel cells</p>
-                  <p>2. <strong>Image URLs:</strong> Add publicly accessible image URLs in the "Image URLs" and "Additional Images" columns</p>
+                  {/* <p>2. <strong>Image URLs:</strong> Add publicly accessible image URLs in the "Image URLs" and "Additional Images" columns</p> */}
+                  <p>2. <strong>Image URLs:</strong>Ensure they are publicly accessible and are absolute URLs with HTTPS or HTTP.</p>
                 </div>
-                <p><strong>URL Format:</strong> https://example.com/image.jpg</p>
-                <p><strong>Multiple URLs:</strong> Separate with commas (e.g., url1.jpg,url2.jpg,url3.jpg)</p>
+                <p><strong>URL Format:</strong> https://example.com/image.jpg or  http://example.com/image.jpg</p>
+                {/* <p><strong>Multiple URLs:</strong> Separate with commas (e.g., url1.jpg,url2.jpg,url3.jpg)</p> */}
               </div>
             </div>
 
