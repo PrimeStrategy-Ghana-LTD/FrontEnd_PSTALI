@@ -587,8 +587,8 @@ const ImportAssetsPage = () => {
                 <li>• Asset ID/VIN must be unique</li>
                 <li>• Year should be between 1990 and current year</li>
                 <li>• <strong>Images can be embedded directly in Excel or use image URLs</strong></li>
-                <li>• For image URLs, ensure they are publicly accessible and use HTTPS</li>
-                <li>• Multiple image URLs can be separated by commas</li>
+                <li>• For image URLs, ensure they are publicly accessible and use HTTPS or HTTP</li>
+                {/* <li>• Multiple image URLs can be separated by commas</li> */}
                 <li>• Supported image formats: JPG, PNG, GIF, WebP</li>
                 <li>• Images will be automatically resized and optimized during import</li>
               </ul>
