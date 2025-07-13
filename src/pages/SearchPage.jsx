@@ -12,6 +12,7 @@ import { LuLogIn } from "react-icons/lu";
 import icon from "../assets/images/icon.png";
 import icon2 from "../assets/images/Icon2.png";
 import useLocationName from "../hooks/useLocationName";
+import AdvancedSearchModal from './AdvancedSearchModal';
 
 const SearchPage = () => {
   const [activeTab, setActiveTab] = useState("Assets");
@@ -27,6 +28,7 @@ const SearchPage = () => {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const { getLocationName } = useLocationName();
+   const [showModal, setShowModal] = useState(false);
 
 
   const navigate = useNavigate();
@@ -365,6 +367,15 @@ useEffect(() => {
   return () => document.removeEventListener("mousedown", handleClickOutside);
 }, [profileDropdownOpen, notificationDropdownOpen]);
 
+ const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    if (tab === "Assets") {
+      navigate("/dashboard/assets");
+    } else if (tab === "Advanced Search") {
+      setShowModal(true); // Open modal
+    }
+  };
+
 
   const handleLogout = () => {
     // Clear localStorage and/or sessionStorage
@@ -575,28 +586,29 @@ useEffect(() => {
           </div>
 
           {/* Tabs - Better spacing on larger screens */}
-          <div className="flex justify-center mb-8 lg:mb-10">
-            <div className="flex space-x-8 lg:space-x-16 xl:space-x-20">
-              {["Assets", "Advanced Search"].map((tab) => (
-                <p
-                  key={tab}
-                  onClick={() => {
-                    setActiveTab(tab);
-                    if (tab === "Assets") {
-                      navigate("/dashboard/assets");
-                    }
-                  }}
-                  className={`text-base lg:text-lg xl:text-xl font-medium cursor-pointer transition-colors hover:text-[#01fe9d] ${
-                    activeTab === tab
-                      ? "text-white pb-1 border-b-2 border-white"
-                      : "text-white"
-                  }`}
-                >
-                  {tab}
-                </p>
-              ))}
-            </div>
-          </div>
+          <>
+      {/* Tab Section */}
+      <div className="flex justify-center mb-8 lg:mb-10">
+        <div className="flex space-x-8 lg:space-x-16 xl:space-x-20">
+          {["Assets", "Advanced Search"].map((tab) => (
+            <p
+              key={tab}
+              onClick={() => handleTabClick(tab)}
+              className={`text-base lg:text-lg xl:text-xl font-medium cursor-pointer transition-colors hover:text-[#01fe9d] ${
+                activeTab === tab
+                  ? "text-white pb-1 border-b-2 border-white"
+                  : "text-white"
+              }`}
+            >
+              {tab}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      {/* Modal */}
+      {showModal && <AdvancedSearchModal onClose={() => setShowModal(false)} />}
+    </>
         </div>
 
         {/* Settings - Positioned better on larger screens */}

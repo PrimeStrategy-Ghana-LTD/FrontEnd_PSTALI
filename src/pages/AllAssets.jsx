@@ -305,6 +305,44 @@ const AllAssets = () => {
                 </button>
               )}
             </div>
+
+            {/* Searchbar */}
+            <div className=" flex ">
+            <div className="relative flex items-center border border-gray-300 rounded-full text-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent px-3 py-2 w-96">
+
+              <svg
+                className="w-4 h-4 text-gray-400 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search assets..."
+                value={searchInput}
+                onChange={handleSearchChange}
+                className="w-full focus:outline-none"
+              />
+              {searchInput && (
+                <button
+                  onClick={() => {
+                    setSearchInput("");
+                    setSearchTerm("");
+                  }}
+                  className="ml-2 text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
             <div className="flex gap-3 text-xs sm:text-[13px]">
               <button
                 className="flex items-center gap-2 px-3 py-1 rounded-sm border border-gray-300 text-gray-600 cursor-pointer"
@@ -395,42 +433,7 @@ const AllAssets = () => {
             </div>
           )}
 
-          <div className="w-full flex justify-end mb-4">
-            <div className="relative flex items-center border border-gray-300 rounded-md text-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent px-3 py-2 sm:w-64">
-              <svg
-                className="w-4 h-4 text-gray-400 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search assets..."
-                value={searchInput}
-                onChange={handleSearchChange}
-                className="w-full focus:outline-none"
-              />
-              {searchInput && (
-                <button
-                  onClick={() => {
-                    setSearchInput("");
-                    setSearchTerm("");
-                  }}
-                  className="ml-2 text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-          </div>
-
+          
           {loading && (
             <div className="flex justify-center items-center py-8">
               <div className="text-gray-600">Loading assets...</div>
