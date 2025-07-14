@@ -52,7 +52,7 @@ const ViewAsset = () => {
           variant: assetData.variant || "",
           bodyType: assetData.bodyType || "",
           origin: assetData.origin || "",
-          // category: assetData.category || ""
+          category: assetData.category || ""
         });
 
         const locationResponse = await apiGetLocations();
@@ -176,7 +176,7 @@ const ViewAsset = () => {
       variant: formData.variant,
       bodyType: formData.bodyType,
       origin: formData.origin,
-      // category: formData.category,
+      category: formData.category,
       assetLocation: formData.assetLocation
     };
 
@@ -252,7 +252,7 @@ const ViewAsset = () => {
       variant: asset?.variant || "",
       bodyType: asset?.bodyType || "",
       origin: asset?.origin || "",
-      // category: asset?.category || "",
+      category: asset?.category || "",
       assetLocation: locationId || ""
     });
     setJustification(asset?.justification || "");
@@ -563,7 +563,7 @@ const ViewAsset = () => {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              {/* <div>
+              <div>
                 <label className="block text-sm text-gray-600 mb-1">Category</label>
                 <input
                   type="text"
@@ -572,7 +572,7 @@ const ViewAsset = () => {
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-              </div> */}
+              </div>
             </div>
 
             <div>
@@ -757,10 +757,10 @@ const ViewAsset = () => {
                       <span className="text-gray-600 text-sm">Origin:</span>
                       <span className="text-gray-900 text-sm font-medium">{asset.origin || "N/A"}</span>
                     </div>
-                    {/* <div className="flex justify-between">
+                    <div className="flex justify-between">
                       <span className="text-gray-600 text-sm">Category:</span>
                       <span className="text-gray-900 text-sm font-medium">{asset.category || "N/A"}</span>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
               </div>
