@@ -221,3 +221,4 @@ const fetchDataForPeriod = async (period, chartType) => {
     console.error('Error fetching data:', error);
   }
 };
+

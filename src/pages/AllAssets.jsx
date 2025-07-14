@@ -11,6 +11,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { apiGetAllAssets, apiGetLocations, apiCountAllAssets } from "../servicess/tali";
 import { FiSearch } from "react-icons/fi";
 import ImportAssetsModal from "./ImportAssetsPage";
+import { useLocation } from "react-router-dom";
+
+
 
 const AllAssets = () => {
   const navigate = useNavigate();
@@ -28,6 +31,20 @@ const AllAssets = () => {
   const [sortOption, setSortOption] = useState("recent");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState(""); // For debouncing
+  const location = useLocation();
+const searchParams = new URLSearchParams(location.search);
+
+const advancedFilters = {
+  search: searchParams.get('search') || '',
+  category: searchParams.get('category') || '',
+  assetLocation: searchParams.get('assetLocation') || '',
+  model: searchParams.get('model') || '',
+  origin: searchParams.get('origin') || '',
+  inspectedBy: searchParams.get('inspectedBy') || '',
+  from: searchParams.get('from') || '',
+  to: searchParams.get('to') || '',
+};
+
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,49 +70,79 @@ const AllAssets = () => {
 
   // Client-side filtering and sorting function
   const filterAndSortAssets = (assetsToFilter) => {
-    let filteredAssets = [...assetsToFilter];
+  let filteredAssets = [...assetsToFilter];
 
-    // Apply filters
-    if (availabilityFilter) {
-      filteredAssets = filteredAssets.filter(asset => asset.status === availabilityFilter);
-    }
+  // 1. Availability and Location filters (existing)
+  if (availabilityFilter) {
+    filteredAssets = filteredAssets.filter(asset => asset.status === availabilityFilter);
+  }
 
-    if (locationFilter) {
-      filteredAssets = filteredAssets.filter(asset => 
-        asset.assetLocation === locationFilter || 
-        getLocationName(asset.assetLocation) === locationFilter
-      );
-    }
+  if (locationFilter) {
+    filteredAssets = filteredAssets.filter(asset => 
+      asset.assetLocation === locationFilter || 
+      getLocationName(asset.assetLocation) === locationFilter
+    );
+  }
 
-    if (searchTerm.trim()) {
-      const searchLower = searchTerm.toLowerCase().trim();
-      filteredAssets = filteredAssets.filter(asset =>
-        asset.assetName?.toLowerCase().includes(searchLower) ||
-        asset.assetId?.toLowerCase().includes(searchLower) ||
-        asset.category?.toLowerCase().includes(searchLower) ||
-        asset.make?.toLowerCase().includes(searchLower) ||
-        asset.model?.toLowerCase().includes(searchLower) ||
-        getLocationName(asset.assetLocation)?.toLowerCase().includes(searchLower)
-      );
-    }
+  // 2. Advanced Search filters
+  if (advancedFilters.search.trim()) {
+    const term = advancedFilters.search.toLowerCase();
+    filteredAssets = filteredAssets.filter(asset =>
+      asset.assetName?.toLowerCase().includes(term) ||
+      asset.assetId?.toLowerCase().includes(term) ||
+      asset.category?.toLowerCase().includes(term) ||
+      asset.make?.toLowerCase().includes(term) ||
+      asset.model?.toLowerCase().includes(term) ||
+      getLocationName(asset.assetLocation)?.toLowerCase().includes(term)
+    );
+  }
 
-    // Apply sorting
-    switch (sortOption) {
-      case "recent":
-        filteredAssets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      case "alphabetical":
-        filteredAssets.sort((a, b) => (a.assetName || '').localeCompare(b.assetName || ''));
-        break;
-      case "reverse":
-        filteredAssets.sort((a, b) => (b.assetName || '').localeCompare(a.assetName || ''));
-        break;
-      default:
-        filteredAssets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    }
+  if (advancedFilters.category) {
+    filteredAssets = filteredAssets.filter(asset => asset.category === advancedFilters.category);
+  }
 
-    return filteredAssets;
-  };
+  if (advancedFilters.assetLocation) {
+    filteredAssets = filteredAssets.filter(asset => getLocationName(asset.assetLocation) === advancedFilters.assetLocation);
+  }
+
+  if (advancedFilters.model) {
+    filteredAssets = filteredAssets.filter(asset => asset.model?.toLowerCase() === advancedFilters.model.toLowerCase());
+  }
+
+  if (advancedFilters.origin) {
+    filteredAssets = filteredAssets.filter(asset => asset.origin?.toLowerCase() === advancedFilters.origin.toLowerCase());
+  }
+
+  if (advancedFilters.inspectedBy) {
+    filteredAssets = filteredAssets.filter(asset => asset.inspectedBy === advancedFilters.inspectedBy);
+  }
+
+  if (advancedFilters.from) {
+    filteredAssets = filteredAssets.filter(asset => new Date(asset.createdAt) >= new Date(advancedFilters.from));
+  }
+
+  if (advancedFilters.to) {
+    filteredAssets = filteredAssets.filter(asset => new Date(asset.createdAt) <= new Date(advancedFilters.to));
+  }
+
+  // 3. Sorting (already handled)
+  switch (sortOption) {
+    case "recent":
+      filteredAssets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      break;
+    case "alphabetical":
+      filteredAssets.sort((a, b) => (a.assetName || '').localeCompare(b.assetName || ''));
+      break;
+    case "reverse":
+      filteredAssets.sort((a, b) => (b.assetName || '').localeCompare(a.assetName || ''));
+      break;
+    default:
+      break;
+  }
+
+  return filteredAssets;
+};
+
 
   // Paginate filtered assets
   const paginateAssets = (filteredAssets, page) => {
