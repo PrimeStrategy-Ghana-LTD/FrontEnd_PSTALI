@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Menu, Bell, User } from 'lucide-react';
+import { Menu, Bell, User, LogOut, Settings } from 'lucide-react';
 import axios from 'axios';
 import icon from "../assets/images/icon.png";
 import icon2 from "../assets/images/Icon2.png";
 
-
 const Searchbar = ({ setSidebarOpen }) => {
   const [user, setUser] = useState(null);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const bellRef = useRef(null);
+  const profileRef = useRef(null);
 
   // Fetch user
   useEffect(() => {
@@ -31,22 +32,30 @@ const Searchbar = ({ setSidebarOpen }) => {
     fetchUsername();
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (bellRef.current && !bellRef.current.contains(event.target)) {
         setNotificationDropdownOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
+
   return (
     <div className="bg-white shadow-sm border-b border-gray-200">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left side - Mobile menu button */}
+          {/* Mobile menu button */}
           <div className="flex items-center">
             <button
               className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
@@ -56,7 +65,7 @@ const Searchbar = ({ setSidebarOpen }) => {
             </button>
           </div>
 
-          {/* Right side - Notifications and user menu */}
+          {/* Right side - Notifications and Profile */}
           <div className="flex items-center space-x-4 ml-auto">
             {/* Notifications */}
             <div className="relative" ref={bellRef}>
@@ -73,7 +82,7 @@ const Searchbar = ({ setSidebarOpen }) => {
                   <p className="text-gray-800 font-semibold mb-2 border-b-[0.5px] border-gray-200">
                     Notifications
                   </p>
-                  <ul className="text-md text-gray-700 space-y-2 ">
+                  <ul className="text-md text-gray-700 space-y-2">
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
                       <img src={icon} alt="icon" className="w-8 h-8" />
                       <span>Pending Approvals</span>
@@ -91,9 +100,12 @@ const Searchbar = ({ setSidebarOpen }) => {
               )}
             </div>
 
-            {/* User menu */}
-            <div className="relative">
-              <button className="flex items-center space-x-3 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            {/* Profile Dropdown */}
+            <div className="relative" ref={profileRef}>
+              <button
+                className="flex items-center space-x-3 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={() => setProfileDropdownOpen((prev) => !prev)}
+              >
                 <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center">
                   {user && user.profilePicture ? (
                     <img
@@ -113,6 +125,31 @@ const Searchbar = ({ setSidebarOpen }) => {
                   {user ? user.fullName || user.userName : 'Loading...'}
                 </span>
               </button>
+
+              {profileDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <ul className="py-1 text-sm text-gray-700">
+                    <li>
+                      <a
+                        href="/account-settings"
+                        className="flex items-center px-4 py-2 hover:bg-gray-100"
+                      >
+                        <Settings className="h-4 w-4 mr-2 text-gray-500" />
+                        Account Settings
+                      </a>
+                    </li>
+                    <li>
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-100"
+                      >
+                        <LogOut className="h-4 w-4 mr-2 text-gray-500" />
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </div>

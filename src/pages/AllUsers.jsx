@@ -340,7 +340,7 @@ const AllUsers = () => {
           </div>
 
           {/* Search and User Count */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center mt-4 gap-4">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <svg
                 className="w-4 h-4"
@@ -357,13 +357,13 @@ const AllUsers = () => {
               </svg>
               <span>Total Users: {filteredUsers.length}</span>
             </div>
-            <div className="relative">
+            <div className="relative ml-28">
               <input
                 type="text"
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-94"
               />
               <svg
                 className="w-4 h-4 absolute left-3 top-3 text-gray-400"

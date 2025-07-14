@@ -537,7 +537,7 @@ const advancedFilters = {
 // ListView Component
 const ListView = ({ assets, getLocationName }) => (
   <div className="space-y-2">
-    <div className="hidden md:flex font-semibold text-sm text-gray-700 pb-2 border-b-2 border-gray-200">
+    <div className="hidden md:flex font-semibold text-sm text-gray-700 pb-2 border-b-2 border-gray-200 mt-9">
       <div className="flex-[1.5]">Name</div>
       <div className="flex-[2]">VIN</div>
       <div className="flex-[1.5]">Origin</div>
@@ -635,7 +635,7 @@ const ListView = ({ assets, getLocationName }) => (
 
 // GridView Component
 const GridView = ({ assets, getLocationName }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xlg:grid-cols-3 gap-4 mt-6 ml-20">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xlg:grid-cols-3 gap-4 mt-9 ml-20">
     {assets.map((item, index) => (
       <div
         key={item._id || index}

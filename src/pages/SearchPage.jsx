@@ -243,30 +243,7 @@ const SearchPage = () => {
           category: "Electronics",
           status: "Available",
         },
-        {
-          id: "keyboard-logitech",
-          name: "Keyboard - Logitech",
-          category: "Electronics",
-          status: "Available",
-        },
-        {
-          id: "mouse-razer",
-          name: "Mouse - Razer",
-          category: "Electronics",
-          status: "Available",
-        },
-        {
-          id: "chair-ergonomic",
-          name: "Chair - Ergonomic",
-          category: "Furniture",
-          status: "Available",
-        },
-        {
-          id: "desk-wooden",
-          name: "Desk - Wooden",
-          category: "Furniture",
-          status: "Available",
-        },
+       
       ]);
     } finally {
       setLoading(false);

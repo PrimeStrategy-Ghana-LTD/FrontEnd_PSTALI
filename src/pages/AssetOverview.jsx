@@ -2,8 +2,18 @@ import React, { useEffect, useState } from "react";
 import AssetSummaryChart from "./AssetSummaryChart";
 import AssetManagementGraph from "./AssetManagementGraph";
 import axios from "axios";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCar } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCar,
+  faBoxOpen,
+  faBox,
+  faLocationDot,
+  faIdCard,
+  faSignal,
+  faCircleUser,
+} from "@fortawesome/free-solid-svg-icons";
+
 import Taxi from "../assets/images/local_taxi.png";
 import loc from "../assets/images/loc.svg";
 import group from "../assets/images/group.svg";
@@ -56,7 +66,12 @@ const AssetOverview = () => {
 
         const formattedData = Object.entries(locationCountMap)
           .map(([locationId, count]) => ({
-            icon: loc,
+            icon: (
+              <FontAwesomeIcon
+                icon={faLocationDot}
+                className="text-blue-500 text-xl"
+              />
+            ),
             count,
             label: getLocationName(locationId),
           }))
@@ -73,16 +88,36 @@ const AssetOverview = () => {
 
   const assetData = [
     { icon: <FontAwesomeIcon icon={faCar} />, count: 300, label: "Cars" },
-    { icon: houses, count: 300, label: "Goods 1" },
-    { icon: houses, count: 300, label: "Goods 2" },
-    { icon: houses, count: 300, label: "Goods 3" },
+    {
+      icon: <FontAwesomeIcon icon={faBoxOpen} />,
+      count: 300,
+      label: "Goods 1",
+    },
+    { icon: <FontAwesomeIcon icon={faBox} />, count: 300, label: "Goods 2" },
+    { icon: <FontAwesomeIcon icon={faBox} />, count: 300, label: "Goods 3" },
   ];
 
   const assignmentData = [
-    { icon: loc, count: assignmentDataState.locations, label: "Locations" },
-    { icon: cancel, count: assignmentDataState.pendingApprovals, label: "Pending Approvals" },
-    { icon: profit, count: assetCount, label: "Total Assets" },
-    { icon: group, count: assignmentDataState.totalUsers, label: "Users" },
+    {
+      icon: <FontAwesomeIcon icon={faLocationDot} />,
+      count: assignmentDataState.locations,
+      label: "Locations",
+    },
+    {
+      icon: <FontAwesomeIcon icon={faIdCard} />,
+      count: assignmentDataState.pendingApprovals,
+      label: "Pending Approvals",
+    },
+    {
+      icon: <FontAwesomeIcon icon={faSignal} />,
+      count: assetCount,
+      label: "Total Assets",
+    },
+    {
+      icon: <FontAwesomeIcon icon={faCircleUser} />,
+      count: assignmentDataState.totalUsers,
+      label: "Users",
+    },
   ];
 
   return (
@@ -108,13 +143,19 @@ const AssetOverview = () => {
                   >
                     <div className="w-8 h-8 flex items-center justify-center mb-2">
                       {typeof item.icon === "string" ? (
-                        <img src={item.icon} alt={item.label} className="w-8 h-8" />
+                        <img
+                          src={item.icon}
+                          alt={item.label}
+                          className="w-8 h-8"
+                        />
                       ) : (
                         item.icon
                       )}
                     </div>
                     <div className="text-center flex gap-2">
-                      <p className="text-sm font-bold text-gray-900">{item.count}</p>
+                      <p className="text-sm font-bold text-gray-900">
+                        {item.count}
+                      </p>
                       <p className="text-xs text-gray-500">{item.label}</p>
                     </div>
                   </div>
@@ -135,10 +176,20 @@ const AssetOverview = () => {
                     }`}
                   >
                     <div className="w-8 h-8 flex items-center justify-center mb-2">
-                      <img src={item.icon} alt={item.label} className="w-8 h-8" />
+                      {typeof item.icon === "string" ? (
+                        <img
+                          src={item.icon}
+                          alt={item.label}
+                          className="w-12 h-12"
+                        />
+                      ) : (
+                        <div className="text-gray- text-xl">{item.icon}</div>
+                      )}
                     </div>
                     <div className="text-center flex gap-2">
-                      <p className="text-sm font-bold text-gray-900">{item.count}</p>
+                      <p className="text-sm font-bold text-gray-900">
+                        {item.count}
+                      </p>
                       <p className="text-xs text-gray-500">{item.label}</p>
                     </div>
                   </div>
@@ -156,7 +207,9 @@ const AssetOverview = () => {
           <div className="w-full lg:w-1/3 space-y-3">
             {/* Asset Summary Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[48%]">
-              <h2 className="text-base font-semibold text-gray-900 mb-3">Location</h2>
+              <h2 className="text-base font-semibold text-gray-900 mb-3">
+                Location
+              </h2>
               <div className="grid grid-cols-2 mt-9">
                 {summaryData.map((item, index) => (
                   <div
@@ -166,8 +219,17 @@ const AssetOverview = () => {
                       ${index < 2 ? "border-b" : ""}`}
                   >
                     <div className="w-6 h-6 flex items-center justify-center mb-3">
-                      <img src={item.icon} alt={item.label} className="w-8 h-8" />
+                      {typeof item.icon === "string" ? (
+                        <img
+                          src={item.icon}
+                          alt={item.label}
+                          className="w-12 h-12"
+                        />
+                      ) : (
+                        item.icon
+                      )}
                     </div>
+
                     <div className="text-center">
                       <p className="text-sm text-gray-900">{item.count}</p>
                       <p className="text-xs text-gray-500 text-center leading-tight">
