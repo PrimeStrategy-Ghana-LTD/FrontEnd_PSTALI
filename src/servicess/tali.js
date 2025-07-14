@@ -201,7 +201,8 @@ export const apiEditAsset = async (id, updateData) => {
   try {
     const response = await apiClient.patch(`/assets/${id}`, updateData, {
       headers: {
-        'Content-Type': 'application/json' // Changed from multipart/form-data to application/json
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}` // Add authorization header
       }
     });
     return response.data;

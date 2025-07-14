@@ -17,7 +17,7 @@ const ViewAsset = () => {
   const [assetLocation, setAssetLocation] = useState("Location Unknown");
   const [locations, setLocations] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [newLocation, setNewLocation] = useState("");
+  const [formData, setFormData] = useState({});
   const [justification, setJustification] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [similarAssets, setSimilarAssets] = useState([]);
@@ -35,6 +35,25 @@ const ViewAsset = () => {
         
         const assetData = await apiGetOneAsset(id);
         setAsset(assetData);
+        setFormData({
+          assetName: assetData.assetName || "",
+          assetId: assetData.assetId || "",
+          make: assetData.make || "",
+          model: assetData.model || "",
+          year: assetData.year || "",
+          condition: assetData.condition || "",
+          mileage: assetData.mileage || "",
+          drivetrain: assetData.drivetrain || "",
+          fuelType: assetData.fuelType || "",
+          exteriorColour: assetData.exteriorColour || assetData.exteriorColour || "",
+          doorCount: assetData.doorCount || "",
+          seatingCapacity: assetData.seatingCapacity || "",
+          status: assetData.status || "",
+          variant: assetData.variant || "",
+          bodyType: assetData.bodyType || "",
+          origin: assetData.origin || "",
+          // category: assetData.category || ""
+        });
 
         const locationResponse = await apiGetLocations();
         const locationData = Array.isArray(locationResponse)
@@ -52,7 +71,6 @@ const ViewAsset = () => {
           setAssetLocation(matchedLocation.assetLocation || matchedLocation.name);
         }
 
-        setNewLocation(locationId || ""); // Preselect current location
         setJustification(assetData.justification || "");
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -78,7 +96,6 @@ const ViewAsset = () => {
         setSimilarAssets(response.results || []);
       } catch (error) {
         console.error("Error fetching similar assets:", error);
-        // Don't show error toast for similar assets as it's not critical
       } finally {
         setSimilarAssetsLoading(false);
       }
@@ -117,73 +134,127 @@ const ViewAsset = () => {
     }
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSaveChanges = async () => {
-    // Validation
-    if (!newLocation) {
-      toast.error("Please select a location");
-      return;
+  // Validation
+  if (!formData.assetLocation) {
+    toast.error("Please select a location");
+    return;
+  }
+
+  if (!justification.trim()) {
+    toast.error("Please provide a justification");
+    return;
+  }
+
+  try {
+    setIsUpdating(true);
+    
+    // Prepare the update data according to API spec
+    const updateData = {
+      year: parseInt(formData.year) || 0, // Ensure year is a number
+      justification: justification.trim(),
+      // Include other fields that the API accepts
+      assetName: formData.assetName,
+      assetId: formData.assetId,
+      make: formData.make,
+      model: formData.model,
+      condition: formData.condition,
+      mileage: formData.mileage,
+      drivetrain: formData.drivetrain,
+      fuelType: formData.fuelType,
+      exteriorColour: formData.exteriorColour,
+      doorCount: formData.doorCount,
+      seatingCapacity: formData.seatingCapacity,
+      variant: formData.variant,
+      bodyType: formData.bodyType,
+      origin: formData.origin,
+      // category: formData.category,
+      assetLocation: formData.assetLocation
+    };
+
+    // Call the API
+    const updatedAsset = await apiEditAsset(id, updateData);
+    
+    // Update local state with the response
+    setAsset(prevAsset => ({
+      ...prevAsset,
+      ...updatedAsset.asset, // Assuming the response has an 'asset' property
+      justification: justification.trim()
+    }));
+    
+    // Update the displayed location
+    const selectedLocation = locations.find(
+      (loc) => (loc._id || loc.id) === formData.assetLocation
+    );
+    if (selectedLocation) {
+      setAssetLocation(selectedLocation.assetLocation || selectedLocation.name);
     }
 
-    if (!justification.trim()) {
-      toast.error("Please provide a justification");
-      return;
-    }
-
-    try {
-      setIsUpdating(true);
+    toast.success("Asset updated successfully");
+    setIsEditing(false);
+    
+  } catch (error) {
+    console.error('Error updating asset:', error);
+    
+    if (error.response) {
+      // Log the response data for debugging
+      console.log('Error response data:', error.response.data);
       
-      // Prepare the update data according to API spec
-      const updateData = {
-        assetLocation: newLocation,
-        justification: justification.trim()
-      };
-
-      // Call the API
-      const updatedAsset = await apiEditAsset(id, updateData);
-      
-      // Update local state with the response
-      setAsset(prevAsset => ({
-        ...prevAsset,
-        ...updatedAsset,
-        assetLocation: newLocation,
-        justification: justification.trim()
-      }));
-      
-      // Update the displayed location
-      const selectedLocation = locations.find(
-        (loc) => (loc._id || loc.id) === newLocation
-      );
-      if (selectedLocation) {
-        setAssetLocation(selectedLocation.assetLocation || selectedLocation.name);
-      }
-
-      toast.success("Asset updated successfully");
-      setIsEditing(false);
-      
-    } catch (error) {
-      console.error('Error updating asset:', error);
-      
-      // Handle different error scenarios
-      if (error.response?.status === 404) {
+      if (error.response.status === 422) {
+        // Handle validation errors
+        const errors = error.response.data.errors || {};
+        const errorMessages = Object.values(errors).join(', ');
+        toast.error(`Validation error: ${errorMessages}`);
+      } else if (error.response.status === 404) {
         toast.error("Asset not found");
-      } else if (error.response?.status === 400) {
+      } else if (error.response.status === 400) {
         toast.error("Invalid data provided");
-      } else if (error.response?.status === 401) {
+      } else if (error.response.status === 401) {
         toast.error("Unauthorized. Please log in again.");
-      } else if (error.response?.status === 403) {
+      } else if (error.response.status === 403) {
         toast.error("You don't have permission to edit this asset");
       } else {
         toast.error("Failed to update asset. Please try again.");
       }
-    } finally {
-      setIsUpdating(false);
+    } else {
+      toast.error("Network error. Please check your connection.");
     }
-  };
+  } finally {
+    setIsUpdating(false);
+  }
+};
 
   const handleCancelEdit = () => {
     // Reset form fields to original values
     const locationId = asset?.assetLocation?._id || asset?.assetLocation;
-    setNewLocation(locationId || "");
+    setFormData({
+      assetName: asset?.assetName || "",
+      assetId: asset?.assetId || "",
+      make: asset?.make || "",
+      model: asset?.model || "",
+      year: asset?.year || "",
+      condition: asset?.condition || "",
+      mileage: asset?.mileage || "",
+      drivetrain: asset?.drivetrain || "",
+      fuelType: asset?.fuelType || "",
+      exteriorColour: asset?.exteriorColour || asset?.exteriorColour || "",
+      doorCount: asset?.doorCount || "",
+      seatingCapacity: asset?.seatingCapacity || "",
+      status: asset?.status || "",
+      variant: asset?.variant || "",
+      bodyType: asset?.bodyType || "",
+      origin: asset?.origin || "",
+      // category: asset?.category || "",
+      assetLocation: locationId || ""
+    });
     setJustification(asset?.justification || "");
     setIsEditing(false);
   };
@@ -310,26 +381,44 @@ const ViewAsset = () => {
             </div>
           </div>
 
-          {/* Right Panel */}
+          {/* Right Panel - Edit Form */}
           <div className="space-y-6">
             <div>
-              <p className="text-sm text-gray-600">Asset Name</p>
-              <p className="text-xl font-semibold text-gray-900">{asset.assetName}</p>
+              <label className="block text-sm text-gray-600 mb-1">Asset Name</label>
+              <input
+                type="text"
+                name="assetName"
+                value={formData.assetName}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             <div>
-              <p className="text-sm text-gray-600">Current Location</p>
+              <label className="block text-sm text-gray-600 mb-1">Current Location</label>
               <p className="text-lg text-gray-900">{assetLocation}</p>
             </div>
 
             <div>
-              <p className="text-sm text-gray-600">Year</p>
-              <p className="text-lg text-gray-900">{asset.year}</p>
+              <label className="block text-sm text-gray-600 mb-1">Year</label>
+              <input
+                type="text"
+                name="year"
+                value={formData.year}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             <div>
-              <p className="text-sm text-gray-600">VIN</p>
-              <p className="text-lg text-gray-900">{asset.assetId}</p>
+              <label className="block text-sm text-gray-600 mb-1">VIN</label>
+              <input
+                type="text"
+                name="assetId"
+                value={formData.assetId}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             <div>
@@ -337,8 +426,9 @@ const ViewAsset = () => {
                 New Location <span className="text-red-500">*</span>
               </label>
               <select
-                value={newLocation}
-                onChange={(e) => setNewLocation(e.target.value)}
+                name="assetLocation"
+                value={formData.assetLocation}
+                onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={isUpdating}
               >
@@ -349,6 +439,140 @@ const ViewAsset = () => {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Additional Editable Fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Make</label>
+                <input
+                  type="text"
+                  name="make"
+                  value={formData.make}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Model</label>
+                <input
+                  type="text"
+                  name="model"
+                  value={formData.model}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Condition</label>
+                <input
+                  type="text"
+                  name="condition"
+                  value={formData.condition}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Mileage</label>
+                <input
+                  type="text"
+                  name="mileage"
+                  value={formData.mileage}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Drivetrain</label>
+                <input
+                  type="text"
+                  name="drivetrain"
+                  value={formData.drivetrain}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Fuel Type</label>
+                <input
+                  type="text"
+                  name="fuelType"
+                  value={formData.fuelType}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Exterior Color</label>
+                <input
+                  type="text"
+                  name="exteriorColour"
+                  value={formData.exteriorColour}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Door Count</label>
+                <input
+                  type="text"
+                  name="doorCount"
+                  value={formData.doorCount}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Seating Capacity</label>
+                <input
+                  type="text"
+                  name="seatingCapacity"
+                  value={formData.seatingCapacity}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Variant</label>
+                <input
+                  type="text"
+                  name="variant"
+                  value={formData.variant}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Body Type</label>
+                <input
+                  type="text"
+                  name="bodyType"
+                  value={formData.bodyType}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Origin</label>
+                <input
+                  type="text"
+                  name="origin"
+                  value={formData.origin}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              {/* <div>
+                <label className="block text-sm text-gray-600 mb-1">Category</label>
+                <input
+                  type="text"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div> */}
             </div>
 
             <div>
@@ -521,6 +745,22 @@ const ViewAsset = () => {
                       <span className="text-gray-600 text-sm">Maximum seating:</span>
                       <span className="text-gray-900 text-sm font-medium">{asset.seatingCapacity || "N/A"}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm">Variant:</span>
+                      <span className="text-gray-900 text-sm font-medium">{asset.variant || "N/A"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm">Body Type:</span>
+                      <span className="text-gray-900 text-sm font-medium">{asset.bodyType || "N/A"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm">Origin:</span>
+                      <span className="text-gray-900 text-sm font-medium">{asset.origin || "N/A"}</span>
+                    </div>
+                    {/* <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm">Category:</span>
+                      <span className="text-gray-900 text-sm font-medium">{asset.category || "N/A"}</span>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -553,78 +793,76 @@ const ViewAsset = () => {
                   </div>
                 </div>
 
-              {/* Similar Assets */}
+                {/* Similar Assets */}
                 <div className="flex-1">
-                  {/* <div className="border-2 border-blue-400 rounded-lg p-4 bg-gray-50"> */}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                      Similar Asset
-                      {similarAssetsLoading && (
-                        <span className="ml-2 text-sm text-gray-500">Loading...</span>
-                      )}
-                    </h3>
-                    <div className="space-y-6">
-                      {similarAssetsLoading ? (
-                        <div className="animate-pulse space-y-6">
-                          <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
-                            <div className="flex-1">
-                              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                              <div className="h-3 bg-gray-200 rounded w-1/2 mt-2"></div>
-                              <div className="h-3 bg-gray-200 rounded w-2/3 mt-1"></div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
-                            <div className="flex-1">
-                              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                              <div className="h-3 bg-gray-200 rounded w-1/2 mt-2"></div>
-                              <div className="h-3 bg-gray-200 rounded w-2/3 mt-1"></div>
-                            </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                    Similar Asset
+                    {similarAssetsLoading && (
+                      <span className="ml-2 text-sm text-gray-500">Loading...</span>
+                    )}
+                  </h3>
+                  <div className="space-y-6">
+                    {similarAssetsLoading ? (
+                      <div className="animate-pulse space-y-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+                          <div className="flex-1">
+                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div className="h-3 bg-gray-200 rounded w-1/2 mt-2"></div>
+                            <div className="h-3 bg-gray-200 rounded w-2/3 mt-1"></div>
                           </div>
                         </div>
-                      ) : similarAssets.length > 0 ? (
-                        similarAssets.slice(0, 3).map((similarAsset) => (
-                          <div 
-                            key={similarAsset._id}
-                            className="flex items-center gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-lg transition-colors"
-                            onClick={() => handleSimilarAssetClick(similarAsset)}
-                          >
-                            <img
-                              src={similarAsset.assetImage || "/placeholder-car.jpg"}
-                              alt={similarAsset.assetName}
-                              className="w-16 h-16 object-cover rounded-full border-2 border-gray-200"
-                              onError={(e) => {
-                                e.target.src = "/placeholder-car.jpg";
-                              }}
-                            />
-                            <div className="flex-1">
-                              <p className="text-base font-semibold text-gray-900 mb-1">
-                                {similarAsset.year} {similarAsset.make} {similarAsset.model}
-                              </p>
-                              <p className="text-sm text-gray-600 mb-1">
-                                VIN: <span className="ml-8">{similarAsset.assetId}</span>
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                Location: <span className="ml-2">{getLocationName(similarAsset.assetLocation)}</span>
-                              </p>
-                            </div>
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+                          <div className="flex-1">
+                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div className="h-3 bg-gray-200 rounded w-1/2 mt-2"></div>
+                            <div className="h-3 bg-gray-200 rounded w-2/3 mt-1"></div>
                           </div>
-                        ))
-                      ) : (
-                        <div className="text-center py-8">
-                          <p className="text-gray-500 text-sm">No similar assets found</p>
                         </div>
-                      )}
-                      
-                      {similarAssets.length > 3 && (
-                        <div className="text-center pt-2">
-                          <button className="text-sm text-blue-600 hover:text-blue-800">
-                            View all {similarAssets.length} similar assets
-                          </button>
+                      </div>
+                    ) : similarAssets.length > 0 ? (
+                      similarAssets.slice(0, 3).map((similarAsset) => (
+                        <div 
+                          key={similarAsset._id}
+                          className="flex items-center gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                          onClick={() => handleSimilarAssetClick(similarAsset)}
+                        >
+                          <img
+                            src={similarAsset.assetImage || "/placeholder-car.jpg"}
+                            alt={similarAsset.assetName}
+                            className="w-16 h-16 object-cover rounded-full border-2 border-gray-200"
+                            onError={(e) => {
+                              e.target.src = "/placeholder-car.jpg";
+                            }}
+                          />
+                          <div className="flex-1">
+                            <p className="text-base font-semibold text-gray-900 mb-1">
+                              {similarAsset.year} {similarAsset.make} {similarAsset.model}
+                            </p>
+                            <p className="text-sm text-gray-600 mb-1">
+                              VIN: <span className="ml-8">{similarAsset.assetId}</span>
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Location: <span className="ml-2">{getLocationName(similarAsset.assetLocation)}</span>
+                            </p>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  {/* </div> */}
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500 text-sm">No similar assets found</p>
+                      </div>
+                    )}
+                    
+                    {similarAssets.length > 3 && (
+                      <div className="text-center pt-2">
+                        <button className="text-sm text-blue-600 hover:text-blue-800">
+                          View all {similarAssets.length} similar assets
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
