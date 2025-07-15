@@ -75,55 +75,7 @@ const AssignedPage = () => {
     <div className="flex w-full overflow-x-hidden">
       <div className="bg-[#f0f1f3] min-h-screen flex-1 space-y-5 py-6 px-4">
         {/* Summary Cards */}
-        <div className="bg-white p-4 rounded-md shadow-sm w-full border border-white">
-          <p className="font-semibold mb-4">Assets</p>
-          <div className="flex flex-wrap gap-6 justify-between">
-            <div>
-              <p className="mb-1 font-semibold text-[#1570ef]">Total Entries</p>
-              <p className="text-[13px] mb-1 font-semibold">67</p>
-              <p className="text-gray-600 text-[13px]">Last 7 Days</p>
-            </div>
-            <div>
-              <p className="mb-1 font-semibold text-[#e19133]">Total Assigns Today</p>
-              <div className="flex gap-4">
-                <div>
-                  <p className="text-[13px] mb-1 font-semibold">90</p>
-                  <p className="text-gray-600 text-[13px]">Last 7 Days</p>
-                </div>
-                <div>
-                  <p className="text-[13px] mb-1 font-semibold">3</p>
-                  <p className="text-gray-600 text-[13px]">Total</p>
-                </div>
-              </div>
-            </div>
-            <div>
-              <p className="mb-1 font-semibold text-[#845ebc]">Total Asset Assigned</p>
-              <div className="flex gap-4">
-                <div>
-                  <p className="text-[13px] mb-1 font-semibold">9</p>
-                  <p className="text-gray-600 text-[13px]">Last 7 Days</p>
-                </div>
-                <div>
-                  <p className="text-[13px] mb-1 font-semibold">28</p>
-                  <p className="text-gray-600 text-[13px]">Total</p>
-                </div>
-              </div>
-            </div>
-            <div>
-              <p className="mb-1 font-semibold text-[#f36960]">Pending Assets</p>
-              <div className="flex gap-4">
-                <div>
-                  <p className="text-[13px] mb-1 font-semibold">8</p>
-                  <p className="text-gray-600 text-[13px]">Last 7 Days</p>
-                </div>
-                <div>
-                  <p className="text-[13px] mb-1 font-semibold">70</p>
-                  <p className="text-gray-600 text-[13px]">Total</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Assigned Assets Table */}
         <div className="bg-white p-4 rounded-md shadow-sm w-full border border-white">
@@ -182,8 +134,10 @@ const AssignedPage = () => {
           {/* Table Head */}
           <div className="flex justify-between font-semibold text-[14px] text-gray-700 pb-2 border-b-2 border-gray-200 mt-6">
             <p className="w-1/3">Asset</p>
+            <p className="w-1/3">VIN</p>
             <p className="w-1/3">Location</p>
-            <p className="w-1/3">Asset ID</p>
+            <p className="w-1/3">New Location</p>
+            <p className="w-1/3">Assigned By</p>
           </div>
 
           {/* Table Rows */}
@@ -194,7 +148,10 @@ const AssignedPage = () => {
       className="flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200"
     >
       <p className="w-1/3">{item.assetName || '—'}</p>
+      <p className="w-1/3">{item.assetId || '—'}</p>
       <p className="w-1/3">{item.assetLocation?.assetLocation || '—'}</p>
+      
+      <p className="w-1/3">{item.assetId || '—'}</p>
       <p className="w-1/3">{item.assetId || '—'}</p>
     </div>
   ))

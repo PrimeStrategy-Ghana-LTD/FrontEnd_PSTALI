@@ -107,7 +107,7 @@ const AdvancedSearchModal = ({ onClose }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity mt-[20%]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity mt-[23%]">
       <div className="w-full max-w-4xl rounded-xl bg-transparent p-6 text-white shadow-lg">
         <div className="flex justify-end">
           <button onClick={onClose} className="text-gray-300 hover:text-white">
@@ -122,7 +122,7 @@ const AdvancedSearchModal = ({ onClose }) => {
             placeholder="Search assets vin, colour"
             value={filters.search}
             onChange={handleChange}
-            className="w-full rounded-lg bg-[#1F1F1F] px-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none"
+            className="w-full rounded-lg bg-transparent border-[0.5px] px-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none"
           />
         </div>
 
@@ -134,10 +134,10 @@ const AdvancedSearchModal = ({ onClose }) => {
             className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
           >
             <option value="">Asset Category</option>
-            <option value="cars">Cars</option>
-            <option value="goods 1">Goods 1</option>
-            <option value="goods 2">Goods 2</option>
-            <option value="goods 3">Goods 3</option>
+            <option value="Cars">Cars</option>
+            <option value="Goods 1">Goods 1</option>
+            <option value="Goods 2">Goods 2</option>
+            <option value="Goods 3">Goods 3</option>
           </select>
 
           <select
