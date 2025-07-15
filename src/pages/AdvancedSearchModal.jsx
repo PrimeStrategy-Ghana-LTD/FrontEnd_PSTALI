@@ -20,8 +20,7 @@ const AdvancedSearchModal = ({ onClose }) => {
 
   const [locations, setLocations] = useState([]);
   const [users, setUsers] = useState([]);
-const [isLoadingUsers, setIsLoadingUsers] = useState(false);
-
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,13 +62,14 @@ const [isLoadingUsers, setIsLoadingUsers] = useState(false);
       try {
         const response = await apiGetLocations();
         console.log("Locations API Response:", response); // Debug log
-        
+
         // Handle different response structures
-        const locationsData = response?.data?.data || 
-                             response?.data || 
-                             response?.locations || 
-                             response;
-        
+        const locationsData =
+          response?.data?.data ||
+          response?.data ||
+          response?.locations ||
+          response;
+
         if (Array.isArray(locationsData)) {
           setLocations(locationsData);
         } else {
@@ -83,32 +83,32 @@ const [isLoadingUsers, setIsLoadingUsers] = useState(false);
     };
 
     const fetchUsers = async () => {
-  setIsLoadingUsers(true);
-  try {
-    const response = await apiGetUsers();
-    console.log("Users API Response:", response);
+      setIsLoadingUsers(true);
+      try {
+        const response = await apiGetUsers();
+        console.log("Users API Response:", response);
 
-    const usersData = response?.data || response?.users || response;
+        const usersData = response?.data || response?.users || response;
 
-    if (Array.isArray(usersData)) {
-      setUsers(usersData);
-    } else {
-      console.error("Unexpected users data format:", usersData);
-    }
-  } catch (error) {
-    console.error("Failed to fetch users:", error);
-  } finally {
-    setIsLoadingUsers(false);
-  }
-};
+        if (Array.isArray(usersData)) {
+          setUsers(usersData);
+        } else {
+          console.error("Unexpected users data format:", usersData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      } finally {
+        setIsLoadingUsers(false);
+      }
+    };
 
     fetchLocations();
-    fetchUsers(); 
+    fetchUsers();
   }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity mt-[20%]">
-      <div className="w-full max-w-4xl rounded-xl bg-[#2C2C2C] p-6 text-white shadow-lg">
+      <div className="w-full max-w-4xl rounded-xl bg-transparent p-6 text-white shadow-lg">
         <div className="flex justify-end">
           <button onClick={onClose} className="text-gray-300 hover:text-white">
             <X size={20} />
@@ -134,8 +134,10 @@ const [isLoadingUsers, setIsLoadingUsers] = useState(false);
             className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
           >
             <option value="">Asset Category</option>
-            <option value="car">Car</option>
-            <option value="truck">Truck</option>
+            <option value="cars">Cars</option>
+            <option value="goods 1">Goods 1</option>
+            <option value="goods 2">Goods 2</option>
+            <option value="goods 3">Goods 3</option>
           </select>
 
           <select
@@ -145,19 +147,20 @@ const [isLoadingUsers, setIsLoadingUsers] = useState(false);
             disabled={isLoadingLocations}
             className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
           >
-            <option value="">{isLoadingLocations ? "Loading locations..." : "Location"}</option>
-            {Array.isArray(locations) && locations.length > 0 ? (
-              locations.map((loc) => (
-                <option 
-                  key={loc?._id || loc?.id} 
-                  value={loc?._id || loc?.id}
-                >
-                  {loc?.name || loc?.assetLocation || "Unnamed Location"}
-                </option>
-              ))
-            ) : (
-              !isLoadingLocations && <option value="" disabled>No locations available</option>
-            )}
+            <option value="">
+              {isLoadingLocations ? "Loading locations..." : "Location"}
+            </option>
+            {Array.isArray(locations) && locations.length > 0
+              ? locations.map((loc) => (
+                  <option key={loc?._id || loc?.id} value={loc?._id || loc?.id}>
+                    {loc?.name || loc?.assetLocation || "Unnamed Location"}
+                  </option>
+                ))
+              : !isLoadingLocations && (
+                  <option value="" disabled>
+                    No locations available
+                  </option>
+                )}
           </select>
 
           <input
@@ -203,24 +206,27 @@ const [isLoadingUsers, setIsLoadingUsers] = useState(false);
           />
 
           <select
-  name="inspectedBy"
-  value={filters.inspectedBy}
-  onChange={handleChange}
-  disabled={isLoadingUsers}
-  className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
->
-  <option value="">{isLoadingUsers ? "Loading users..." : "Select User"}</option>
-  {Array.isArray(users) && users.length > 0 ? (
-    users.map((user) => (
-      <option key={user._id} value={user._id}>
-        {user.userName || user.name || user.userName}
-      </option>
-    ))
-  ) : (
-    !isLoadingUsers && <option value="" disabled>No users available</option>
-  )}
-</select>
-
+            name="inspectedBy"
+            value={filters.inspectedBy}
+            onChange={handleChange}
+            disabled={isLoadingUsers}
+            className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
+          >
+            <option value="">
+              {isLoadingUsers ? "Loading users..." : "Select User"}
+            </option>
+            {Array.isArray(users) && users.length > 0
+              ? users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.userName || user.name || user.userName}
+                  </option>
+                ))
+              : !isLoadingUsers && (
+                  <option value="" disabled>
+                    No users available
+                  </option>
+                )}
+          </select>
         </div>
 
         {/* Buttons */}
