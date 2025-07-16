@@ -434,11 +434,11 @@ const ImportAssetsPage = () => {
   };
 
   const handleDownloadTemplate = () => {
-    // Create a sample Excel template with image support
+    // Create a sample Excel template with the specified columns
     const templateData = [
-      ['Asset Name', 'Asset ID/VIN', 'Make', 'Model', 'Year', 'Mileage', 'Exterior Colour', 'Variant', 'Body Type', 'Fuel Type', 'Drivetrain', 'Door Count', 'Seating Capacity', 'Condition', 'Asset Location', 'Justification', 'Image URLs', 'Additional Images'],
-      ['Toyota Camry', 'VIN123456789', 'Toyota', 'Camry', '2023', '15000', 'Silver', 'LE', 'Sedan', 'Gasoline', 'FWD', '4', '5', 'Good', 'Main Office', 'Fleet vehicle for operations', 'https://example.com/camry-front.jpg', 'https://example.com/camry-side.jpg,https://example.com/camry-interior.jpg'],
-      ['Honda Civic', 'VIN987654321', 'Honda', 'Civic', '2022', '25000', 'Blue', 'Sport', 'Sedan', 'Gasoline', 'FWD', '4', '5', 'Excellent', 'Branch Office', 'Company car for executives', 'https://example.com/civic-main.jpg', 'https://example.com/civic-rear.jpg']
+      ['Asset Name', 'Asset ID', 'Mileage', 'Fuel Type', 'Exterior Colour', 'Drivetrain', 'Asset Location', 'Justification', 'Make', 'Model', 'Year', 'Body Type', 'Variant', 'Category', 'Origin', 'Condition', 'Door Count', 'Seating Capacity', 'Image URL'],
+      ['Toyota Camry', 'VIN123456789', '15000', 'Gasoline', 'Silver', 'FWD', 'Main Office', 'Fleet vehicle for operations', 'Toyota', 'Camry', '2023', 'Sedan', 'LE', 'Vehicle', 'Purchase', 'Good', '4', '5', 'https://example.com/camry-front.jpg'],
+      ['Honda Civic', 'VIN987654321', '25000', 'Gasoline', 'Blue', 'FWD', 'Branch Office', 'Company car for executives', 'Honda', 'Civic', '2022', 'Sedan', 'Sport', 'Vehicle', 'Lease', 'Excellent', '4', '5', 'https://example.com/civic-main.jpg']
     ];
 
     const csvContent = templateData.map(row => 
@@ -461,6 +461,12 @@ const ImportAssetsPage = () => {
     setError('');
     setImportResult(null);
     setLoading(false);
+    
+    // Clear the file input value to allow selecting the same file again
+    const fileInput = document.getElementById('excel-file-input');
+    if (fileInput) {
+      fileInput.value = '';
+    }
   };
 
   // Helper function to render error messages properly
@@ -584,11 +590,10 @@ const ImportAssetsPage = () => {
                 <li>• Ensure your Excel file follows the template format</li>
                 <li>• Asset Location must match existing locations in the system</li>
                 <li>• All required fields must be filled</li>
-                <li>• Asset ID/VIN must be unique</li>
+                <li>• Asset ID must be unique</li>
                 <li>• Year should be between 1990 and current year</li>
                 <li>• <strong>Images can be embedded directly in Excel or use image URLs</strong></li>
                 <li>• For image URLs, ensure they are publicly accessible and use HTTPS or HTTP</li>
-                {/* <li>• Multiple image URLs can be separated by commas</li> */}
                 <li>• Supported image formats: JPG, PNG, GIF, WebP</li>
                 <li>• Images will be automatically resized and optimized during import</li>
               </ul>
@@ -601,11 +606,9 @@ const ImportAssetsPage = () => {
                 <p><strong>Two ways to add images:</strong></p>
                 <div className="ml-4 space-y-1">
                   <p>1. <strong>Direct embedding:</strong> Copy and paste images directly into Excel cells</p>
-                  {/* <p>2. <strong>Image URLs:</strong> Add publicly accessible image URLs in the "Image URLs" and "Additional Images" columns</p> */}
-                  <p>2. <strong>Image URLs:</strong>Ensure they are publicly accessible and are absolute URLs with HTTPS or HTTP.</p>
+                  <p>2. <strong>Image URLs:</strong> Ensure they are publicly accessible and are absolute URLs with HTTPS or HTTP.</p>
                 </div>
                 <p><strong>URL Format:</strong> https://example.com/image.jpg or  http://example.com/image.jpg</p>
-                {/* <p><strong>Multiple URLs:</strong> Separate with commas (e.g., url1.jpg,url2.jpg,url3.jpg)</p> */}
               </div>
             </div>
 
