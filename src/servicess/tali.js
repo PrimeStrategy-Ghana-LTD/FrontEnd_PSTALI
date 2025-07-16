@@ -222,3 +222,21 @@ const fetchDataForPeriod = async (period, chartType) => {
   }
 };
 
+export const updateAssetLocation = async (assetId, newLocationId) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`https://backend-ps-tali.onrender.com/assets/${assetId}/update-location`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ newLocation: newLocationId }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
+  }
+
+  return response.json();
+};

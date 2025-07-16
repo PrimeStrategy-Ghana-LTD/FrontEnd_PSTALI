@@ -32,18 +32,44 @@ const AssetOverview = () => {
     totalUsers: 0,
   });
   const [summaryData, setSummaryData] = useState([]);
+  const [categoryStats, setCategoryStats] = useState({
+    "Cars": 0,
+    "Goods 1": 0,
+    "Goods 2": 0,
+    "Goods 3": 0
+  });
   const { getLocationName } = useLocationName();
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [assetRes, dashboardRes] = await Promise.all([
+        const [assetRes, dashboardRes, categoryStatsRes] = await Promise.all([
           axios.get("https://backend-ps-tali.onrender.com/assets/count"),
           axios.get("https://backend-ps-tali.onrender.com/dashboard/get"),
+          axios.get("https://backend-ps-tali.onrender.com/assets/stats/category")
         ]);
 
         // Update asset count
         setAssetCount(assetRes.data.count || 0);
+
+        // Update category stats - NEW IMPLEMENTATION
+        if (categoryStatsRes.data?.stats) {
+          const newStats = {
+            "Cars": 0,
+            "Goods 1": 0,
+            "Goods 2": 0,
+            "Goods 3": 0
+          };
+          
+          categoryStatsRes.data.stats.forEach(stat => {
+            if (stat.category in newStats) {
+              newStats[stat.category] = stat.count;
+            }
+          });
+          
+          setCategoryStats(newStats);
+        }
 
         // Handle assignment overview from dashboard
         const assignmentOverview = dashboardRes.data.assignmentOverview;
@@ -87,16 +113,17 @@ const AssetOverview = () => {
   }, [getLocationName]);
 
   const assetData = [
-    { icon: <FontAwesomeIcon icon={faCar} />, count: 300, label: "Cars" },
+    { icon: <FontAwesomeIcon icon={faCar} />, count: categoryStats["Cars"], label: "Cars" },
     {
       icon: <FontAwesomeIcon icon={faBoxOpen} />,
-      count: 300,
+      count: categoryStats["Goods 1"],
       label: "Goods 1",
     },
-    { icon: <FontAwesomeIcon icon={faBox} />, count: 300, label: "Goods 2" },
-    { icon: <FontAwesomeIcon icon={faBox} />, count: 300, label: "Goods 3" },
+    { icon: <FontAwesomeIcon icon={faBox} />, count: categoryStats["Goods 2"], label: "Goods 2" },
+    { icon: <FontAwesomeIcon icon={faBox} />, count: categoryStats["Goods 3"], label: "Goods 3" },
   ];
 
+  
   const assignmentData = [
     {
       icon: <FontAwesomeIcon icon={faLocationDot} />,
