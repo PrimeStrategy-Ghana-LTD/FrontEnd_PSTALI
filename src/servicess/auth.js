@@ -6,8 +6,21 @@ export const apiSignin = async(payload) => {
 ;
 
 
-export const apiProfile = async() => {
-    return await apiClient.get('user/me');
+export const apiGetProfile = async (payload) => {
+    return await apiClient.get ( '/users/me')
+}
+
+export const apiUpdateProfile = async (updateData) => {
+    try {
+        const response = await apiClient.patch('/users/me', updateData, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const apiAddUser = async(payload) => {
@@ -18,3 +31,19 @@ export const apiAddUser = async(payload) => {
     });
 };
 console.log("Auth service loaded");
+
+
+export const apiChangePassword = async (updateData) => {
+  try {
+    const response = await apiClient.patch("/change-password", updateData, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}` // Add authorization header
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating asset:', error);
+    throw error;
+  }
+};
