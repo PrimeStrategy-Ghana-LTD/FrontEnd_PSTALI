@@ -45,10 +45,6 @@ const router = createBrowserRouter([
     element: <SearchResult />,
   },
 
-  // {
-  //   path: "/add-user",
-  //   element: <AddUser />,
-  // },
 
   {
     path: "/add-asset",

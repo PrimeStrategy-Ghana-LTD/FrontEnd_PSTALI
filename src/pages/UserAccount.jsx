@@ -42,6 +42,25 @@ const Toast = ({ message, type, onClose }) => {
   );
 };
 
+// Statistics Card Component
+const StatCard = ({ title, value, linkText = "View List", onLinkClick }) => {
+  return (
+    <div className="bg-gray-50 p-4 rounded-lg">
+      <div className="text-sm text-gray-600 mb-1">{title}</div>
+      <div className="text-2xl font-bold text-gray-900 mb-2">{value}</div>
+      <button 
+        onClick={onLinkClick}
+        className="text-green-600 text-sm hover:text-green-700 flex items-center"
+      >
+        {linkText}
+        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  );
+};
+
 const UserAccount = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -55,6 +74,14 @@ const UserAccount = () => {
   const [error, setError] = useState("");
   const [locations, setLocations] = useState([]);
   const [toast, setToast] = useState(null);
+  
+  // Mock statistics data - replace with actual API calls
+  const [stats, setStats] = useState({
+    totalAssetsAdded: 173,
+    totalAssetsAssigned: 173,
+    totalUsers: 173,
+    totalAssetsAtLocation: 173
+  });
 
   // Show toast notification
   const showToast = (message, type) => {
@@ -105,6 +132,54 @@ const UserAccount = () => {
   const getLocationName = (locationId) => {
     const location = locations.find((loc) => loc._id === locationId);
     return location ? location.assetLocation : locationId;
+  };
+
+  // Function to determine which stats to show based on role
+  const getStatsForRole = (userRole) => {
+    const role = userRole?.toLowerCase();
+    
+    switch (role) {
+      case 'admin':
+      case 'administrator':
+        return [
+          { title: "Total Assets Added", value: stats.totalAssetsAdded, key: "assetsAdded" },
+          { title: "Total Assets Assigned", value: stats.totalAssetsAssigned, key: "assetsAssigned1" },
+          { title: "Total Assets Assigned", value: stats.totalAssetsAssigned, key: "assetsAssigned2" },
+          { title: "Total Users", value: stats.totalUsers, key: "users" }
+        ];
+      
+      case 'asset manager':
+        return [
+          { title: "Total Assets Added", value: stats.totalAssetsAdded, key: "assetsAdded" },
+          { title: "Total Assets Assigned", value: stats.totalAssetsAssigned, key: "assetsAssigned" },
+          { title: "Total Assets At Location", value: stats.totalAssetsAtLocation, key: "assetsAtLocation" }
+        ];
+      
+      case 'user':
+      default:
+        return [
+          { title: "Total Assets At Location", value: stats.totalAssetsAtLocation, key: "assetsAtLocation" },
+          { title: "Total Assets Assigned", value: stats.totalAssetsAssigned, key: "assetsAssigned" }
+        ];
+    }
+  };
+
+  // Handle stat card clicks
+  const handleStatCardClick = (statKey) => {
+    switch (statKey) {
+      case 'assetsAdded':
+      case 'assetsAssigned':
+      case 'assetsAssigned1':
+      case 'assetsAssigned2':
+      case 'assetsAtLocation':
+        navigate('/dashboard/assets');
+        break;
+      case 'users':
+        navigate('/dashboard/users');
+        break;
+      default:
+        console.log(`Clicked on ${statKey}`);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -173,6 +248,8 @@ const UserAccount = () => {
 
   if (loading) return <div className="text-center p-10">Loading...</div>;
   if (error) return <div className="text-center p-10 text-red-500">{error}</div>;
+
+  const userStats = getStatsForRole(user?.role);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
@@ -276,9 +353,9 @@ const UserAccount = () => {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white"
                 >
                   <option value="">Select role</option>
-                  <option value="user">user</option>
-                  <option value="administrator">administrator</option>
-                  <option value="asset manager">asset manager</option>
+                  <option value="user">User</option>
+                  <option value="administrator">Administrator</option>
+                  <option value="asset manager">Asset manager</option>
                 </select>
               </div>
 
@@ -304,19 +381,57 @@ const UserAccount = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center mt-4">
-              <h2 className="text-xl font-semibold">{user?.userName || "User"}</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                {user?.email || "No email"} | {user?.phone || "No phone"}
-              </p>
+            <div className="w-full">
+              {/* User Info */}
+              <div className="text-center mt-4 mb-6">
+                <h2 className="text-xl font-semibold">
+                  {user?.userName || "User"} | {user?.role || "No role"}
+                </h2>
+                <div className="flex items-center justify-center space-x-4 text-sm text-gray-500 mt-2">
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    {user?.email || "No email"}
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    {user?.phone || "No phone"}
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {user?.storeLocation ? getLocationName(user.storeLocation) : "No location"}
+                  </div>
+                </div>
+                
+                {/* Edit Profile Button */}
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="mt-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm"
+                >
+                  Edit profile
+                </button>
+              </div>
 
-              <div className="mt-6 space-y-2 text-center">
-                <p>
-                  <span className="font-semibold">Role:</span> {user?.role || "No role"}
-                </p>
-                <p>
-                  <span className="font-semibold">Location:</span> {user?.storeLocation ? getLocationName(user.storeLocation) : "No location"}
-                </p>
+              {/* Role-based Statistics */}
+              <div className={`grid gap-4 max-w-4xl mx-auto ${
+                userStats.length === 4 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' :
+                userStats.length === 3 ? 'grid-cols-1 sm:grid-cols-3' :
+                'grid-cols-1 sm:grid-cols-2'
+              }`}>
+                {userStats.map((stat) => (
+                  <StatCard
+                    key={stat.key}
+                    title={stat.title}
+                    value={stat.value}
+                    onLinkClick={() => handleStatCardClick(stat.key)}
+                  />
+                ))}
               </div>
             </div>
           )}
