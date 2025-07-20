@@ -12,7 +12,7 @@ import { LuLogIn } from "react-icons/lu";
 import icon from "../assets/images/icon.png";
 import icon2 from "../assets/images/Icon2.png";
 import useLocationName from "../hooks/useLocationName";
-import AdvancedSearchModal from './AdvancedSearchModal';
+import AdvancedSearchModal from "./AdvancedSearchModal";
 
 const SearchPage = () => {
   const [activeTab, setActiveTab] = useState("Assets");
@@ -28,8 +28,8 @@ const SearchPage = () => {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const { getLocationName } = useLocationName();
-   const [showModal, setShowModal] = useState(false);
-
+  const [showModal, setShowModal] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
 
   const navigate = useNavigate();
 
@@ -243,7 +243,6 @@ const SearchPage = () => {
           category: "Electronics",
           status: "Available",
         },
-       
       ]);
     } finally {
       setLoading(false);
@@ -318,33 +317,33 @@ const SearchPage = () => {
   };
 
   const profileRef = useRef();
-const bellRef = useRef();
+  const bellRef = useRef();
 
-useEffect(() => {
-  const handleClickOutside = (e) => {
-    // If click is outside both profile and bell dropdowns
-    if (
-      profileRef.current &&
-      !profileRef.current.contains(e.target) &&
-      profileDropdownOpen
-    ) {
-      setProfileDropdownOpen(false);
-    }
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      // If click is outside both profile and bell dropdowns
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(e.target) &&
+        profileDropdownOpen
+      ) {
+        setProfileDropdownOpen(false);
+      }
 
-    if (
-      bellRef.current &&
-      !bellRef.current.contains(e.target) &&
-      notificationDropdownOpen
-    ) {
-      setNotificationDropdownOpen(false);
-    }
-  };
+      if (
+        bellRef.current &&
+        !bellRef.current.contains(e.target) &&
+        notificationDropdownOpen
+      ) {
+        setNotificationDropdownOpen(false);
+      }
+    };
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => document.removeEventListener("mousedown", handleClickOutside);
-}, [profileDropdownOpen, notificationDropdownOpen]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [profileDropdownOpen, notificationDropdownOpen]);
 
- const handleTabClick = (tab) => {
+  const handleTabClick = (tab) => {
     setActiveTab(tab);
     if (tab === "Assets") {
       navigate("/dashboard/assets");
@@ -352,7 +351,6 @@ useEffect(() => {
       setShowModal(true); // Open modal
     }
   };
-
 
   const handleLogout = () => {
     // Clear localStorage and/or sessionStorage
@@ -406,7 +404,6 @@ useEffect(() => {
             </div>
 
             <div className="flex items-center gap-2 relative" ref={profileRef}>
-
               <div
                 className="relative h-10 w-10 lg:h-12 lg:w-12 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => {
@@ -450,7 +447,8 @@ useEffect(() => {
                         <MdOutlineContactPage /> {userInfo.phone}
                       </p>
                       <p className="flex items-center gap-1 text-sm">
-                        <MdOutlineLocationOn /> {getLocationName(userInfo.storeLocation)}
+                        <MdOutlineLocationOn />{" "}
+                        {getLocationName(userInfo.storeLocation)}
                       </p>
 
                       <p className="border-b-[0.5px] border-gray-300"></p>
@@ -464,7 +462,7 @@ useEffect(() => {
                         <p className="mt-1">
                           <MdOutlineSettings />
                         </p>
-                        <Link to='/dashboard/settings'>Settings</Link>
+                        <Link to="/dashboard/settings">Settings</Link>
                       </div>
                       <p className="border-b-[0.5px] border-gray-300"></p>
                       <button
@@ -512,8 +510,16 @@ useEffect(() => {
             </div>
 
             {/* Suggestions Box - Matching search bar width */}
-            {searchTerm && filteredAssets.length > 0 && (
-              <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-20 p-2">
+            {searchTerm && filteredAssets.length > 0 && showSuggestions && (
+              <div className="absolute top-full mt-2 w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl bg-white rounded-lg shadow-lg z-100 p-2 ">
+                <div className="flex justify-end mb-2">
+                  <button
+                    className="text-sm text-red-500 hover:text-red-600"
+                    onClick={() => setShowSuggestions(false)}
+                  >
+                    Close ✕
+                  </button>
+                </div>
                 {filteredAssets.slice(0, 8).map((asset, idx) => (
                   <div
                     key={asset.id || idx}
@@ -564,28 +570,34 @@ useEffect(() => {
 
           {/* Tabs - Better spacing on larger screens */}
           <>
-      {/* Tab Section */}
-      <div className="flex justify-center mb-8 lg:mb-10">
-        <div className="flex space-x-8 lg:space-x-16 xl:space-x-20">
-          {["Assets", "Advanced Search"].map((tab) => (
-            <p
-              key={tab}
-              onClick={() => handleTabClick(tab)}
-              className={`text-base lg:text-lg xl:text-xl font-medium cursor-pointer transition-colors hover:text-[#01fe9d] ${
-                activeTab === tab
-                  ? "text-white pb-1 border-b-2 border-white"
-                  : "text-white"
-              }`}
-            >
-              {tab}
-            </p>
-          ))}
-        </div>
-      </div>
+            {/* Tab Section */}
+            <div className="flex justify-center mb-8 lg:mb-10">
+              <div className="flex space-x-8 lg:space-x-16 xl:space-x-20">
+                {["Assets", "Advanced Search"].map((tab) => (
+                  <p
+                    key={tab}
+                    onClick={() => handleTabClick(tab)}
+                    className={`text-base lg:text-lg xl:text-xl font-medium cursor-pointer transition-colors hover:text-[#01fe9d] ${
+                      activeTab === tab
+                        ? "text-white pb-1 border-b-2 border-white"
+                        : "text-white"
+                    }`}
+                  >
+                    {tab}
+                  </p>
+                ))}
+              </div>
+            </div>
 
-      {/* Modal */}
-      {showModal && <AdvancedSearchModal onClose={() => setShowModal(false)} />}
-    </>
+            {/* Modal */}
+            {showModal && (
+              <AdvancedSearchModal
+                onClose={() => setShowModal(false)}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+              />
+            )}
+          </>
         </div>
 
         {/* Settings - Positioned better on larger screens */}

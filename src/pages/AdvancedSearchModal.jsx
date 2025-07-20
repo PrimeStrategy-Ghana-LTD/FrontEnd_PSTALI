@@ -2,13 +2,14 @@ import { CalendarDays, Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { apiGetLocations, apiGetUsers } from "../servicess/tali";
+import { useRef } from "react";
 
-const AdvancedSearchModal = ({ onClose }) => {
+const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
   const navigate = useNavigate();
   const [isLoadingLocations, setIsLoadingLocations] = useState(false);
 
   const [filters, setFilters] = useState({
-    search: "",
+    search: searchTerm,
     category: "",
     assetLocation: "",
     model: "",
@@ -22,9 +23,15 @@ const AdvancedSearchModal = ({ onClose }) => {
   const [users, setUsers] = useState([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
+  const fromInputRef = useRef();
+  const toInputRef = useRef();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
+    if (name === "search") {
+      setSearchTerm(value); // Update parent's state
+    }
   };
 
   const handleSearch = () => {
@@ -55,6 +62,10 @@ const AdvancedSearchModal = ({ onClose }) => {
       to: "",
     });
   };
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, search: searchTerm }));
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -115,17 +126,6 @@ const AdvancedSearchModal = ({ onClose }) => {
           </button>
         </div>
 
-        <div className="mb-6">
-          <input
-            type="text"
-            name="search"
-            placeholder="Search assets vin, colour"
-            value={filters.search}
-            onChange={handleChange}
-            className="w-full rounded-lg bg-transparent border-[0.5px] px-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none"
-          />
-        </div>
-
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
           <select
             name="category"
@@ -174,25 +174,36 @@ const AdvancedSearchModal = ({ onClose }) => {
 
           {/* Date Range */}
           <div className="flex space-x-2">
+            {/* From Date */}
             <div className="relative w-1/2">
               <input
+                ref={fromInputRef}
                 type="date"
                 name="from"
                 value={filters.from}
                 onChange={handleChange}
                 className="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-500"
               />
-              <CalendarDays className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
+              <CalendarDays
+                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer"
+                onClick={() => fromInputRef.current?.showPicker?.()}
+              />
             </div>
+
+            {/* To Date */}
             <div className="relative w-1/2">
               <input
+                ref={toInputRef}
                 type="date"
                 name="to"
                 value={filters.to}
                 onChange={handleChange}
                 className="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-500"
               />
-              <CalendarDays className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
+              <CalendarDays
+                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer"
+                onClick={() => toInputRef.current?.showPicker?.()}
+              />
             </div>
           </div>
 
