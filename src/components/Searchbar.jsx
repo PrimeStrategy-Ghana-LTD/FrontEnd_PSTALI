@@ -134,8 +134,8 @@ const Searchbar = ({ setSidebarOpen }) => {
                         href="/dashboard/settings"
                         className="flex items-center px-4 py-2 hover:bg-gray-100"
                       >
-                        <Settings className="h-4 w-4 mr-2 text-gray-500" />
-                        Account Settings
+                        <User  className="h-4 w-4 mr-2 text-gray-500" />
+                        Account
                       </a>
                     </li>
                     <li>
