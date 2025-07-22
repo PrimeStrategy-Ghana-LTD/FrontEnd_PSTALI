@@ -16,30 +16,31 @@ const AssetApprovals = () => {
 
   useEffect(() => {
     const fetchAssignments = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          "https://backend-ps-tali.onrender.com/assets/location-assignments",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
-        }
-
-        const data = await response.json();
-        setAssignments(data.assets);
-        setFilteredAssignments(data.assets);
-      } catch (error) {
-        console.error("Error fetching assignments:", error);
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      "https://backend-ps-tali.onrender.com/assets/unapproved",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       }
-    };
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    setAssignments(data.assets); // assuming the response has `assets`
+    setFilteredAssignments(data.assets);
+  } catch (error) {
+    console.error("Error fetching unapproved assets:", error);
+  }
+};
+
 
     const fetchLocations = async () => {
       try {
@@ -231,8 +232,9 @@ const AssetApprovals = () => {
 
       // Optionally remove rejected item from the lists
       const updatedAssignments = assignments.filter(
-        (item) => item.assetId !== assetId
-      );
+  (item) => item._id !== assetId
+);
+
       setAssignments(updatedAssignments);
       setFilteredAssignments(updatedAssignments);
     } catch (error) {
@@ -245,9 +247,7 @@ const AssetApprovals = () => {
     <div className="flex w-full overflow-x-hidden">
       <div className="bg-[#f0f1f3] min-h-screen flex-1 space-y-5 py-6 px-4">
         <div className="flex gap-2">
-          <p>
-            <FiArrowLeft className="w-5 h-5 mt-1" />
-          </p>
+          
           <p className="font-semibold">Asset Approvals</p>
         </div>
 
@@ -355,14 +355,16 @@ const AssetApprovals = () => {
                 <p className="w-1/3">{item.assignedBy?.userName || "—"}</p>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleApprove(item.assetId)}
+                   onClick={() => handleApprove(item._id)}
+
                     className="border-[0.5px] px-1 py-0.5 rounded-sm bg-[#46A46C] border-[#46A46C] text-white text-[13px]"
                   >
-                    Approval
+                    Approve
                   </button>
 
                   <button
-                    onClick={() => handleReject(item.assetId)}
+                    onClick={() => handleReject(item._id)}
+
                     className="border border-red-500 bg-red-500 text-white text-red-600 px-2 py-1 rounded-sm text-sm"
                   >
                     Reject

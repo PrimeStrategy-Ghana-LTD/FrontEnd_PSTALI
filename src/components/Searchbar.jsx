@@ -1,13 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Menu, Bell, User, LogOut, Settings } from 'lucide-react';
-import axios from 'axios';
+import React, { useEffect, useRef, useState } from "react";
+import { Menu, Bell, User, LogOut, Settings } from "lucide-react";
+import axios from "axios";
 import icon from "../assets/images/icon.png";
 import icon2 from "../assets/images/Icon2.png";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const Searchbar = ({ setSidebarOpen }) => {
   const [user, setUser] = useState(null);
-  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  const [notificationDropdownOpen, setNotificationDropdownOpen] =
+    useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
+  const [assetUpdateCount, setAssetUpdateCount] = useState(0);
+
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const bellRef = useRef(null);
   const profileRef = useRef(null);
@@ -17,21 +22,62 @@ const Searchbar = ({ setSidebarOpen }) => {
     const fetchUsername = async () => {
       try {
         const response = await axios.get(
-          'https://backend-ps-tali.onrender.com/users/me',
+          "https://backend-ps-tali.onrender.com/users/me",
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
         setUser(response.data);
       } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error("Error fetching user:", error);
       }
     };
 
     fetchUsername();
   }, []);
+
+  const fetchNotifications = async () => {
+  try {
+    const response = await axios.get(
+      "https://backend-ps-tali.onrender.com/notifications/me",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    console.log("Notification response:", response.data);
+
+    const data = response.data.data || [];
+    setNotifications(data);
+
+    // Count pending approvals based on title or message content
+    const pending = data.filter(n => 
+      n.title.includes("Pending Approval") || 
+      n.message.includes("awaiting approval")
+    ).length;
+    setPendingApprovalsCount(pending);
+
+    // Count asset updates (adjust this based on your actual asset update notifications)
+    const updates = data.filter(n => 
+      n.title.includes("Asset Update") ||
+      n.message.includes("asset update")
+    ).length;
+    setAssetUpdateCount(updates);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+  }
+};
+
+
+  useEffect(() => {
+  fetchNotifications();
+}, []);
+
+  
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -43,13 +89,13 @@ const Searchbar = ({ setSidebarOpen }) => {
         setProfileDropdownOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
+    localStorage.removeItem("token");
+    window.location.href = "/login";
   };
 
   return (
@@ -75,7 +121,11 @@ const Searchbar = ({ setSidebarOpen }) => {
                 onClick={() => setNotificationDropdownOpen((prev) => !prev)}
               >
                 <Bell className="text-gray-500" size={20} />
-                <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
+                {pendingApprovalsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+                    {pendingApprovalsCount}
+                  </span>
+                )}
               </div>
 
               {notificationDropdownOpen && (
@@ -86,12 +136,25 @@ const Searchbar = ({ setSidebarOpen }) => {
                   <ul className="text-md text-gray-700 space-y-2">
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
                       <img src={icon} alt="icon" className="w-8 h-8" />
-                      <Link to='/dashboard/approvals'>Pending Approvals</Link>
+                      <Link
+                        to="/dashboard/approvals"
+                        onClick={() => setNotificationDropdownOpen(false)}
+                      >
+                        Pending Approvals ({pendingApprovalsCount})
+                      </Link>
                     </li>
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
                       <img src={icon} alt="icon" className="w-8 h-8" />
-                      <span>Asset Update</span>
+                      <span>
+                        Asset Update
+                        {assetUpdateCount > 0 && (
+                          <span className="ml-1 text-xs font-semibold text-blue-600">
+                            ({assetUpdateCount})
+                          </span>
+                        )}
+                      </span>
                     </li>
+
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
                       <img src={icon2} alt="icon2" className="w-8 h-8" />
                       <span>Profile Update</span>
@@ -111,7 +174,7 @@ const Searchbar = ({ setSidebarOpen }) => {
                   {user && user.profilePicture ? (
                     <img
                       src={
-                        user.profilePicture.startsWith('http')
+                        user.profilePicture.startsWith("http")
                           ? user.profilePicture
                           : `https://backend-ps-tali.onrender.com${user.profilePicture}`
                       }
@@ -123,7 +186,7 @@ const Searchbar = ({ setSidebarOpen }) => {
                   )}
                 </div>
                 <span className="hidden md:block text-gray-700 font-medium">
-                  {user ? user.fullName || user.userName : 'Loading...'}
+                  {user ? user.fullName || user.userName : "Loading..."}
                 </span>
               </button>
 
@@ -135,7 +198,7 @@ const Searchbar = ({ setSidebarOpen }) => {
                         href="/dashboard/settings"
                         className="flex items-center px-4 py-2 hover:bg-gray-100"
                       >
-                        <User  className="h-4 w-4 mr-2 text-gray-500" />
+                        <User className="h-4 w-4 mr-2 text-gray-500" />
                         Account
                       </a>
                     </li>

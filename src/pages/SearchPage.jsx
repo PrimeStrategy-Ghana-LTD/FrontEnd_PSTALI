@@ -30,8 +30,56 @@ const SearchPage = () => {
   const { getLocationName } = useLocationName();
   const [showModal, setShowModal] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const fetchNotifications = async () => {
+    setNotificationsLoading(true);
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch("https://backend-ps-tali.onrender.com/notifications/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setNotifications(data);
+
+      // Count pending approvals
+      const pendingCount = data.filter(notification => 
+        notification.type === 'approval' && notification.status === 'pending'
+      ).length;
+      setPendingApprovalsCount(pendingCount);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  };
+
+  // Fetch notifications when component mounts and when dropdown is opened
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  useEffect(() => {
+    if (notificationDropdownOpen) {
+      fetchNotifications();
+    }
+  }, [notificationDropdownOpen]);
+
 
   const dropdownRef = useRef();
 
@@ -378,6 +426,11 @@ const SearchPage = () => {
                 }}
               >
                 <Bell className="text-gray-500" size={20} />
+                {pendingApprovalsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  {pendingApprovalsCount}
+                </span>
+              )}
               </div>
 
               {notificationDropdownOpen && (
