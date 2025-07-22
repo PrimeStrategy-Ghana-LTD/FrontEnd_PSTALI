@@ -19,9 +19,10 @@ import loc from "../assets/images/loc.svg";
 import group from "../assets/images/group.svg";
 import houses from "../assets/images/Houses.svg";
 import location from "../assets/images/location.png";
-import cancel from "../assets/images/cancel.svg";
-import profit from "../assets/images/profit.svg";
+import orange from "../assets/images/orange.svg";
+import blue from "../assets/images/blue.svg";
 import useLocationName from "../hooks/useLocationName";
+import WavyChart from "./WavyChart";
 
 const AssetOverview = () => {
   const [assetCount, setAssetCount] = useState(0);
@@ -33,13 +34,12 @@ const AssetOverview = () => {
   });
   const [summaryData, setSummaryData] = useState([]);
   const [categoryStats, setCategoryStats] = useState({
-    "Cars": 0,
+    Cars: 0,
     "Goods 1": 0,
     "Goods 2": 0,
-    "Goods 3": 0
+    "Goods 3": 0,
   });
   const { getLocationName } = useLocationName();
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,7 +47,9 @@ const AssetOverview = () => {
         const [assetRes, dashboardRes, categoryStatsRes] = await Promise.all([
           axios.get("https://backend-ps-tali.onrender.com/assets/count"),
           axios.get("https://backend-ps-tali.onrender.com/dashboard/get"),
-          axios.get("https://backend-ps-tali.onrender.com/assets/stats/category")
+          axios.get(
+            "https://backend-ps-tali.onrender.com/assets/stats/category"
+          ),
         ]);
 
         // Update asset count
@@ -56,18 +58,18 @@ const AssetOverview = () => {
         // Update category stats - NEW IMPLEMENTATION
         if (categoryStatsRes.data?.stats) {
           const newStats = {
-            "Cars": 0,
+            Cars: 0,
             "Goods 1": 0,
             "Goods 2": 0,
-            "Goods 3": 0
+            "Goods 3": 0,
           };
-          
-          categoryStatsRes.data.stats.forEach(stat => {
+
+          categoryStatsRes.data.stats.forEach((stat) => {
             if (stat.category in newStats) {
               newStats[stat.category] = stat.count;
             }
           });
-          
+
           setCategoryStats(newStats);
         }
 
@@ -113,17 +115,28 @@ const AssetOverview = () => {
   }, [getLocationName]);
 
   const assetData = [
-    { icon: <FontAwesomeIcon icon={faCar} />, count: categoryStats["Cars"], label: "Cars" },
+    {
+      icon: <FontAwesomeIcon icon={faCar} />,
+      count: categoryStats["Cars"],
+      label: "Cars",
+    },
     {
       icon: <FontAwesomeIcon icon={faBoxOpen} />,
       count: categoryStats["Goods 1"],
       label: "Goods 1",
     },
-    { icon: <FontAwesomeIcon icon={faBox} />, count: categoryStats["Goods 2"], label: "Goods 2" },
-    { icon: <FontAwesomeIcon icon={faBox} />, count: categoryStats["Goods 3"], label: "Goods 3" },
+    {
+      icon: <FontAwesomeIcon icon={faBox} />,
+      count: categoryStats["Goods 2"],
+      label: "Goods 2",
+    },
+    {
+      icon: <FontAwesomeIcon icon={faBox} />,
+      count: categoryStats["Goods 3"],
+      label: "Goods 3",
+    },
   ];
 
-  
   const assignmentData = [
     {
       icon: <FontAwesomeIcon icon={faLocationDot} />,
@@ -152,9 +165,9 @@ const AssetOverview = () => {
       <div className="max-w-7xl mx-auto h-full">
         <div className="flex flex-col lg:flex-row gap-3 h-full">
           {/* Left Column - Main Content */}
-          <div className="w-full lg:w-2/3 space-y-3">
+          <div className="w-full lg:w-full space-y-3">
             {/* Asset Overview Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[22vh]">
+            {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[22vh]">
               <h2 className="text-base font-semibold text-gray-900 mb-3">
                 Asset Overview
               </h2>
@@ -188,10 +201,10 @@ const AssetOverview = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
 
             {/* Assignments Overview Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[22vh]">
+            {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[22vh]">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
                 {assignmentData.map((item, index) => (
                   <div
@@ -222,7 +235,40 @@ const AssetOverview = () => {
                   </div>
                 ))}
               </div>
+            </div> */}
+
+            <div className="flex gap-3">
+              <div className="border-2 flex w-[250px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4">
+                <div className="space-y-1">
+                  <p className="text-[13px] text-gray-500 font-semibold">Cars</p>
+                  <p className="text-[1.2rem] font-bold">5000</p>
+                </div>
+                <img src={orange} alt="" className="w-12 h-12"/>
+              </div>
+              <div className="border-2 flex w-[256px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4">
+                <div className="space-y-1">
+                  <p className="text-[13px] text-gray-500 font-semibold">Goods 1</p>
+                  <p className="text-[1.2rem] font-bold">3000</p>
+                </div>
+                <img src={blue} alt="" className="w-12 h-12"/>
+              </div>
+              <div className="border-2 flex w-[256px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4">
+                <div className="space-y-1">
+                  <p className="text-[13px] text-gray-500 font-semibold">Goods 2</p>
+                  <p className="text-[1.2rem] font-bold">3000</p>
+                </div>
+                <img src={blue} alt="" className="w-12 h-12"/>
+              </div>
+              <div className="border-2 flex w-[256px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4">
+                <div className="space-y-1">
+                  <p className="text-[13px] text-gray-500 font-semibold">Goods 3</p>
+                  <p className="text-[1.2rem] font-bold">3000</p>
+                </div>
+                <img src={blue} alt="" className="w-12 h-12"/>
+              </div>
             </div>
+
+            <WavyChart />
 
             {/* Asset Management Graph */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 min-h-0">
@@ -231,48 +277,6 @@ const AssetOverview = () => {
           </div>
 
           {/* Right Column - Summary and Chart */}
-          <div className="w-full lg:w-1/3 space-y-3">
-            {/* Asset Summary Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 h-[48%]">
-              <h2 className="text-base font-semibold text-gray-900 mb-3">
-                Location
-              </h2>
-              <div className="grid grid-cols-2 mt-9">
-                {summaryData.map((item, index) => (
-                  <div
-                    key={index}
-                    className={`flex flex-col items-center justify-center p-4 border-gray-200
-                      ${index % 2 === 0 ? "border-r" : ""}
-                      ${index < 2 ? "border-b" : ""}`}
-                  >
-                    <div className="w-6 h-6 flex items-center justify-center mb-3">
-                      {typeof item.icon === "string" ? (
-                        <img
-                          src={item.icon}
-                          alt={item.label}
-                          className="w-12 h-12"
-                        />
-                      ) : (
-                        item.icon
-                      )}
-                    </div>
-
-                    <div className="text-center">
-                      <p className="text-sm text-gray-900">{item.count}</p>
-                      <p className="text-xs text-gray-500 text-center leading-tight">
-                        {item.label}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Asset Summary Chart */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 min-h-0">
-              <AssetSummaryChart />
-            </div>
-          </div>
         </div>
       </div>
     </div>

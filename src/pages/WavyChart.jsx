@@ -76,9 +76,9 @@ const WavyChart = () => {
 
   return (
     <div >
-      <div className="bg-white rounded-lg p-4 shadow-md w-[97%] ml-4">
+      <div className="bg-white rounded-lg p-4 shadow-md w-[%] ml-">
         <div className="flex items-center justify-between mb-2">
-        <p className="font-semibold text-gray-700">Assets Assignment</p>
+        <p className="font-semibold text-gray-700">Assets Summary Chart</p>
         <p className="text-sm bg-gray-100 px-2 py-1 rounded-md">Weekly</p>
       </div>
       <div className="h-[250px]"> {/* 👈 Fixed pixel height */}
