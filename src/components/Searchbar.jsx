@@ -3,6 +3,7 @@ import { Menu, Bell, User, LogOut, Settings } from 'lucide-react';
 import axios from 'axios';
 import icon from "../assets/images/icon.png";
 import icon2 from "../assets/images/Icon2.png";
+import { Link } from 'react-router-dom';
 
 const Searchbar = ({ setSidebarOpen }) => {
   const [user, setUser] = useState(null);
@@ -85,7 +86,7 @@ const Searchbar = ({ setSidebarOpen }) => {
                   <ul className="text-md text-gray-700 space-y-2">
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
                       <img src={icon} alt="icon" className="w-8 h-8" />
-                      <span>Pending Approvals</span>
+                      <Link to='/dashboard/approvals'>Pending Approvals</Link>
                     </li>
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
                       <img src={icon} alt="icon" className="w-8 h-8" />

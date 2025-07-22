@@ -238,33 +238,49 @@ const AssetOverview = () => {
             </div> */}
 
             <div className="flex gap-3">
-              <div className="border-2 flex w-[250px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4">
+              <div className="border-2 flex w-[250px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4 shadow-sm">
                 <div className="space-y-1">
-                  <p className="text-[13px] text-gray-500 font-semibold">Cars</p>
-                  <p className="text-[1.2rem] font-bold">5000</p>
+                  <p className="text-[13px] text-gray-500 font-semibold">
+                    Cars
+                  </p>
+                  <p className="text-[1.2rem] font-bold">
+                    {categoryStats["Cars"]}
+                  </p>
                 </div>
-                <img src={orange} alt="" className="w-12 h-12"/>
+                <img src={orange} alt="" className="w-12 h-12" />
               </div>
-              <div className="border-2 flex w-[256px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4">
+              <div className="border-2 flex w-[256px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4 shadow-sm">
                 <div className="space-y-1">
-                  <p className="text-[13px] text-gray-500 font-semibold">Goods 1</p>
-                  <p className="text-[1.2rem] font-bold">3000</p>
+                  <p className="text-[13px] text-gray-500 font-semibold">
+                    Goods 1
+                  </p>
+                  <p className="text-[1.2rem] font-bold">
+                    {categoryStats["Goods 1"]}
+                  </p>
                 </div>
-                <img src={blue} alt="" className="w-12 h-12"/>
+                <img src={blue} alt="" className="w-12 h-12" />
               </div>
-              <div className="border-2 flex w-[256px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4">
+              <div className="border-2 flex w-[256px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4 shadow-sm">
                 <div className="space-y-1">
-                  <p className="text-[13px] text-gray-500 font-semibold">Goods 2</p>
-                  <p className="text-[1.2rem] font-bold">3000</p>
+                  <p className="text-[13px] text-gray-500 font-semibold">
+                    Goods 2
+                  </p>
+                  <p className="text-[1.2rem] font-bold">
+                    {categoryStats["Goods 2"]}
+                  </p>
                 </div>
-                <img src={blue} alt="" className="w-12 h-12"/>
+                <img src={blue} alt="" className="w-12 h-12" />
               </div>
-              <div className="border-2 flex w-[256px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4">
+              <div className="border-2 flex w-[256px] h-[145px] rounded-lg bg-[#FFFF] border-[#FFFF] justify-between p-4 shadow-sm">
                 <div className="space-y-1">
-                  <p className="text-[13px] text-gray-500 font-semibold">Goods 3</p>
-                  <p className="text-[1.2rem] font-bold">3000</p>
+                  <p className="text-[13px] text-gray-500 font-semibold">
+                    Goods 3
+                  </p>
+                  <p className="text-[1.2rem] font-bold">
+                    {categoryStats["Goods 3"]}
+                  </p>
                 </div>
-                <img src={blue} alt="" className="w-12 h-12"/>
+                <img src={blue} alt="" className="w-12 h-12" />
               </div>
             </div>
 

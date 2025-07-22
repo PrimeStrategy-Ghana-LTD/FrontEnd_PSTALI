@@ -25,6 +25,7 @@ import AssignLocationPage from "./pages/AssignLocationPage";
 import ImportAssetsPage from "./pages/ImportAssetsPage";
 import AssetManagementTable from "./pages/AssetManagementGraph";
 import AdvancedSearchModal from "./pages/AdvancedSearchModal";
+import AssetApprovals from "./pages/AssetApprovals";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -104,6 +105,10 @@ const router = createBrowserRouter([
       {
         path: "reports",
         element: <Report />,
+      },
+      {
+        path: "approvals",
+        element: <AssetApprovals />,
       },
       {
         path: "users/add-user",
