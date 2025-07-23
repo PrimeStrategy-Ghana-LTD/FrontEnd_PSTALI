@@ -41,7 +41,7 @@ const Sidebar1 = ({ setSidebarOpen }) => {
     <div className="flex flex-col h-full w-64 bg-[#051b34] border-r border-gray-200">
       {/* Header */}
       <div className="flex items-center justify-between p-4 lg:justify-center">
-        <Link to="/" onClick={handleNavClick}>
+        <Link to="/search" onClick={handleNavClick}>
           <img src={logo} alt="Logo" className="h-14 w-auto" />
         </Link>
 
