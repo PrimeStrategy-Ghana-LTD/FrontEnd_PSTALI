@@ -33,22 +33,27 @@ const SearchPage = () => {
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [unreadApprovalCount, setUnreadApprovalCount] = useState(0);
 
   const navigate = useNavigate();
 
   const fetchNotifications = async () => {
     setNotificationsLoading(true);
     try {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) return;
 
-      const response = await fetch("https://backend-ps-tali.onrender.com/notifications/me", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        "https://backend-ps-tali.onrender.com/notifications/me",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -58,8 +63,9 @@ const SearchPage = () => {
       setNotifications(data);
 
       // Count pending approvals
-      const pendingCount = data.filter(notification => 
-        notification.type === 'approval' && notification.status === 'pending'
+      const pendingCount = data.filter(
+        (notification) =>
+          notification.type === "approval" && notification.status === "pending"
       ).length;
       setPendingApprovalsCount(pendingCount);
     } catch (err) {
@@ -80,7 +86,6 @@ const SearchPage = () => {
     }
   }, [notificationDropdownOpen]);
 
-
   const dropdownRef = useRef();
 
   useEffect(() => {
@@ -90,11 +95,42 @@ const SearchPage = () => {
     }, 1000);
   }, []);
 
+  const fetchUnreadApprovalCount = async () => {
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(
+        "https://backend-ps-tali.onrender.com/notifications/unread-count",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Adjust this based on the response structure
+      // For example: { unreadCount: 4 } or just a number
+      const count = data.unreadCount || data.count || data || 0;
+      setUnreadApprovalCount(count);
+    } catch (err) {
+      console.error("Error fetching unread approval count:", err);
+    }
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false);
+        setProfileDropdownOpen(false); // or whichever dropdown this was for
       }
     };
 
@@ -267,30 +303,6 @@ const SearchPage = () => {
           category: "Electronics",
           status: "Available",
         },
-        {
-          id: "laptop-dell",
-          name: "Laptop - Dell",
-          category: "Electronics",
-          status: "Available",
-        },
-        {
-          id: "laptop-xps",
-          name: "Laptop - XPS",
-          category: "Electronics",
-          status: "Available",
-        },
-        {
-          id: "laptop-dellps",
-          name: "Laptop - DellPS",
-          category: "Electronics",
-          status: "Available",
-        },
-        {
-          id: "monitor-samsung-24",
-          name: 'Monitor - Samsung 24"',
-          category: "Electronics",
-          status: "Available",
-        },
       ]);
     } finally {
       setLoading(false);
@@ -300,7 +312,8 @@ const SearchPage = () => {
   // Fetch assets and profile picture when component mounts
   useEffect(() => {
     fetchAssets();
-    fetchUserInfo(); // now fetching full user info including profile picture
+    fetchUserInfo();
+    fetchUnreadApprovalCount(); // <--- Add this here
   }, []);
 
   // Filter assets based on search term (with safety check)
@@ -427,10 +440,10 @@ const SearchPage = () => {
               >
                 <Bell className="text-gray-500" size={20} />
                 {pendingApprovalsCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  {pendingApprovalsCount}
-                </span>
-              )}
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                    {pendingApprovalsCount}
+                  </span>
+                )}
               </div>
 
               {notificationDropdownOpen && (
@@ -441,7 +454,14 @@ const SearchPage = () => {
                   <ul className="text-md text-gray-700 space-y-2 ">
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
                       <img src={icon} alt="" />
-                      <span>Pending Approvals</span>
+                      <Link to="/dashboard/approvals" className="relative flex items-center gap-2 text-black">
+                        Pending Approvals
+                        {unreadApprovalCount > 0 && (
+                          <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                            {unreadApprovalCount}
+                          </span>
+                        )}
+                      </Link>
                     </li>
                     <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
                       <img src={icon} alt="" />

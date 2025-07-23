@@ -12,7 +12,7 @@ const AssetApprovals = () => {
   const [filterLocation, setFilterLocation] = useState("");
   const [filterAsset, setFilterAsset] = useState("");
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
-  const [totalAssignedAssets, setTotalAssignedAssets] = useState(0);
+  const [totalUnapproved, setTotalUnapproved] = useState(0);
 
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -254,8 +254,8 @@ const AssetApprovals = () => {
         <div className="bg-white p-4 rounded-md shadow-sm w-full border border-white">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2 text-[16px]">
-              <p>Total Assigned Asset:</p>
-              <p className="text-sm text-black">{totalAssignedAssets}</p>
+              <p>Total Unapproved Assets:</p>
+              <p className="text-sm text-black">{totalUnapproved}</p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -344,7 +344,8 @@ const AssetApprovals = () => {
                 key={index}
                 className="flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200"
               >
-                <p className="w-1/3">{item.assetName || "—"}</p>
+                <img src={item.assetImage} alt="" className="w-10 h-10 rounded-full mr-3" />
+                <p className="w-1/3 mt-2">{item.assetName || "—"}</p>
                 <p className="w-1/3">{item.assetId || "—"}</p>
                 <p className="w-1/3">
                   {item.assetLocation?.assetLocation || "—"}

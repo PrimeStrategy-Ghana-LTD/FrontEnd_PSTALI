@@ -274,12 +274,12 @@ const AssignedPage = () => {
       key={index}
       className="flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200"
     >
-      <img src={item.assetImage} alt="" />
-      <p className="w-1/3">{item.assetName || "—"}</p>
-      <p className="w-1/3">{item.assetId || "—"}</p>
-      <p className="w-1/3">{item.assetLocation?.assetLocation || "—"}</p>
-      <p className="w-1/3">{item.newLocation?.assetLocation || "—"}</p>
-      <p className="w-1/3">{item.assignedBy?.userName || "—"}</p>
+      <img src={item.assetImage} alt="" className="w-10 h-10 rounded-full mr-3" />
+      <p className="w-1/3 mt-2 ">{item.assetName || "—"}</p>
+      <p className="w-1/3 mt-2">{item.assetId || "—"}</p>
+      <p className="w-1/3 mt-2">{item.assetLocation?.assetLocation || "—"}</p>
+      <p className="w-1/3 mt-2">{item.newLocation?.assetLocation || "—"}</p>
+      <p className="w-1/3 mt-2">{item.assignedBy?.userName || "—"}</p>
     </div>
   ))
 ) : (
