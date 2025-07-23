@@ -306,16 +306,15 @@ const AllAssets = () => {
   };
 
   const clearFilters = () => {
-    setAvailabilityFilter("");
-    setLocationFilter("");
-    setSearchInput("");
-    setSearchTerm("");
-    setSortOption("recent");
-    setCurrentPage(1);
-
-    // Re-apply full unfiltered list
-    applyFiltersAndPagination(1, true);
-  };
+  setAvailabilityFilter("");
+  setLocationFilter("");
+  setSearchInput("");
+  setSearchTerm("");
+  setSortOption("recent");
+  setCurrentPage(1);
+  navigate("/dashboard/assets"); // Clear query params
+  applyFiltersAndPagination(1, true);
+};
 
   const handleReset = () => {
     setFilterLocation("");
