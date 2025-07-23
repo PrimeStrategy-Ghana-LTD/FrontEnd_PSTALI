@@ -12,7 +12,7 @@ function Sidebar() {
         <div className='space-y-3 text-[14px] mt-10'>
           <div className='flex items-center gap-2 pb-2'>
            <span><PiHouse /></span>
-            <span className='ml-2'>Dashboard</span>
+            <span className='ml-2'>Dasboard</span>
           </div>
           <div className='flex items-center gap-2 pb-2'>
             <span><PiHouse /></span>
