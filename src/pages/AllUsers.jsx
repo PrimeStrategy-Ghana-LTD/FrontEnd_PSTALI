@@ -5,7 +5,7 @@ import { apiGetAllUsers, apiGetLocations } from "../servicess/tali";
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-   const [locations, setLocations] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -44,7 +44,9 @@ const AllUsers = () => {
   const fetchLocations = async () => {
     try {
       const response = await apiGetLocations();
-      setLocations(Array.isArray(response) ? response : response.locations || []);
+      setLocations(
+        Array.isArray(response) ? response : response.locations || []
+      );
     } catch (error) {
       console.error("Error fetching locations:", error);
     }
@@ -56,30 +58,33 @@ const AllUsers = () => {
   };
 
   useEffect(() => {
-    const filtered = users.filter((user) => {
-      const matchRole = selectedRole ? user.role === selectedRole : true;
-      const matchLocation = selectedLocation
-        ? user.storeLocation === selectedLocation
-        : true;
-      const matchSearch = searchTerm
-        ? user.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-        : true;
-      return matchRole && matchLocation && matchSearch;
-    });
+  const filtered = users.filter((user) => {
+    const matchRole = selectedRole ? user.role === selectedRole : true;
+    const matchLocation = selectedLocation
+      ? user.storeLocation === selectedLocation
+      : true;
+    const matchSearch = searchTerm
+      ? user.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      : true;
+    return matchRole && matchLocation && matchSearch;
+  });
 
-    setFilteredUsers(filtered);
-    setCurrentPage(1); // Reset to first page when filtering
-  }, [selectedRole, selectedLocation, users, searchTerm]);
+  setFilteredUsers(filtered);
+  setCurrentPage(1);
+}, [selectedRole, selectedLocation, users, searchTerm]);
 
-   const uniqueRoles = [...new Set(users.map((u) => u.role))];
-  const uniqueLocations = [...new Set(
-    users.map((u) => {
-      const location = locations.find(loc => loc._id === u.storeLocation);
-      return location ? location.assetLocation : u.storeLocation;
-    })
-  )];
+
+  const uniqueRoles = [...new Set(users.map((u) => u.role))];
+  const uniqueLocations = [
+    ...new Set(
+      users.map((u) => {
+        const location = locations.find((loc) => loc._id === u.storeLocation);
+        return location ? location.assetLocation : u.storeLocation;
+      })
+    ),
+  ];
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
@@ -164,7 +169,7 @@ const AllUsers = () => {
   // New component to render user avatar
   const UserAvatar = ({ user, size = "w-10 h-10" }) => {
     const [imageError, setImageError] = useState(false);
-    
+
     const handleImageError = () => {
       setImageError(true);
     };
@@ -206,6 +211,15 @@ const AllUsers = () => {
 
   const handleAddUser = () => {
     navigate("add-user");
+  };
+
+  const handleResetFilters = () => {
+    setSelectedRole("");
+    setSelectedLocation("");
+    setSearchTerm("");
+    setSortOption("");
+    setFilteredUsers(users);
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -383,46 +397,51 @@ const AllUsers = () => {
 
           {/* Filters */}
           {showFilters && (
-    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Role
-          </label>
-          <select
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">All Roles</option>
-            {uniqueRoles.map((role, idx) => (
-              <option key={idx} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Location
-          </label>
-          <select
-            value={selectedLocation}
-            onChange={(e) => setSelectedLocation(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">All Locations</option>
-            {locations.map((location) => (
-              <option key={location._id} value={location._id}>
-                {location.assetLocation}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-    </div>
-  )}
-
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Role
+                  </label>
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">All Roles</option>
+                    {uniqueRoles.map((role, idx) => (
+                      <option key={idx} value={role}>
+                        {role}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Location
+                  </label>
+                  <select
+                    value={selectedLocation}
+                    onChange={(e) => setSelectedLocation(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">All Locations</option>
+                    {locations.map((location) => (
+                      <option key={location._id} value={location._id}>
+                        {location.assetLocation}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  onClick={handleResetFilters}
+                  className="w-14 h-9 mt-6 rounded-sm border border-gray-400 text-gray-700 hover:bg-gray-100 text-xs sm:text-sm"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Table */}
@@ -531,7 +550,7 @@ const AllUsers = () => {
                   <div>
                     <span className="text-gray-500">Location:</span>
                     <span className="ml-1 text-gray-900">
-                     {getLocationName(user.storeLocation)}
+                      {getLocationName(user.storeLocation)}
                     </span>
                   </div>
                   <div className="col-span-2">

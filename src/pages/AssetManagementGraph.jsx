@@ -20,15 +20,15 @@ const AssetManagementTable = () => {
       }
       case "This Month": {
         return (
-          date.getMonth() === new Date().getMonth() &&
-          date.getFullYear() === new Date().getFullYear()
+          date.getMonth() === now.getMonth() &&
+          date.getFullYear() === now.getFullYear()
         );
       }
       case "This Year": {
-        return date.getFullYear() === new Date().getFullYear();
+        return date.getFullYear() === now.getFullYear();
       }
       default:
-        return true; // Latest
+        return true; // For "Latest"
     }
   };
 
@@ -44,11 +44,16 @@ const AssetManagementTable = () => {
         isWithinPeriod(asset.createdAt, period)
       );
 
-      const sortedAssets = filteredAssets
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 5);
+      const sortedAssets = filteredAssets.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
 
-      setRecentAssets(sortedAssets);
+      const limitedAssets =
+        period === "Latest" || period === "This Week"
+          ? sortedAssets.slice(0, 5)
+          : sortedAssets;
+
+      setRecentAssets(limitedAssets);
     } catch (err) {
       console.error("Failed to fetch assets:", err);
       setError("Failed to load recent assets.");
@@ -57,7 +62,6 @@ const AssetManagementTable = () => {
     }
   };
 
-  // Re-fetch on dropdown change
   useEffect(() => {
     fetchRecentAssets(selectedPeriod);
   }, [selectedPeriod]);
@@ -78,7 +82,14 @@ const AssetManagementTable = () => {
         </select>
       </div>
 
-      <div className="h-48 w-full overflow-y-auto">
+      {/* Scrollable Table Container */}
+      <div
+        className={`w-full overflow-y-auto ${
+          selectedPeriod === "Latest" || selectedPeriod === "This Week"
+            ? "h-48"
+            : "h-72"
+        }`}
+      >
         {loading ? (
           <p className="text-gray-500 px-2">Loading...</p>
         ) : error ? (
@@ -111,7 +122,11 @@ const AssetManagementTable = () => {
 
       <div className="flex gap-6 mt-3 px-4">
         <span className="text-sm text-gray-500">
-          Table shows 5 most recent assets based on:{" "}
+          Table shows{" "}
+          {selectedPeriod === "Latest" || selectedPeriod === "This Week"
+            ? "5 most recent assets"
+            : "all assets"}{" "}
+          based on:{" "}
           <span className="font-medium text-gray-700">{selectedPeriod}</span>
         </span>
       </div>

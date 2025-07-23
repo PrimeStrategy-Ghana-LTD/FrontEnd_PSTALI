@@ -274,6 +274,7 @@ const AssignedPage = () => {
       key={index}
       className="flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200"
     >
+      <img src={item.assetImage} alt="" />
       <p className="w-1/3">{item.assetName || "—"}</p>
       <p className="w-1/3">{item.assetId || "—"}</p>
       <p className="w-1/3">{item.assetLocation?.assetLocation || "—"}</p>

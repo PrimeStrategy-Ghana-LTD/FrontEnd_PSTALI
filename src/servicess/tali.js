@@ -240,3 +240,21 @@ export const updateAssetLocation = async (assetId, newLocationId) => {
 
   return response.json();
 };
+
+
+export const apiGetNotifications = async () => {
+  try {
+    const response = await axios.get(
+      "https://backend-ps-tali.onrender.com/notifications/me",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data.data || []; // return the data part only
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return []; // return empty list if error
+  }
+};

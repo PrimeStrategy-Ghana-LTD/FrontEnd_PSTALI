@@ -8,12 +8,14 @@ import {
 import { FaListUl, FaTh } from "react-icons/fa";
 import AssetAssignmentModal from "./AssetAssignmentModal";
 import { Link, useNavigate } from "react-router-dom";
-import { apiGetAllAssets, apiGetLocations, apiCountAllAssets } from "../servicess/tali";
+import {
+  apiGetAllAssets,
+  apiGetLocations,
+  apiCountAllAssets,
+} from "../servicess/tali";
 import { FiSearch } from "react-icons/fi";
 import ImportAssetsModal from "./ImportAssetsPage";
 import { useLocation } from "react-router-dom";
-
-
 
 const AllAssets = () => {
   const navigate = useNavigate();
@@ -32,19 +34,18 @@ const AllAssets = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState(""); // For debouncing
   const location = useLocation();
-const searchParams = new URLSearchParams(location.search);
+  const searchParams = new URLSearchParams(location.search);
 
-const advancedFilters = {
-  search: searchParams.get('search') || '',
-  category: searchParams.get('category') || '',
-  assetLocation: searchParams.get('assetLocation') || '',
-  model: searchParams.get('model') || '',
-  origin: searchParams.get('origin') || '',
-  inspectedBy: searchParams.get('inspectedBy') || '',
-  from: searchParams.get('from') || '',
-  to: searchParams.get('to') || '',
-};
-
+  const advancedFilters = {
+    search: searchParams.get("search") || "",
+    category: searchParams.get("category") || "",
+    assetLocation: searchParams.get("assetLocation") || "",
+    model: searchParams.get("model") || "",
+    origin: searchParams.get("origin") || "",
+    inspectedBy: searchParams.get("inspectedBy") || "",
+    from: searchParams.get("from") || "",
+    to: searchParams.get("to") || "",
+  };
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,94 +71,120 @@ const advancedFilters = {
 
   // Client-side filtering and sorting function
   const filterAndSortAssets = (assetsToFilter) => {
-  let filteredAssets = [...assetsToFilter];
+    let filteredAssets = [...assetsToFilter];
 
-  // 1. Availability and Location filters (existing)
-  if (availabilityFilter) {
-    filteredAssets = filteredAssets.filter(asset => asset.status === availabilityFilter);
-  }
+    // 1. Availability and Location filters (existing)
+    if (availabilityFilter) {
+      filteredAssets = filteredAssets.filter(
+        (asset) => asset.status === availabilityFilter
+      );
+    }
 
-  if (locationFilter) {
-    filteredAssets = filteredAssets.filter(asset => 
-      asset.assetLocation === locationFilter || 
-      getLocationName(asset.assetLocation) === locationFilter
-    );
-  }
+    if (locationFilter) {
+      filteredAssets = filteredAssets.filter(
+        (asset) =>
+          asset.assetLocation === locationFilter ||
+          getLocationName(asset.assetLocation) === locationFilter
+      );
+    }
 
-  // 2. Advanced Search filters
-  if (advancedFilters.search.trim()) {
-    const term = advancedFilters.search.toLowerCase();
-    filteredAssets = filteredAssets.filter(asset =>
-      asset.assetName?.toLowerCase().includes(term) ||
-      asset.assetId?.toLowerCase().includes(term) ||
-      asset.category?.toLowerCase().includes(term) ||
-      asset.make?.toLowerCase().includes(term) ||
-      asset.model?.toLowerCase().includes(term) ||
-      getLocationName(asset.assetLocation)?.toLowerCase().includes(term)
-    );
-  }
+    // 2. Advanced Search filters
+    if (advancedFilters.search.trim()) {
+      const term = advancedFilters.search.toLowerCase();
+      filteredAssets = filteredAssets.filter(
+        (asset) =>
+          asset.assetName?.toLowerCase().includes(term) ||
+          asset.assetId?.toLowerCase().includes(term) ||
+          asset.category?.toLowerCase().includes(term) ||
+          asset.make?.toLowerCase().includes(term) ||
+          asset.model?.toLowerCase().includes(term) ||
+          getLocationName(asset.assetLocation)?.toLowerCase().includes(term)
+      );
+    }
 
-  if (advancedFilters.category) {
-    filteredAssets = filteredAssets.filter(asset => asset.category === advancedFilters.category);
-  }
+    if (advancedFilters.category) {
+      filteredAssets = filteredAssets.filter(
+        (asset) => asset.category === advancedFilters.category
+      );
+    }
 
-  if (advancedFilters.assetLocation) {
-    filteredAssets = filteredAssets.filter(asset => getLocationName(asset.assetLocation) === advancedFilters.assetLocation);
-  }
+    if (advancedFilters.assetLocation) {
+      filteredAssets = filteredAssets.filter(
+        (asset) =>
+          getLocationName(asset.assetLocation) === advancedFilters.assetLocation
+      );
+    }
 
-  if (advancedFilters.model) {
-    filteredAssets = filteredAssets.filter(asset => asset.model?.toLowerCase() === advancedFilters.model.toLowerCase());
-  }
+    if (advancedFilters.model) {
+      filteredAssets = filteredAssets.filter(
+        (asset) =>
+          asset.model?.toLowerCase() === advancedFilters.model.toLowerCase()
+      );
+    }
 
-  if (advancedFilters.origin) {
-    filteredAssets = filteredAssets.filter(asset => asset.origin?.toLowerCase() === advancedFilters.origin.toLowerCase());
-  }
+    if (advancedFilters.origin) {
+      filteredAssets = filteredAssets.filter(
+        (asset) =>
+          asset.origin?.toLowerCase() === advancedFilters.origin.toLowerCase()
+      );
+    }
 
-  if (advancedFilters.inspectedBy) {
-    filteredAssets = filteredAssets.filter(asset => asset.inspectedBy === advancedFilters.inspectedBy);
-  }
+    if (advancedFilters.inspectedBy) {
+      filteredAssets = filteredAssets.filter(
+        (asset) => asset.inspectedBy === advancedFilters.inspectedBy
+      );
+    }
 
-  if (advancedFilters.from) {
-    filteredAssets = filteredAssets.filter(asset => new Date(asset.createdAt) >= new Date(advancedFilters.from));
-  }
+    if (advancedFilters.from) {
+      filteredAssets = filteredAssets.filter(
+        (asset) => new Date(asset.createdAt) >= new Date(advancedFilters.from)
+      );
+    }
 
-  if (advancedFilters.to) {
-    filteredAssets = filteredAssets.filter(asset => new Date(asset.createdAt) <= new Date(advancedFilters.to));
-  }
+    if (advancedFilters.to) {
+      filteredAssets = filteredAssets.filter(
+        (asset) => new Date(asset.createdAt) <= new Date(advancedFilters.to)
+      );
+    }
 
-  // 3. Sorting (already handled)
-  switch (sortOption) {
-    case "recent":
-      filteredAssets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      break;
-    case "alphabetical":
-      filteredAssets.sort((a, b) => (a.assetName || '').localeCompare(b.assetName || ''));
-      break;
-    case "reverse":
-      filteredAssets.sort((a, b) => (b.assetName || '').localeCompare(a.assetName || ''));
-      break;
-    default:
-      break;
-  }
+    // 3. Sorting (already handled)
+    switch (sortOption) {
+      case "recent":
+        filteredAssets.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        break;
+      case "alphabetical":
+        filteredAssets.sort((a, b) =>
+          (a.assetName || "").localeCompare(b.assetName || "")
+        );
+        break;
+      case "reverse":
+        filteredAssets.sort((a, b) =>
+          (b.assetName || "").localeCompare(a.assetName || "")
+        );
+        break;
+      default:
+        break;
+    }
 
-  return filteredAssets;
-};
-
+    return filteredAssets;
+  };
 
   // Paginate filtered assets
   const paginateAssets = (filteredAssets, page) => {
     const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const paginatedAssets = filteredAssets.slice(startIndex, endIndex);
-    
+
     const totalCount = filteredAssets.length;
     const totalPagesCount = Math.ceil(totalCount / itemsPerPage) || 1;
-    
+
     return {
       assets: paginatedAssets,
       totalCount,
       totalPages: totalPagesCount,
-      currentPage: page
+      currentPage: page,
     };
   };
 
@@ -165,21 +192,22 @@ const advancedFilters = {
   const getAllAssets = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch all assets without pagination for client-side filtering
       const response = await apiGetAllAssets({ limit: 100 }); // Large limit to get all assets
-      
+
       const assetsData = response.data?.assets || response.data || [];
       setAllAssets(Array.isArray(assetsData) ? assetsData : []);
-      
+
       // Apply filtering and pagination
-      const filteredAssets = filterAndSortAssets(Array.isArray(assetsData) ? assetsData : []);
+      const filteredAssets = filterAndSortAssets(
+        Array.isArray(assetsData) ? assetsData : []
+      );
       const paginatedResult = paginateAssets(filteredAssets, currentPage);
-      
+
       setAssets(paginatedResult.assets);
       setTotalAssets(paginatedResult.totalCount);
       setTotalPages(paginatedResult.totalPages);
-      
     } catch (error) {
       console.error("Error fetching assets:", error);
       setAssets([]);
@@ -196,7 +224,7 @@ const advancedFilters = {
     const filteredAssets = filterAndSortAssets(allAssets);
     const targetPage = resetPagination ? 1 : page;
     const paginatedResult = paginateAssets(filteredAssets, targetPage);
-    
+
     setAssets(paginatedResult.assets);
     setTotalAssets(paginatedResult.totalCount);
     setTotalPages(paginatedResult.totalPages);
@@ -236,7 +264,14 @@ const advancedFilters = {
     if (allAssets.length > 0) {
       applyFiltersAndPagination(1, true);
     }
-  }, [availabilityFilter, locationFilter, searchTerm, sortOption, itemsPerPage, viewMode]);
+  }, [
+    availabilityFilter,
+    locationFilter,
+    searchTerm,
+    sortOption,
+    itemsPerPage,
+    viewMode,
+  ]);
 
   // Handle pagination changes
   useEffect(() => {
@@ -277,6 +312,15 @@ const advancedFilters = {
     setSearchTerm("");
     setSortOption("recent");
     setCurrentPage(1);
+
+    // Re-apply full unfiltered list
+    applyFiltersAndPagination(1, true);
+  };
+
+  const handleReset = () => {
+    setFilterLocation("");
+    setFilterAsset("");
+    setFilteredAssignments(assignments);
   };
 
   // View toggle buttons
@@ -323,7 +367,7 @@ const advancedFilters = {
             >
               Add Asset
             </button>
-            
+
             <button
               onClick={() => navigate("/dashboard/assets/import-assets")}
               className="flex items-center gap-1 px-2 py-1 rounded-sm bg-blue-600 text-white border border-blue-600 text-xs sm:text-sm hover:bg-blue-700 transition-colors"
@@ -355,41 +399,40 @@ const advancedFilters = {
 
             {/* Searchbar */}
             <div className=" flex ">
-            <div className="relative flex items-center border border-gray-300 rounded-full text-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent px-3 py-2 w-96">
-
-              <svg
-                className="w-4 h-4 text-gray-400 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search assets..."
-                value={searchInput}
-                onChange={handleSearchChange}
-                className="w-full focus:outline-none"
-              />
-              {searchInput && (
-                <button
-                  onClick={() => {
-                    setSearchInput("");
-                    setSearchTerm("");
-                  }}
-                  className="ml-2 text-gray-400 hover:text-gray-600"
+              <div className="relative flex items-center border border-gray-300 rounded-full text-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent px-3 py-2 w-96">
+                <svg
+                  className="w-4 h-4 text-gray-400 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  ×
-                </button>
-              )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search assets..."
+                  value={searchInput}
+                  onChange={handleSearchChange}
+                  className="w-full focus:outline-none"
+                />
+                {searchInput && (
+                  <button
+                    onClick={() => {
+                      setSearchInput("");
+                      setSearchTerm("");
+                    }}
+                    className="ml-2 text-gray-400 hover:text-gray-600"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
             <div className="flex gap-3 text-xs sm:text-[13px]">
               <button
                 className="flex items-center gap-2 px-3 py-1 rounded-sm border border-gray-300 text-gray-600 cursor-pointer"
@@ -403,8 +446,12 @@ const advancedFilters = {
                   className="px-4 py-2 border border-gray-300 text-gray-600 rounded-sm hover:bg-gray-50 transition-colors"
                   onClick={() => setShowSortDropdown((prev) => !prev)}
                 >
-                  Sort: {sortOption === "recent" ? "Recently Added" : 
-                         sortOption === "alphabetical" ? "A-Z" : "Z-A"}
+                  Sort:{" "}
+                  {sortOption === "recent"
+                    ? "Recently Added"
+                    : sortOption === "alphabetical"
+                    ? "A-Z"
+                    : "Z-A"}
                 </button>
                 {showSortDropdown && (
                   <div className="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-200 shadow-md rounded-sm text-sm">
@@ -477,10 +524,15 @@ const advancedFilters = {
                   ))}
                 </select>
               </div>
+              <button
+                onClick={clearFilters}
+                className="px-2 py-1 rounded-sm border border-gray-400 text-gray-700 hover:bg-gray-100 text-xs sm:text-sm"
+              >
+                Reset
+              </button>
             </div>
           )}
 
-          
           {loading && (
             <div className="flex justify-center items-center py-8">
               <div className="text-gray-600">Loading assets...</div>
@@ -490,15 +542,9 @@ const advancedFilters = {
           {!loading && (
             <>
               {viewMode === "list" ? (
-                <ListView
-                  assets={assets}
-                  getLocationName={getLocationName}
-                />
+                <ListView assets={assets} getLocationName={getLocationName} />
               ) : (
-                <GridView
-                  assets={assets}
-                  getLocationName={getLocationName}
-                />
+                <GridView assets={assets} getLocationName={getLocationName} />
               )}
 
               {assets.length === 0 && (

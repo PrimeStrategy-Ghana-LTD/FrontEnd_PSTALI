@@ -4,6 +4,7 @@ import axios from "axios";
 import icon from "../assets/images/icon.png";
 import icon2 from "../assets/images/Icon2.png";
 import { Link } from "react-router-dom";
+import { apiGetNotifications } from "../servicess/tali";
 
 const Searchbar = ({ setSidebarOpen }) => {
   const [user, setUser] = useState(null);
@@ -39,39 +40,21 @@ const Searchbar = ({ setSidebarOpen }) => {
   }, []);
 
   const fetchNotifications = async () => {
-  try {
-    const response = await axios.get(
-      "https://backend-ps-tali.onrender.com/notifications/me",
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+  const data = await apiGetNotifications();
+  setNotifications(data);
 
-    console.log("Notification response:", response.data);
+  const pending = data.filter(n =>
+    n.title.includes("Pending Approval") || 
+    n.message.includes("awaiting approval")
+  ).length;
+  setPendingApprovalsCount(pending);
 
-    const data = response.data.data || [];
-    setNotifications(data);
-
-    // Count pending approvals based on title or message content
-    const pending = data.filter(n => 
-      n.title.includes("Pending Approval") || 
-      n.message.includes("awaiting approval")
-    ).length;
-    setPendingApprovalsCount(pending);
-
-    // Count asset updates (adjust this based on your actual asset update notifications)
-    const updates = data.filter(n => 
-      n.title.includes("Asset Update") ||
-      n.message.includes("asset update")
-    ).length;
-    setAssetUpdateCount(updates);
-  } catch (error) {
-    console.error("Error fetching notifications:", error);
-  }
+  const updates = data.filter(n =>
+    n.title.includes("Asset Update") || 
+    n.message.includes("asset update")
+  ).length;
+  setAssetUpdateCount(updates);
 };
-
 
   useEffect(() => {
   fetchNotifications();
