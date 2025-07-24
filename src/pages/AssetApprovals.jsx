@@ -351,9 +351,9 @@ const AssetApprovals = () => {
                   <span>{item.assetName || "—"}</span>
                 </div>
                 <p>{item.assetId || "—"}</p>
-                <p>{item.assetLocation?.assetLocation || "—"}</p>
+                <p>{item.assetLocation || "—"}</p>
                 <p>{item.newLocation?.assetLocation || "—"}</p>
-                <p>{item.assignedBy?.userName || "—"}</p>
+                <p>{item.inspectedBy || "—"}</p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleApprove(item._id)}
