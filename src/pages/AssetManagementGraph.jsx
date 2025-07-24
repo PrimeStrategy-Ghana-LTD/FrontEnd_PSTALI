@@ -102,6 +102,9 @@ const AssetManagementTable = () => {
                 <th className="py-1 pr-4">Status</th>
                 <th className="py-1 pr-4">Location</th>
                 <th className="py-1">Asset ID</th>
+                <th className="py-1">Origin</th>
+                <th className="py-1">Date</th>
+
               </tr>
             </thead>
             <tbody className="text-gray-800">
@@ -113,6 +116,8 @@ const AssetManagementTable = () => {
                     {getLocationName(item.assetLocation) || "—"}
                   </td>
                   <td className="py-1">{item.assetId || "—"}</td>
+                  <td className="py-1">{item.origin || "—"}</td>
+                  <td className="py-1">{item.dateUploaded || "—"}</td>
                 </tr>
               ))}
             </tbody>
