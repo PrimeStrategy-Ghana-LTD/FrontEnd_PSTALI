@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import useLocationName from "../hooks/useLocationName";
 import { apiGetAllAssets } from "../servicess/tali";
+import useUserName from "../hooks/useUserName";
 
 const AssetManagementTable = () => {
   const [recentAssets, setRecentAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { getLocationName } = useLocationName();
   const [selectedPeriod, setSelectedPeriod] = useState("Latest");
+
+  const { getLocationName } = useLocationName();
+  const { getUserName } = useUserName();
 
   const isWithinPeriod = (dateStr, period) => {
     const date = new Date(dateStr);
@@ -68,6 +71,7 @@ const AssetManagementTable = () => {
 
   return (
     <div className="border-2 bg-white border-white p-4 rounded-md shadow-sm">
+      {/* Header */}
       <div className="flex flex-row justify-between mb-2">
         <p className="font-semibold">Recently Added</p>
         <select
@@ -98,26 +102,29 @@ const AssetManagementTable = () => {
           <table className="min-w-full text-sm text-left border-t border-gray-200">
             <thead className="text-gray-600">
               <tr>
-                <th className="py-1 pr-4">Asset Name</th>
-                <th className="py-1 pr-4">Status</th>
-                <th className="py-1 pr-4">Location</th>
-                <th className="py-1">Asset ID</th>
-                <th className="py-1">Origin</th>
-                <th className="py-1">Date</th>
-
+                <th className="py-2 px-4">Asset Name</th>
+                <th className="py-2 px-4">Location</th>
+                <th className="py-2 px-4">VIN</th>
+                <th className="py-2 px-4">Origin</th>
+                <th className="py-2 px-4">Date</th>
+                <th className="py-2 px-4">Added By</th>
               </tr>
             </thead>
             <tbody className="text-gray-800">
               {recentAssets.map((item, index) => (
                 <tr key={index} className="border-t border-gray-100">
-                  <td className="py-1 pr-4">{item.assetName || "—"}</td>
-                  <td className="py-1 pr-4">{item.status || "—"}</td>
-                  <td className="py-1 pr-4">
+                  <td className="py-2 px-4">{item.assetName || "—"}</td>
+                  <td className="py-2 px-4">
                     {getLocationName(item.assetLocation) || "—"}
                   </td>
-                  <td className="py-1">{item.assetId || "—"}</td>
-                  <td className="py-1">{item.origin || "—"}</td>
-                  <td className="py-1">{item.dateUploaded || "—"}</td>
+                   <td className="py-2 px-4">{item.assetId || "—"}</td>
+                   <td className="py-2 px-4">{item.origin || "—"}</td>
+                   <td className="py-2 px-4">{item.dateUploaded || "—"}</td>
+                  <td className="py-2 px-4">{getUserName(item.inspectedBy)}</td>
+                  
+                 
+                  
+                  
                 </tr>
               ))}
             </tbody>
@@ -125,6 +132,7 @@ const AssetManagementTable = () => {
         )}
       </div>
 
+      {/* Footer */}
       <div className="flex gap-6 mt-3 px-4">
         <span className="text-sm text-gray-500">
           Table shows{" "}
