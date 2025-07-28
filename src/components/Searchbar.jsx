@@ -5,6 +5,7 @@ import icon from "../assets/images/icon.png";
 import icon2 from "../assets/images/Icon2.png";
 import { Link } from "react-router-dom";
 import { apiGetNotifications } from "../servicess/tali";
+import NotificationDropdown from "./NotificationDropdown";
 
 const Searchbar = ({ setSidebarOpen }) => {
   const [user, setUser] = useState(null);
@@ -99,7 +100,7 @@ const Searchbar = ({ setSidebarOpen }) => {
           <div className="flex items-center space-x-4 ml-auto">
             {/* Notifications */}
             <div className="relative" ref={bellRef}>
-              <div
+              {/* <div
                 className="flex items-center gap-2 mr-2 bg-white p-2 lg:p-3 rounded-full shadow-sm hover:shadow transition-shadow cursor-pointer"
                 onClick={() => setNotificationDropdownOpen((prev) => !prev)}
               >
@@ -109,9 +110,11 @@ const Searchbar = ({ setSidebarOpen }) => {
                     {pendingApprovalsCount}
                   </span>
                 )}
-              </div>
+              </div> */}
 
-              {notificationDropdownOpen && (
+              <NotificationDropdown />
+
+              {/* {notificationDropdownOpen && (
                 <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw]">
                   <p className="text-gray-800 font-semibold mb-2 border-b-[0.5px] border-gray-200">
                     Notifications
@@ -144,7 +147,7 @@ const Searchbar = ({ setSidebarOpen }) => {
                     </li>
                   </ul>
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Profile Dropdown */}
