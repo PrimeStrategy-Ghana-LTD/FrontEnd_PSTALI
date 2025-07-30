@@ -26,7 +26,7 @@ import ImportAssetsPage from "./pages/ImportAssetsPage";
 import AssetManagementTable from "./pages/AssetManagementGraph";
 import AdvancedSearchModal from "./pages/AdvancedSearchModal";
 import AssetApprovals from "./pages/AssetApprovals";
-import ErrorPage from "./pages/ErrorPage"; // Import the error page
+import ErrorPage from "./pages/ErrorPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { getUserRole } from "./servicess/auth";
@@ -55,11 +55,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/advanced",
-    element: <AdvancedSearchModal />
+    element: <AdvancedSearchModal />,
   },
   {
-    path:"/assetchart",
-    element: <AssetManagementTable />
+    path: "/assetchart",
+    element: <AssetManagementTable />,
   },
   {
     path: "/side-bar",
@@ -70,70 +70,127 @@ const router = createBrowserRouter([
     path: "/error",
     element: <ErrorPage />,
   },
-    {
+  {
     path: "/unauthorized",
     element: <UnauthorizedPage />,
   },
   {
     path: "/dashboard",
-    element: <DashboardLayout />,
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />,
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
-        element: <AssetOverview />,
+        element: (
+          <ProtectedRoute>
+            <AssetOverview />,
+          </ProtectedRoute>
+        ),
       },
       {
         path: "assets",
-        element: <AllAssets />,
+        element: (
+        <ProtectedRoute>
+        <AllAssets />,
+        </ProtectedRoute>
+        )
       },
       {
         path: "assets/add-asset",
-        element: <AddAsset />,
+        element: (
+        <ProtectedRoute>
+        <AddAsset />,
+        </ProtectedRoute>
+        )
       },
       {
         path: "assets/view-asset/:id",
-        element: <ViewAsset />,
+        element: (
+        <ProtectedRoute>
+        <ViewAsset />,
+        </ProtectedRoute>
+        )
       },
       {
         path: "assets/import-assets",
-        element: <ImportAssetsPage />,
+        element: (
+        <ProtectedRoute>
+        <ImportAssetsPage />,
+        </ProtectedRoute>
+        )
       },
       {
         path: "assign-location/:id",
-        element: <AssignLocationPage />,
+        element: (
+        <ProtectedRoute>
+        <AssignLocationPage />,
+        </ProtectedRoute>
+        )
       },
       {
         path: "users",
         element: (
-        <ProtectedRoute allowedRoles={['admin']} userRole={getUserRole()}>
-        <AllUsers />
-        </ProtectedRoute>
+          <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
+            <AllUsers />
+          </ProtectedRoute>
         ),
       },
       {
         path: "users/:userId",
-        element: <UserAccount />,
+        element: (
+        <ProtectedRoute>
+        <UserAccount />,
+        </ProtectedRoute>
+        )
       },
       {
         path: "reports",
-        element: <Report />,
+        element: (
+        <ProtectedRoute>
+        <Report />,
+        </ProtectedRoute>
+        )
       },
       {
         path: "approvals",
-        element: <AssetApprovals />,
+        element: (
+        <ProtectedRoute>
+        <AssetApprovals />,
+        </ProtectedRoute>
+        )
       },
       {
         path: "users/add-user",
-        element: <AddUser />,
+        element: (
+        <ProtectedRoute>
+        <AddUser />,
+        </ProtectedRoute>
+        )
       },
       {
         path: "assigned",
-        element: <AssignedPage />,
+        element: (
+        <ProtectedRoute>
+        <AssignedPage />,
+        </ProtectedRoute>
+        )
       },
-      { path: "manage-location", element: <ManageStore /> },
+      { path: "manage-location", element:(
+        <ProtectedRoute>
+        <ManageStore />,
+        </ProtectedRoute>
+        ) 
+      },
       {
         path: "settings",
-        element: <Settings />,
+        element: (
+        <ProtectedRoute>
+        <Settings />,
+        </ProtectedRoute>
+        )
       },
     ],
   },
