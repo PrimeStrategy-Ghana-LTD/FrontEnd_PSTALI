@@ -3,6 +3,8 @@ import { FiArrowLeft } from "react-icons/fi";
 import Sidebar1 from "../components/Sidebar1";
 import Searchbar from "../components/Searchbar";
 import { apiGetLocations } from "../servicess/tali";
+import useLocationName from "../hooks/useLocationName"; // adjust the path if needed
+
 
 const AssetApprovals = () => {
   const [assignments, setAssignments] = useState([]);
@@ -13,6 +15,7 @@ const AssetApprovals = () => {
   const [filterAsset, setFilterAsset] = useState("");
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const [totalUnapproved, setTotalUnapproved] = useState(0);
+const { getLocationName } = useLocationName();
 
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -351,8 +354,9 @@ const AssetApprovals = () => {
                   <span>{item.assetName || "—"}</span>
                 </div>
                 <p>{item.assetId || "—"}</p>
-                <p>{item.assetLocation || "—"}</p>
-                <p>{item.newLocation?.assetLocation || "—"}</p>
+                <p>{getLocationName(item.assetLocation)}</p>
+                {/* <p>{item.newLocation?.assetLocation || "—"}</p> */}
+                <p>{getLocationName(item.newLocation)}</p>
                 <p>{item.inspectedBy || "—"}</p>
                 <div className="flex gap-2">
                   <button

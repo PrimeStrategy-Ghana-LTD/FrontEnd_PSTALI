@@ -120,11 +120,7 @@ const AssetManagementTable = () => {
                    <td className="py-2 px-4">{item.assetId || "—"}</td>
                    <td className="py-2 px-4">{item.origin || "—"}</td>
                    <td className="py-2 px-4">{item.dateUploaded || "—"}</td>
-                  <td className="py-2 px-4">{getUserName(item.inspectedBy)}</td>
-                  
-                 
-                  
-                  
+                  <td className="py-2 px-4">{item.approvedBy}</td>
                 </tr>
               ))}
             </tbody>
