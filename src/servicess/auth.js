@@ -47,3 +47,49 @@ export const apiChangePassword = async (updateData) => {
     throw error;
   }
 };
+
+// Add this to the bottom of your existing auth service file
+
+// ========== UTILITY FUNCTIONS ==========
+
+// Get user role from JWT token
+export const getUserRole = () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    
+    // Decode JWT token to get user role
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.role || payload.userRole || null;
+  } catch (error) {
+    console.error('Error getting user role:', error);
+    return null;
+  }
+};
+
+// Check if user is authenticated and token is valid
+export const isAuthenticated = () => {
+  const token = localStorage.getItem('token');
+  if (!token) return false;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Date.now() / 1000;
+    return payload.exp > currentTime;
+  } catch (error) {
+    return false;
+  }
+};
+
+// Check if user has required permissions
+export const hasPermission = (userRole, requiredRoles) => {
+  if (!userRole || !requiredRoles) return false;
+  return requiredRoles.includes(userRole);
+};
+
+// User roles constants
+export const USER_ROLES = {
+  ADMIN: 'administrator',
+  MANAGER: 'assetManager',
+  VIEWER: 'viewer'
+};

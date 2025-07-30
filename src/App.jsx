@@ -26,6 +26,10 @@ import ImportAssetsPage from "./pages/ImportAssetsPage";
 import AssetManagementTable from "./pages/AssetManagementGraph";
 import AdvancedSearchModal from "./pages/AdvancedSearchModal";
 import AssetApprovals from "./pages/AssetApprovals";
+import ErrorPage from "./pages/ErrorPage"; // Import the error page
+import UnauthorizedPage from "./pages/UnauthorizedPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { getUserRole } from "./servicess/auth";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -45,8 +49,6 @@ const router = createBrowserRouter([
     path: "/search-result",
     element: <SearchResult />,
   },
-
-
   {
     path: "/add-asset",
     element: <AddAsset />,
@@ -59,12 +61,19 @@ const router = createBrowserRouter([
     path:"/assetchart",
     element: <AssetManagementTable />
   },
-
   {
     path: "/side-bar",
     element: <Sidebar1 />,
   },
-
+  // Error page route
+  {
+    path: "/error",
+    element: <ErrorPage />,
+  },
+    {
+    path: "/unauthorized",
+    element: <UnauthorizedPage />,
+  },
   {
     path: "/dashboard",
     element: <DashboardLayout />,
@@ -93,10 +102,13 @@ const router = createBrowserRouter([
         path: "assign-location/:id",
         element: <AssignLocationPage />,
       },
-
       {
         path: "users",
-        element: <AllUsers />,
+        element: (
+        <ProtectedRoute allowedRoles={['admin']} userRole={getUserRole()}>
+        <AllUsers />
+        </ProtectedRoute>
+        ),
       },
       {
         path: "users/:userId",
@@ -124,6 +136,11 @@ const router = createBrowserRouter([
         element: <Settings />,
       },
     ],
+  },
+  // Catch-all route for 404 errors
+  {
+    path: "*",
+    element: <ErrorPage />,
   },
 ]);
 
