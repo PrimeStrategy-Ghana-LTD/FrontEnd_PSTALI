@@ -29,6 +29,7 @@ import AssetApprovals from "./pages/AssetApprovals";
 import ErrorPage from "./pages/ErrorPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { getUserRole } from "./servicess/auth";
 
 // Define all your routes here
@@ -36,34 +37,42 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <LoginPage />,
+    errorElement: <ErrorPage />, // Handle errors on this route
   },
   {
     path: "/search",
     element: <SearchPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "view-asset/:id",
     element: <ViewAsset />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/search-result",
     element: <SearchResult />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/add-asset",
     element: <AddAsset />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/advanced",
     element: <AdvancedSearchModal />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/assetchart",
     element: <AssetManagementTable />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/side-bar",
     element: <Sidebar1 />,
+    errorElement: <ErrorPage />,
   },
   // Error page route
   {
@@ -78,56 +87,57 @@ const router = createBrowserRouter([
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <DashboardLayout />,
+        <DashboardLayout />
       </ProtectedRoute>
     ),
+    errorElement: <ErrorPage />, // Handle errors for dashboard and all child routes
     children: [
       {
         index: true,
         element: (
           <ProtectedRoute>
-            <AssetOverview />,
+            <AssetOverview />
           </ProtectedRoute>
         ),
       },
       {
         path: "assets",
         element: (
-        <ProtectedRoute>
-        <AllAssets />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <AllAssets />
+          </ProtectedRoute>
         )
       },
       {
         path: "assets/add-asset",
         element: (
-        <ProtectedRoute>
-        <AddAsset />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <AddAsset />
+          </ProtectedRoute>
         )
       },
       {
         path: "assets/view-asset/:id",
         element: (
-        <ProtectedRoute>
-        <ViewAsset />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <ViewAsset />
+          </ProtectedRoute>
         )
       },
       {
         path: "assets/import-assets",
         element: (
-        <ProtectedRoute>
-        <ImportAssetsPage />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <ImportAssetsPage />
+          </ProtectedRoute>
         )
       },
       {
         path: "assign-location/:id",
         element: (
-        <ProtectedRoute>
-        <AssignLocationPage />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <AssignLocationPage />
+          </ProtectedRoute>
         )
       },
       {
@@ -141,60 +151,62 @@ const router = createBrowserRouter([
       {
         path: "users/:userId",
         element: (
-        <ProtectedRoute>
-        <UserAccount />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <UserAccount />
+          </ProtectedRoute>
         )
       },
       {
         path: "reports",
         element: (
-        <ProtectedRoute>
-        <Report />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <Report />
+          </ProtectedRoute>
         )
       },
       {
         path: "approvals",
         element: (
-        <ProtectedRoute>
-        <AssetApprovals />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <AssetApprovals />
+          </ProtectedRoute>
         )
       },
       {
         path: "users/add-user",
         element: (
-        <ProtectedRoute>
-        <AddUser />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <AddUser />
+          </ProtectedRoute>
         )
       },
       {
         path: "assigned",
         element: (
-        <ProtectedRoute>
-        <AssignedPage />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <AssignedPage />
+          </ProtectedRoute>
         )
       },
-      { path: "manage-location", element:(
-        <ProtectedRoute>
-        <ManageStore />,
-        </ProtectedRoute>
+      { 
+        path: "manage-location",
+        element: (
+          <ProtectedRoute allowedRoles={["administrator", "assetManager"]} userRole={getUserRole()}>
+            <ManageStore />
+          </ProtectedRoute>
         ) 
       },
       {
         path: "settings",
         element: (
-        <ProtectedRoute>
-        <Settings />,
-        </ProtectedRoute>
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
         )
       },
     ],
   },
-  // Catch-all route for 404 errors
+  // Catch-all route for 404 errors - this should be the last route
   {
     path: "*",
     element: <ErrorPage />,
@@ -203,7 +215,7 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <>
+    <ErrorBoundary>
       <RouterProvider router={router} />
       <ToastContainer
         position="top-right"
@@ -217,7 +229,7 @@ function App() {
         pauseOnHover
         theme="light"
       />
-    </>
+    </ErrorBoundary>
   );
 }
 

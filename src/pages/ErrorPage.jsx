@@ -1,10 +1,11 @@
 // src/pages/ErrorPage.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import logo from "../assets/images/white-tali-logo.png"; // Using the white logo for dark background
+import { useNavigate, useRouteError } from 'react-router-dom';
+import logo from "../assets/images/white-tali-logo.png";
 
 const ErrorPage = () => {
   const navigate = useNavigate();
+  const error = useRouteError(); // This hook gets error info from React Router
 
   const handleSearchClick = () => {
     navigate('/search');
@@ -12,6 +13,28 @@ const ErrorPage = () => {
 
   const handleDashboardClick = () => {
     navigate('/dashboard');
+  };
+
+  const handleHomeClick = () => {
+    navigate('/');
+  };
+
+  // Determine error message based on error type
+  const getErrorMessage = () => {
+    if (error?.status === 404) {
+      return "The page you're looking for doesn't exist.";
+    }
+    if (error?.message) {
+      return "Something went wrong. Please try again.";
+    }
+    return "Kindly return to the login page, search page or the Dashboard. You must login to use the search page or access the Dashboard.";
+  };
+
+  const getErrorTitle = () => {
+    if (error?.status === 404) {
+      return "PAGE NOT FOUND";
+    }
+    return "PAGE UNDER CONSTRUCTION...";
   };
 
   return (
@@ -31,32 +54,36 @@ const ErrorPage = () => {
         ))}
       </div>
 
-         {/* Logo in top right */}
-            <div className="absolute top-8 right-8">
-              <img 
-                src={logo} 
-                alt="TALI Logo" 
-                className="h-20 w-auto" 
-              />
-            </div>
+      {/* Logo in top right */}
+      <div className="absolute top-8 right-8">
+        <img 
+          src={logo} 
+          alt="TALI Logo" 
+          className="h-20 w-auto" 
+        />
+      </div>
 
       {/* Main content */}
       <div className="flex flex-col items-center justify-center min-h-screen px-4 relative z-10">
         <div className="text-center max-w-2xl">
           <h1 className="text-6xl md:text-7xl font-bold text-white mb-8 leading-tight">
-            PAGE UNDER
-            <br />
-            CONSTRUCTION...
+            {getErrorTitle()}
           </h1>
           
           <p className="text-white text-lg mb-12 opacity-90">
-            Please return to the search page or the Dashboard
+            {getErrorMessage()}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
-              onClick={handleSearchClick}
+              onClick={handleHomeClick}
               className="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold px-8 py-3 rounded-full transition-colors duration-200 min-w-[120px]"
+            >
+              Home
+            </button>
+            <button
+              onClick={handleSearchClick}
+              className="bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black font-semibold px-8 py-3 rounded-full transition-colors duration-200 min-w-[120px]"
             >
               Search
             </button>

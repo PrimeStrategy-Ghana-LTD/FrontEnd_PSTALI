@@ -16,6 +16,7 @@ import {
 import { FiSearch } from "react-icons/fi";
 import ImportAssetsModal from "./ImportAssetsPage";
 import { useLocation } from "react-router-dom";
+import { getUserRole, hasPermission } from "../servicess/auth";
 
 const AllAssets = () => {
   const navigate = useNavigate();
@@ -35,6 +36,9 @@ const AllAssets = () => {
   const [searchInput, setSearchInput] = useState(""); // For debouncing
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
+
+  // Get user role
+  const userRole = getUserRole();
 
   const advancedFilters = {
     search: searchParams.get("search") || "",
@@ -306,15 +310,15 @@ const AllAssets = () => {
   };
 
   const clearFilters = () => {
-  setAvailabilityFilter("");
-  setLocationFilter("");
-  setSearchInput("");
-  setSearchTerm("");
-  setSortOption("recent");
-  setCurrentPage(1);
-  navigate("/dashboard/assets"); // Clear query params
-  applyFiltersAndPagination(1, true);
-};
+    setAvailabilityFilter("");
+    setLocationFilter("");
+    setSearchInput("");
+    setSearchTerm("");
+    setSortOption("recent");
+    setCurrentPage(1);
+    navigate("/dashboard/assets"); // Clear query params
+    applyFiltersAndPagination(1, true);
+  };
 
   const handleReset = () => {
     setFilterLocation("");
@@ -360,12 +364,14 @@ const AllAssets = () => {
             View and Manage Assets
           </p>
           <div className="flex text-xs sm:text-[13px] gap-2 sm:gap-3">
-            <button
-              onClick={handleAddAssetClick}
-              className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
-            >
-              Add Asset
-            </button>
+            {hasPermission(userRole, ["administrator", "assetManager", "user"]) && (
+              <button
+                onClick={handleAddAssetClick}
+                className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
+              >
+                Add Asset
+              </button>
+            )}
 
             <button
               onClick={() => navigate("/dashboard/assets/import-assets")}

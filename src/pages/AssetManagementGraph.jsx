@@ -107,7 +107,7 @@ const AssetManagementTable = () => {
                 <th className="py-2 px-4">VIN</th>
                 <th className="py-2 px-4">Origin</th>
                 <th className="py-2 px-4">Date</th>
-                <th className="py-2 px-4">Added By</th>
+                <th className="py-2 px-4">Inspected By</th>
               </tr>
             </thead>
             <tbody className="text-gray-800">
