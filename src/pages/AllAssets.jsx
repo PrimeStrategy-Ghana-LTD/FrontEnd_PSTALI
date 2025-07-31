@@ -364,14 +364,14 @@ const AllAssets = () => {
             View and Manage Assets
           </p>
           <div className="flex text-xs sm:text-[13px] gap-2 sm:gap-3">
-            {hasPermission(userRole, ["administrator", "assetManager", "user"]) && (
+            {/* {hasPermission(userRole, ["administrator", "assetManager", "user"]) && ( */}
               <button
                 onClick={handleAddAssetClick}
                 className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
               >
                 Add Asset
               </button>
-            )}
+            {/* )} */}
 
             <button
               onClick={() => navigate("/dashboard/assets/import-assets")}
