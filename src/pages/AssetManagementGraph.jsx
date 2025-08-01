@@ -69,6 +69,28 @@ const AssetManagementTable = () => {
     fetchRecentAssets(selectedPeriod);
   }, [selectedPeriod]);
 
+  // Helper function to safely extract location ID
+  const getLocationId = (assetLocation) => {
+    if (typeof assetLocation === 'string') {
+      return assetLocation;
+    }
+    if (assetLocation && typeof assetLocation === 'object') {
+      return assetLocation._id || assetLocation.id;
+    }
+    return null;
+  };
+
+  // Helper function to safely get location name
+  const getLocationDisplay = (assetLocation) => {
+    // If it's already populated with location name
+    if (assetLocation && typeof assetLocation === 'object' && assetLocation.assetLocation) {
+      return assetLocation.assetLocation;
+    }
+    // Otherwise, use the hook to get the name
+    const locationId = getLocationId(assetLocation);
+    return locationId ? getLocationName(locationId) : "—";
+  };
+
   return (
     <div className="border-2 bg-white border-white p-4 rounded-md shadow-sm">
       {/* Header */}
@@ -115,12 +137,17 @@ const AssetManagementTable = () => {
                 <tr key={index} className="border-t border-gray-100">
                   <td className="py-2 px-4">{item.assetName || "—"}</td>
                   <td className="py-2 px-4">
-                    {getLocationName(item.assetLocation) || "—"}
+                    {getLocationDisplay(item.assetLocation)}
                   </td>
-                   <td className="py-2 px-4">{item.assetId || "—"}</td>
-                   <td className="py-2 px-4">{item.origin || "—"}</td>
-                   <td className="py-2 px-4">{item.dateUploaded || "—"}</td>
-                  <td className="py-2 px-4">{item.approvedBy}</td>
+                  <td className="py-2 px-4">{item.assetId || "—"}</td>
+                  <td className="py-2 px-4">{item.origin || "—"}</td>
+                  <td className="py-2 px-4">{item.dateUploaded || "—"}</td>
+                  <td className="py-2 px-4">
+                    {item.approvedBy && typeof item.approvedBy === 'object' 
+                      ? item.approvedBy.userName || "—"
+                      : item.approvedBy || "—"
+                    }
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -144,3 +171,42 @@ const AssetManagementTable = () => {
 };
 
 export default AssetManagementTable;
+
+// Also update your AssetOverview.jsx - replace the location handling section:
+// In the fetchData useEffect, update this part:
+
+/*
+// Handle recently added assets by location
+const assets = dashboardRes.data?.recentlyAdded || [];
+const locationCountMap = {};
+assets.forEach((item) => {
+  // Handle both populated and non-populated location objects
+  let locationId;
+  if (item.assetLocation) {
+    if (typeof item.assetLocation === 'string') {
+      locationId = item.assetLocation;
+    } else if (typeof item.assetLocation === 'object') {
+      locationId = item.assetLocation._id || item.assetLocation.id;
+    }
+    
+    if (locationId) {
+      locationCountMap[locationId] = (locationCountMap[locationId] || 0) + 1;
+    }
+  }
+});
+
+const formattedData = Object.entries(locationCountMap)
+  .map(([locationId, count]) => ({
+    icon: (
+      <FontAwesomeIcon
+        icon={faLocationDot}
+        className="text-blue-500 text-xl"
+      />
+    ),
+    count,
+    label: getLocationName(locationId),
+  }))
+  .slice(0, 4);
+
+setSummaryData(formattedData);
+*/
