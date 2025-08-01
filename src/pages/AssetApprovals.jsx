@@ -3,8 +3,7 @@ import { FiArrowLeft } from "react-icons/fi";
 import Sidebar1 from "../components/Sidebar1";
 import Searchbar from "../components/Searchbar";
 import { apiGetLocations } from "../servicess/tali";
-import useLocationName from "../hooks/useLocationName"; // adjust the path if needed
-
+import useLocationName from "../hooks/useLocationName";
 
 const AssetApprovals = () => {
   const [assignments, setAssignments] = useState([]);
@@ -15,11 +14,31 @@ const AssetApprovals = () => {
   const [filterAsset, setFilterAsset] = useState("");
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const [totalUnapproved, setTotalUnapproved] = useState(0);
-const { getLocationName } = useLocationName();
+  const [totalAssignedAssets, setTotalAssignedAssets] = useState(0); // Add missing state
+  const [loading, setLoading] = useState(false);
+  const { getLocationName } = useLocationName();
+
+  // Helper function to get location name from populated or ID field
+  const getLocationDisplayName = (locationField) => {
+    if (!locationField) return "—";
+    
+    // If it's a populated object
+    if (typeof locationField === 'object' && locationField.assetLocation) {
+      return locationField.assetLocation;
+    }
+    
+    // If it's just an ID, use the hook
+    if (typeof locationField === 'string') {
+      return getLocationName(locationField);
+    }
+    
+    return "—";
+  };
 
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem("token");
         const response = await fetch(
           "https://backend-ps-tali.onrender.com/assets/unapproved",
@@ -37,13 +56,17 @@ const { getLocationName } = useLocationName();
         }
 
         const data = await response.json();
-        setAssignments(data.assets);
-        setFilteredAssignments(data.assets);
-
-        // ✅ Add this line to correctly set the totalUnapproved count
-        setTotalUnapproved(data.totalUnapproved || 0);
+        console.log("Unapproved assets response:", data); // Debug log
+        
+        setAssignments(data.assets || []);
+        setFilteredAssignments(data.assets || []);
+        setTotalUnapproved(data.totalUnapproved || data.total || 0);
       } catch (error) {
         console.error("Error fetching unapproved assets:", error);
+        setAssignments([]);
+        setFilteredAssignments([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -92,7 +115,7 @@ const { getLocationName } = useLocationName();
   const handleFilter = () => {
     const filtered = assignments.filter((item) => {
       const locationMatch = filterLocation
-        ? item.assetLocation?.assetLocation === filterLocation
+        ? getLocationDisplayName(item.assetLocation) === filterLocation
         : true;
       const assetMatch = filterAsset
         ? item.assetName?.toLowerCase().includes(filterAsset.toLowerCase())
@@ -108,82 +131,11 @@ const { getLocationName } = useLocationName();
     setFilteredAssignments(assignments);
   };
 
-  // const handleDownload = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     const response = await fetch(
-  //       "https://backend-ps-tali.onrender.com/assets/locations/xlsx",
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-
-  //     if (!response.ok) {
-  //       throw new Error(`Failed to download: ${response.status}`);
-  //     }
-
-  //     const blob = await response.blob();
-  //     const url = window.URL.createObjectURL(blob);
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     a.download = "asset_locations.xlsx";
-  //     a.click();
-  //     window.URL.revokeObjectURL(url);
-  //   } catch (error) {
-  //     console.error("Download failed:", error);
-  //     alert("Failed to download file");
-  //   }
-  // };
-
-  // const handleDownloadCSV = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     const response = await fetch(
-  //       "https://backend-ps-tali.onrender.com/assets/locations/csv",
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-
-  //     if (!response.ok) {
-  //       throw new Error(`Failed to download CSV: ${response.status}`);
-  //     }
-
-  //     const blob = await response.blob();
-  //     const url = window.URL.createObjectURL(blob);
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     a.download = "asset_locations.csv";
-  //     a.click();
-  //     window.URL.revokeObjectURL(url);
-  //   } catch (error) {
-  //     console.error("CSV Download failed:", error);
-  //     alert("Failed to download CSV file");
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (!event.target.closest(".download-dropdown")) {
-  //       setShowDownloadOptions(false);
-  //     }
-  //   };
-
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
-
   const handleApprove = async (assetId) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://backend-ps-tali.onrender.com/${assetId}/approve`,
+        `https://backend-ps-tali.onrender.com/assets/${assetId}/approve`, // Fixed endpoint
         {
           method: "PATCH",
           headers: {
@@ -198,15 +150,15 @@ const { getLocationName } = useLocationName();
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
-      // Optional: Show success message or remove approved item from list
       alert("Asset approved successfully");
 
-      // Refresh data
+      // Remove approved item from list - use _id consistently
       const updatedAssignments = assignments.filter(
-        (item) => item.assetId !== assetId
+        (item) => item._id !== assetId // Fixed: use _id instead of assetId
       );
       setAssignments(updatedAssignments);
       setFilteredAssignments(updatedAssignments);
+      setTotalUnapproved(prev => Math.max(0, prev - 1)); // Update count
     } catch (error) {
       console.error("Approval failed:", error);
       alert("Approval failed. Please try again.");
@@ -217,7 +169,7 @@ const { getLocationName } = useLocationName();
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://backend-ps-tali.onrender.com/${assetId}/reject`,
+        `https://backend-ps-tali.onrender.com/assets/${assetId}/reject`, // Fixed endpoint
         {
           method: "PATCH",
           headers: {
@@ -234,13 +186,14 @@ const { getLocationName } = useLocationName();
 
       alert("Asset rejected successfully");
 
-      // Optionally remove rejected item from the lists
+      // Remove rejected item from the lists
       const updatedAssignments = assignments.filter(
         (item) => item._id !== assetId
       );
 
       setAssignments(updatedAssignments);
       setFilteredAssignments(updatedAssignments);
+      setTotalUnapproved(prev => Math.max(0, prev - 1)); // Update count
     } catch (error) {
       console.error("Rejection failed:", error);
       alert("Rejection failed. Please try again.");
@@ -276,25 +229,11 @@ const { getLocationName } = useLocationName();
                 >
                   Download
                 </button>
-
-                {/* <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow z-10 download-dropdown">
-                    <button
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                    >
-                      Download as Excel (XLSX)
-                    </button>
-                    <button
-                      
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                    >
-                      Download as CSV
-                    </button>
-                  </div> */}
               </div>
             </div>
           </div>
 
-          {/* {filterVisible && (
+          {filterVisible && (
             <div className="bg-gray-50 rounded-md p-4 mb-4 flex flex-wrap gap-4">
               <select
                 className="border p-2 rounded-sm text-sm w-[200px]"
@@ -328,46 +267,52 @@ const { getLocationName } = useLocationName();
                 Reset
               </button>
             </div>
-          )} */}
+          )}
 
           <div className="grid grid-cols-6 font-semibold text-[14px] text-gray-700 pb-2 border-b-2 border-gray-200 mt-6">
             <p>Asset</p>
             <p>VIN</p>
-            <p>Location</p>
+            <p>Current Location</p>
             <p>New Location</p>
             <p>Assigned By</p>
             <p>Actions</p>
           </div>
 
-          {filteredAssignments.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <p className="text-gray-500">Loading...</p>
+            </div>
+          ) : filteredAssignments.length > 0 ? (
             filteredAssignments.map((item, index) => (
               <div
-                key={index}
+                key={item._id || index}
                 className="grid grid-cols-6 items-center text-[13px] text-gray-600 py-3 border-b border-gray-200"
               >
                 <div className="flex items-center gap-2">
                   <img
-                    src={item.assetImage}
+                    src={item.assetImage || "/default-asset.png"}
                     alt=""
-                    className="w-8 h-8 rounded-full"
+                    className="w-8 h-8 rounded-full object-cover"
+                    onError={(e) => {
+                      e.target.src = "/default-asset.png";
+                    }}
                   />
                   <span>{item.assetName || "—"}</span>
                 </div>
                 <p>{item.assetId || "—"}</p>
-                <p>{getLocationName(item.assetLocation)}</p>
-                {/* <p>{item.newLocation?.assetLocation || "—"}</p> */}
-                <p>{getLocationName(item.newLocation)}</p>
-                <p>{item.inspectedBy || "—"}</p>
+                <p>{getLocationDisplayName(item.assetLocation)}</p>
+                <p>{getLocationDisplayName(item.newLocation)}</p>
+                <p>{item.inspectedBy?.userName || item.inspectedBy || "—"}</p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleApprove(item._id)}
-                    className="border-[0.5px] px-1 py-0.5 rounded-sm bg-[#46A46C] border-[#46A46C] text-white text-[13px]"
+                    className="border-[0.5px] px-2 py-1 rounded-sm bg-[#46A46C] border-[#46A46C] text-white text-[13px] hover:bg-[#3a8a59] transition-colors"
                   >
                     Approve
                   </button>
                   <button
                     onClick={() => handleReject(item._id)}
-                    className="border border-red-500 bg-red-500 text-white px-2 py-1 rounded-sm text-sm"
+                    className="border border-red-500 bg-red-500 text-white px-2 py-1 rounded-sm text-[13px] hover:bg-red-600 transition-colors"
                   >
                     Reject
                   </button>
@@ -375,7 +320,9 @@ const { getLocationName } = useLocationName();
               </div>
             ))
           ) : (
-            <p className="text-sm text-gray-500 mt-4 flex justify-center">No unapprove assets found.</p>
+            <p className="text-sm text-gray-500 mt-4 flex justify-center py-8">
+              No unapproved assets found.
+            </p>
           )}
         </div>
       </div>

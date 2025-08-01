@@ -27,7 +27,7 @@ const ErrorPage = () => {
     if (error?.message) {
       return "Something went wrong. Please try again.";
     }
-    return "Kindly return to the login page, search page or the Dashboard. You must login to use the search page or access the Dashboard.";
+    return "Please return to the search page or the Dashboard";
   };
 
   const getErrorTitle = () => {
@@ -106,7 +106,7 @@ const ErrorPage = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes scroll {
           0% {
             transform: translateX(0);

@@ -20,6 +20,7 @@ import { getUserRole, hasPermission } from "../servicess/auth";
 
 const AllAssets = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [viewMode, setViewMode] = useState("list");
   const [showFilters, setShowFilters] = useState(false);
   const [availabilityFilter, setAvailabilityFilter] = useState("");
@@ -28,18 +29,18 @@ const AllAssets = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [assets, setAssets] = useState([]);
-  const [allAssets, setAllAssets] = useState([]); // Store all assets for client-side filtering
+  const [allAssets, setAllAssets] = useState([]);
   const [locations, setLocations] = useState([]);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [sortOption, setSortOption] = useState("recent");
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchInput, setSearchInput] = useState(""); // For debouncing
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-
+  const [searchInput, setSearchInput] = useState("");
+  
   // Get user role
   const userRole = getUserRole();
 
+  // Parse URL search params safely
+  const searchParams = new URLSearchParams(location.search);
   const advancedFilters = {
     search: searchParams.get("search") || "",
     category: searchParams.get("category") || "",
@@ -69,114 +70,153 @@ const AllAssets = () => {
 
   // Helper function to get location name by ID
   const getLocationName = (locationId) => {
-    const location = locations.find((loc) => loc._id === locationId);
-    return location ? location.assetLocation : locationId;
+    if (!locationId) return "—";
+    
+    // Handle populated location object
+    if (typeof locationId === 'object' && locationId.assetLocation) {
+      return locationId.assetLocation;
+    }
+    
+    // Handle location ID string
+    if (typeof locationId === 'string') {
+      const location = locations.find((loc) => loc._id === locationId);
+      return location ? location.assetLocation : locationId;
+    }
+    
+    return "—";
   };
 
   // Client-side filtering and sorting function
   const filterAndSortAssets = (assetsToFilter) => {
+    if (!Array.isArray(assetsToFilter)) {
+      console.warn("filterAndSortAssets received non-array:", assetsToFilter);
+      return [];
+    }
+
     let filteredAssets = [...assetsToFilter];
 
-    // 1. Availability and Location filters (existing)
+    // 1. Availability and Location filters
     if (availabilityFilter) {
       filteredAssets = filteredAssets.filter(
-        (asset) => asset.status === availabilityFilter
+        (asset) => asset && asset.status === availabilityFilter
       );
     }
 
     if (locationFilter) {
       filteredAssets = filteredAssets.filter(
-        (asset) =>
-          asset.assetLocation === locationFilter ||
-          getLocationName(asset.assetLocation) === locationFilter
+        (asset) => {
+          if (!asset) return false;
+          const locationName = getLocationName(asset.assetLocation);
+          return locationName === locationFilter;
+        }
       );
     }
 
     // 2. Advanced Search filters
-    if (advancedFilters.search.trim()) {
+    if (advancedFilters.search && advancedFilters.search.trim()) {
       const term = advancedFilters.search.toLowerCase();
       filteredAssets = filteredAssets.filter(
-        (asset) =>
-          asset.assetName?.toLowerCase().includes(term) ||
-          asset.assetId?.toLowerCase().includes(term) ||
-          asset.category?.toLowerCase().includes(term) ||
-          asset.make?.toLowerCase().includes(term) ||
-          asset.model?.toLowerCase().includes(term) ||
-          getLocationName(asset.assetLocation)?.toLowerCase().includes(term)
+        (asset) => {
+          if (!asset) return false;
+          return (
+            (asset.assetName && asset.assetName.toLowerCase().includes(term)) ||
+            (asset.assetId && asset.assetId.toLowerCase().includes(term)) ||
+            (asset.category && asset.category.toLowerCase().includes(term)) ||
+            (asset.make && asset.make.toLowerCase().includes(term)) ||
+            (asset.model && asset.model.toLowerCase().includes(term)) ||
+            getLocationName(asset.assetLocation).toLowerCase().includes(term)
+          );
+        }
       );
     }
 
     if (advancedFilters.category) {
       filteredAssets = filteredAssets.filter(
-        (asset) => asset.category === advancedFilters.category
+        (asset) => asset && asset.category === advancedFilters.category
       );
     }
 
     if (advancedFilters.assetLocation) {
       filteredAssets = filteredAssets.filter(
-        (asset) =>
-          getLocationName(asset.assetLocation) === advancedFilters.assetLocation
+        (asset) => {
+          if (!asset) return false;
+          return getLocationName(asset.assetLocation) === advancedFilters.assetLocation;
+        }
       );
     }
 
     if (advancedFilters.model) {
       filteredAssets = filteredAssets.filter(
-        (asset) =>
-          asset.model?.toLowerCase() === advancedFilters.model.toLowerCase()
+        (asset) => asset && asset.model && 
+          asset.model.toLowerCase() === advancedFilters.model.toLowerCase()
       );
     }
 
     if (advancedFilters.origin) {
       filteredAssets = filteredAssets.filter(
-        (asset) =>
-          asset.origin?.toLowerCase() === advancedFilters.origin.toLowerCase()
+        (asset) => asset && asset.origin && 
+          asset.origin.toLowerCase() === advancedFilters.origin.toLowerCase()
       );
     }
 
     if (advancedFilters.inspectedBy) {
       filteredAssets = filteredAssets.filter(
-        (asset) => asset.inspectedBy === advancedFilters.inspectedBy
+        (asset) => asset && asset.inspectedBy === advancedFilters.inspectedBy
       );
     }
 
     if (advancedFilters.from) {
       filteredAssets = filteredAssets.filter(
-        (asset) => new Date(asset.createdAt) >= new Date(advancedFilters.from)
+        (asset) => asset && asset.createdAt && 
+          new Date(asset.createdAt) >= new Date(advancedFilters.from)
       );
     }
 
     if (advancedFilters.to) {
       filteredAssets = filteredAssets.filter(
-        (asset) => new Date(asset.createdAt) <= new Date(advancedFilters.to)
+        (asset) => asset && asset.createdAt && 
+          new Date(asset.createdAt) <= new Date(advancedFilters.to)
       );
     }
 
-    // 3. Sorting (already handled)
+    // 3. Sorting
     switch (sortOption) {
       case "recent":
-        filteredAssets.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        filteredAssets.sort((a, b) => {
+          if (!a || !b) return 0;
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        });
         break;
       case "alphabetical":
-        filteredAssets.sort((a, b) =>
-          (a.assetName || "").localeCompare(b.assetName || "")
-        );
+        filteredAssets.sort((a, b) => {
+          if (!a || !b) return 0;
+          return (a.assetName || "").localeCompare(b.assetName || "");
+        });
         break;
       case "reverse":
-        filteredAssets.sort((a, b) =>
-          (b.assetName || "").localeCompare(a.assetName || "")
-        );
+        filteredAssets.sort((a, b) => {
+          if (!a || !b) return 0;
+          return (b.assetName || "").localeCompare(a.assetName || "");
+        });
         break;
       default:
         break;
     }
 
-    return filteredAssets;
+    return filteredAssets.filter(asset => asset !== null && asset !== undefined);
   };
 
   // Paginate filtered assets
   const paginateAssets = (filteredAssets, page) => {
+    if (!Array.isArray(filteredAssets)) {
+      return {
+        assets: [],
+        totalCount: 0,
+        totalPages: 1,
+        currentPage: 1,
+      };
+    }
+
     const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const paginatedAssets = filteredAssets.slice(startIndex, endIndex);
@@ -197,16 +237,33 @@ const AllAssets = () => {
     try {
       setLoading(true);
 
-      // Fetch all assets without pagination for client-side filtering
-      const response = await apiGetAllAssets({ limit: 100 }); // Large limit to get all assets
+      const response = await apiGetAllAssets({ limit: 1000 });
+      console.log("API Response:", response);
 
-      const assetsData = response.data?.assets || response.data || [];
-      setAllAssets(Array.isArray(assetsData) ? assetsData : []);
+      let assetsData = [];
+      
+      // Handle different response structures
+      if (response && response.data) {
+        if (Array.isArray(response.data.assets)) {
+          assetsData = response.data.assets;
+        } else if (Array.isArray(response.data)) {
+          assetsData = response.data;
+        }
+      } else if (Array.isArray(response)) {
+        assetsData = response;
+      } else if (response && Array.isArray(response.assets)) {
+        assetsData = response.assets;
+      }
+
+      // Ensure we have valid assets
+      const validAssets = assetsData.filter(asset => 
+        asset && typeof asset === 'object' && asset._id
+      );
+
+      setAllAssets(validAssets);
 
       // Apply filtering and pagination
-      const filteredAssets = filterAndSortAssets(
-        Array.isArray(assetsData) ? assetsData : []
-      );
+      const filteredAssets = filterAndSortAssets(validAssets);
       const paginatedResult = paginateAssets(filteredAssets, currentPage);
 
       setAssets(paginatedResult.assets);
@@ -235,25 +292,14 @@ const AllAssets = () => {
     setCurrentPage(paginatedResult.currentPage);
   };
 
-  const getTotalAssetsCount = async () => {
-    try {
-      const response = await apiCountAllAssets();
-      const count = response.count || response.total || 0;
-      // Note: This will show the total count from API, not filtered count
-      // If you want to show filtered count, remove this function and rely on client-side counting
-    } catch (error) {
-      console.error("Error fetching total assets count:", error);
-    }
-  };
-
   const getLocations = async () => {
     try {
       const response = await apiGetLocations();
-      setLocations(
-        Array.isArray(response) ? response : response.locations || []
-      );
+      const locationsData = Array.isArray(response) ? response : response.locations || [];
+      setLocations(locationsData);
     } catch (error) {
       console.error("Error fetching locations:", error);
+      setLocations([]);
     }
   };
 
@@ -296,7 +342,6 @@ const AllAssets = () => {
 
   const handleImportSuccess = () => {
     setIsImportModalOpen(false);
-    // Refresh the assets list after successful import
     getAllAssets();
   };
 
@@ -316,14 +361,8 @@ const AllAssets = () => {
     setSearchTerm("");
     setSortOption("recent");
     setCurrentPage(1);
-    navigate("/dashboard/assets"); // Clear query params
+    navigate("/dashboard/assets");
     applyFiltersAndPagination(1, true);
-  };
-
-  const handleReset = () => {
-    setFilterLocation("");
-    setFilterAsset("");
-    setFilteredAssignments(assignments);
   };
 
   // View toggle buttons
@@ -364,14 +403,12 @@ const AllAssets = () => {
             View and Manage Assets
           </p>
           <div className="flex text-xs sm:text-[13px] gap-2 sm:gap-3">
-            {/* {hasPermission(userRole, ["administrator", "assetManager", "user"]) && ( */}
-              <button
-                onClick={handleAddAssetClick}
-                className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
-              >
-                Add Asset
-              </button>
-            {/* )} */}
+            <button
+              onClick={handleAddAssetClick}
+              className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
+            >
+              Add Asset
+            </button>
 
             <button
               onClick={() => navigate("/dashboard/assets/import-assets")}
@@ -403,7 +440,7 @@ const AllAssets = () => {
             </div>
 
             {/* Searchbar */}
-            <div className=" flex ">
+            <div className="flex">
               <div className="relative flex items-center border border-gray-300 rounded-full text-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent px-3 py-2 w-96">
                 <svg
                   className="w-4 h-4 text-gray-400 mr-2"
@@ -438,6 +475,7 @@ const AllAssets = () => {
                 )}
               </div>
             </div>
+
             <div className="flex gap-3 text-xs sm:text-[13px]">
               <button
                 className="flex items-center gap-2 px-3 py-1 rounded-sm border border-gray-300 text-gray-600 cursor-pointer"
@@ -576,174 +614,205 @@ const AllAssets = () => {
         </div>
       </div>
 
-      <AssetAssignmentModal
-        isOpen={isAssignModalOpen}
-        onClose={() => setIsAssignModalOpen(false)}
-        asset={selectedAsset}
-      />
+      {isAssignModalOpen && (
+        <AssetAssignmentModal
+          isOpen={isAssignModalOpen}
+          onClose={() => setIsAssignModalOpen(false)}
+          asset={selectedAsset}
+        />
+      )}
     </div>
   );
 };
 
 // ListView Component
-const ListView = ({ assets, getLocationName }) => (
-  <div className="space-y-2">
-    <div className="hidden md:flex font-semibold text-sm text-gray-700 pb-2 border-b-2 border-gray-200 mt-9">
-      <div className="flex-[1.5]">Name</div>
-      <div className="flex-[2]">VIN</div>
-      <div className="flex-[1.5]">Origin</div>
-      <div className="flex-[1.5]">Location</div>
-      <div className="flex-[1.5] text-center">Assignment</div>
-    </div>
+const ListView = ({ assets, getLocationName }) => {
+  if (!Array.isArray(assets)) {
+    return <div className="text-center py-4">No assets to display</div>;
+  }
 
-    {assets.map((item, index) => (
-      <div
-        key={item._id || index}
-        className="flex flex-col md:flex-row md:items-center text-xs sm:text-[13px] text-gray-600 py-3 border-b border-gray-200 gap-3 md:gap-0"
-      >
-        <div className="md:hidden">
-          <div className="flex items-center gap-3 mb-3">
-            <img
-              src={item.assetImage}
-              alt=""
-              className="border-2 h-12 w-12 rounded-full border-transparent flex-shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <Link
-                to={`/dashboard/assets/view-asset/${item._id}`}
-                className="block font-medium text-sm hover:text-blue-600 truncate"
-              >
-                {item.assetName}
-              </Link>
-              <p className="text-gray-400 text-xs">2025</p>
-            </div>
-          </div>
+  return (
+    <div className="space-y-2">
+      <div className="hidden md:flex font-semibold text-sm text-gray-700 pb-2 border-b-2 border-gray-200 mt-9">
+        <div className="flex-[1.5]">Name</div>
+        <div className="flex-[2]">VIN</div>
+        <div className="flex-[1.5]">Origin</div>
+        <div className="flex-[1.5]">Location</div>
+        <div className="flex-[1.5] text-center">Assignment</div>
+      </div>
 
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div>
-              <span className="text-gray-500 font-medium">VIN:</span>
-              <p className="text-gray-700">{item.assetId}</p>
+      {assets.map((item, index) => {
+        if (!item || !item._id) return null;
+        
+        return (
+          <div
+            key={item._id}
+            className="flex flex-col md:flex-row md:items-center text-xs sm:text-[13px] text-gray-600 py-3 border-b border-gray-200 gap-3 md:gap-0"
+          >
+            <div className="md:hidden">
+              <div className="flex items-center gap-3 mb-3">
+                <img
+                  src={item.assetImage || "/default-asset.png"}
+                  alt=""
+                  className="border-2 h-12 w-12 rounded-full border-transparent flex-shrink-0 object-cover"
+                  onError={(e) => {
+                    e.target.src = "/default-asset.png";
+                  }}
+                />
+                <div className="flex-1 min-w-0">
+                  <Link
+                    to={`/dashboard/assets/view-asset/${item._id}`}
+                    className="block font-medium text-sm hover:text-blue-600 truncate"
+                  >
+                    {item.assetName || "Unnamed Asset"}
+                  </Link>
+                  <p className="text-gray-400 text-xs">{item.year || "2025"}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-gray-500 font-medium">VIN:</span>
+                  <p className="text-gray-700">{item.assetId || "—"}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500 font-medium">Origin:</span>
+                  <p className="font-semibold">{item.origin || "—"}</p>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-gray-500 font-medium">Location:</span>
+                  <p className="text-gray-700">
+                    {getLocationName(item.assetLocation)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <div className="flex-[1.5] text-center">
+                  <Link
+                    to={`/dashboard/assign-location/${item._id}`}
+                    className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
+                  >
+                    Assign To
+                  </Link>
+                </div>
+              </div>
             </div>
-            <div>
-              <span className="text-gray-500 font-medium">Origin:</span>
-              <p className="font-semibold">{item.origin}</p>
-            </div>
-            <div className="col-span-2">
-              <span className="text-gray-500 font-medium">Location:</span>
-              <p className="text-gray-700">
+
+            <div className="hidden md:flex w-full items-center">
+              <div className="flex-[1.5] truncate flex items-center gap-2">
+                <img
+                  src={item.assetImage || "/default-asset.png"}
+                  alt=""
+                  className="border-2 h-8 w-8 rounded-full border-transparent flex-shrink-0 object-cover"
+                  onError={(e) => {
+                    e.target.src = "/default-asset.png";
+                  }}
+                />
+                <div className="min-w-0">
+                  <Link
+                    to={`/dashboard/assets/view-asset/${item._id}`}
+                    className="block truncate hover:text-blue-600"
+                  >
+                    {item.assetName || "Unnamed Asset"}
+                  </Link>
+                  <p className="text-gray-400 text-xs">{item.year || "2025"}</p>
+                </div>
+              </div>
+              <div className="flex-[2] truncate">{item.assetId || "—"}</div>
+              <div className="flex-[1.5] font-semibold">{item.origin || "—"}</div>
+              <div className="flex-[1.5]">
                 {getLocationName(item.assetLocation)}
-              </p>
+              </div>
+              <div className="flex-[1.5] flex justify-center">
+                <Link
+                  to={`/dashboard/assign-location/${item._id}`}
+                  className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
+                >
+                  Assign To
+                </Link>
+              </div>
             </div>
           </div>
+        );
+      })}
+    </div>
+  );
+};
 
-          <div className="mt-3">
-            <div className="flex-[1.5] text-center">
-              <Link
-                to={`/dashboard/assign-location/${item._id}`}
-                className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
-              >
-                Assign To
-              </Link>
-            </div>
-          </div>
-        </div>
+// GridView Component
+const GridView = ({ assets, getLocationName }) => {
+  if (!Array.isArray(assets)) {
+    return <div className="text-center py-4">No assets to display</div>;
+  }
 
-        <div className="hidden md:flex w-full items-center">
-          <div className="flex-[1.5] truncate flex items-center gap-2">
-            <img
-              src={item.assetImage}
-              alt=""
-              className="border-2 h-8 w-8 rounded-full border-transparent flex-shrink-0"
-            />
-            <div className="min-w-0">
-              <Link
-                to={`/dashboard/assets/view-asset/${item._id}`}
-                className="block truncate hover:text-blue-600"
-              >
-                {item.assetName}
-              </Link>
-              <p className="text-gray-400 text-xs">2025</p>
-            </div>
-          </div>
-          <div className="flex-[2] truncate">{item.assetId}</div>
-          <div className="flex-[1.5] font-semibold">{item.origin}</div>
-          <div className="flex-[1.5]">
-            {getLocationName(item.assetLocation)}
-          </div>
-          <div className="flex-[1.5] flex justify-center">
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xlg:grid-cols-3 gap-4 mt-9 ml-20">
+      {assets.map((item, index) => {
+        if (!item || !item._id) return null;
+        
+        return (
+          <div
+            key={item._id}
+            className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow h-[243px] w-[348px]"
+          >
             <Link
               to={`/dashboard/assign-location/${item._id}`}
               className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
             >
               Assign To
             </Link>
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
 
-// GridView Component
-const GridView = ({ assets, getLocationName }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xlg:grid-cols-3 gap-4 mt-9 ml-20">
-    {assets.map((item, index) => (
-      <div
-        key={item._id || index}
-        className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow h-[243px] w-[348px]"
-      >
-        <Link
-          to={`/dashboard/assign-location/${item._id}`}
-          className="px-2 py-1 rounded-sm bg-[#051b34] text-white border border-[#051b34] text-xs sm:text-sm"
-        >
-          Assign To
-        </Link>
+            <p className="border-b-[0.5px] mt-2 border-gray-300"></p>
+            <div className="flex gap-4 mt-2">
+              <div className="flex-shrink-0">
+                <img
+                  src={item.assetImage || "/default-asset.png"}
+                  alt={item.assetName || "Asset"}
+                  className="w-[149px] h-[149px] object-cover"
+                  onError={(e) => {
+                    e.target.src = "/default-asset.png";
+                  }}
+                />
+              </div>
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <Link
+                    to={`/dashboard/assets/view-asset/${item._id}`}
+                    className="font-semibold text-gray-800 hover:text-blue-600 text-sm"
+                  >
+                    {item.assetName || "Unnamed Asset"}
+                  </Link>
+                  <p className="text-xs text-gray-500">{item.year || "2025"}</p>
+                </div>
 
-        <p className="border-b-[0.5px] mt-2 border-gray-300"></p>
-        <div className="flex gap-4 mt-2">
-          <div className="flex-shrink-0">
-            <img
-              src={item.assetImage}
-              alt={item.assetName}
-              className="w-[149px] h-[149px] object-cover"
-            />
-          </div>
-          <div className="flex-1 flex flex-col justify-between">
-            <div>
-              <Link
-                to={`/dashboard/assets/view-asset/${item._id}`}
-                className="font-semibold text-gray-800 hover:text-blue-600 text-sm"
-              >
-                {item.assetName}
-              </Link>
-              <p className="text-xs text-gray-500">2025</p>
-            </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">Location:</span>
+                  <span className="text-xs text-gray-700">
+                    {getLocationName(item.assetLocation)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">VIN:</span>
+                  <span className="text-xs text-gray-700 font-medium">
+                    {item.assetId || "—"}
+                  </span>
+                </div>
 
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-gray-500">Location:</span>
-              <span className="text-xs text-gray-700">
-                {getLocationName(item.assetLocation)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-gray-500">VIN:</span>
-              <span className="text-xs text-gray-700 font-medium">
-                {item.assetId}
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-gray-500">Origin</span>
-              <span className="text-xs font-semibold text-gray-700">
-                {item.origin}
-              </span>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">Origin</span>
+                  <span className="text-xs font-semibold text-gray-700">
+                    {item.origin || "—"}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
+        );
+      })}
+    </div>
+  );
+};
 
 // Pagination Component
 const Pagination = ({
