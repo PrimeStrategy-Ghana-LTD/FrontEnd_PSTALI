@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import Sidebar1 from "../components/Sidebar1";
 import Searchbar from "../components/Searchbar";
-import { apiGetLocations } from "../servicess/tali";
+import { 
+  apiGetLocations, 
+  apiApproveAsset, 
+  apiRejectAsset, 
+  apiGetUnapprovedAssets, 
+  apiGetLocationStats 
+} from "../servicess/tali";
 import useLocationName from "../hooks/useLocationName";
 
 const AssetApprovals = () => {
@@ -14,7 +20,7 @@ const AssetApprovals = () => {
   const [filterAsset, setFilterAsset] = useState("");
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const [totalUnapproved, setTotalUnapproved] = useState(0);
-  const [totalAssignedAssets, setTotalAssignedAssets] = useState(0); // Add missing state
+  const [totalAssignedAssets, setTotalAssignedAssets] = useState(0);
   const [loading, setLoading] = useState(false);
   const { getLocationName } = useLocationName();
 
@@ -39,23 +45,7 @@ const AssetApprovals = () => {
     const fetchAssignments = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          "https://backend-ps-tali.onrender.com/assets/unapproved",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
-        }
-
-        const data = await response.json();
+        const data = await apiGetUnapprovedAssets();
         console.log("Unapproved assets response:", data); // Debug log
         
         setAssignments(data.assets || []);
@@ -84,23 +74,7 @@ const AssetApprovals = () => {
 
     const fetchTotalAssignmentCount = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          "https://backend-ps-tali.onrender.com/assets/location-stats",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
-        }
-
-        const data = await response.json();
+        const data = await apiGetLocationStats();
         setTotalAssignedAssets(data.totalAssetsWithAssetLocation || 0);
       } catch (error) {
         console.error("Error fetching total assignment count:", error);
@@ -133,32 +107,16 @@ const AssetApprovals = () => {
 
   const handleApprove = async (assetId) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `https://backend-ps-tali.onrender.com/assets/${assetId}/approve`, // Fixed endpoint
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
+      await apiApproveAsset(assetId);
       alert("Asset approved successfully");
 
       // Remove approved item from list - use _id consistently
       const updatedAssignments = assignments.filter(
-        (item) => item._id !== assetId // Fixed: use _id instead of assetId
+        (item) => item._id !== assetId
       );
       setAssignments(updatedAssignments);
       setFilteredAssignments(updatedAssignments);
-      setTotalUnapproved(prev => Math.max(0, prev - 1)); // Update count
+      setTotalUnapproved(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error("Approval failed:", error);
       alert("Approval failed. Please try again.");
@@ -167,23 +125,7 @@ const AssetApprovals = () => {
 
   const handleReject = async (assetId) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `https://backend-ps-tali.onrender.com/assets/${assetId}/reject`, // Fixed endpoint
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
+      await apiRejectAsset(assetId);
       alert("Asset rejected successfully");
 
       // Remove rejected item from the lists
@@ -193,7 +135,7 @@ const AssetApprovals = () => {
 
       setAssignments(updatedAssignments);
       setFilteredAssignments(updatedAssignments);
-      setTotalUnapproved(prev => Math.max(0, prev - 1)); // Update count
+      setTotalUnapproved(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error("Rejection failed:", error);
       alert("Rejection failed. Please try again.");

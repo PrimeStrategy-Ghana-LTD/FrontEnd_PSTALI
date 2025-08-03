@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import Sidebar1 from "../components/Sidebar1";
 import Searchbar from "../components/Searchbar";
-import { apiGetLocations } from "../servicess/tali";
+import { 
+  apiGetLocations, 
+  apiGetLocationAssignments, 
+  apiGetLocationStats 
+} from "../servicess/tali";
 
 const AssignedPage = () => {
   const [assignments, setAssignments] = useState([]);
@@ -17,25 +21,10 @@ const AssignedPage = () => {
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          "https://backend-ps-tali.onrender.com/assets/location-assignments",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
-        }
-
-        const data = await response.json();
-        setAssignments(data.assets);
-        setFilteredAssignments(data.assets);
+        const data = await apiGetLocationAssignments();
+        console.log("Assignments data:", data); // Debug log
+        setAssignments(data.assets || data);
+        setFilteredAssignments(data.assets || data);
       } catch (error) {
         console.error("Error fetching assignments:", error);
       }
@@ -55,23 +44,7 @@ const AssignedPage = () => {
 
     const fetchTotalAssignmentCount = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          "https://backend-ps-tali.onrender.com/assets/location-stats",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
-        }
-
-        const data = await response.json();
+        const data = await apiGetLocationStats();
         setTotalAssignedAssets(data.totalAssetsWithAssetLocation || 0);
       } catch (error) {
         console.error("Error fetching total assignment count:", error);
@@ -86,7 +59,8 @@ const AssignedPage = () => {
   const handleFilter = () => {
     const filtered = assignments.filter((item) => {
       const locationMatch = filterLocation
-        ? item.assetLocation?.assetLocation === filterLocation
+        ? item.assetLocation?.assetLocation === filterLocation ||
+          item.newLocation?.assetLocation === filterLocation
         : true;
       const assetMatch = filterAsset
         ? item.assetName?.toLowerCase().includes(filterAsset.toLowerCase())
@@ -172,6 +146,27 @@ const AssignedPage = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Helper function to determine if an asset has been reassigned
+  const hasLocationChange = (item) => {
+    return item.newLocation && item.assignedBy;
+  };
+
+  // Helper function to get previous location
+  const getPreviousLocation = (item) => {
+    if (hasLocationChange(item)) {
+      return item.assetLocation?.assetLocation || "—";
+    }
+    return "—";
+  };
+
+  // Helper function to get current location
+  const getCurrentLocation = (item) => {
+    if (hasLocationChange(item)) {
+      return item.newLocation?.assetLocation || "—";
+    }
+    return item.assetLocation?.assetLocation || "—";
+  };
 
   return (
     <div className="flex w-full overflow-x-hidden">
@@ -261,31 +256,67 @@ const AssignedPage = () => {
           )}
 
           <div className="flex justify-between font-semibold text-[14px] text-gray-700 pb-2 border-b-2 border-gray-200 mt-6">
-            <p className="w-1/3">Asset</p>
-            <p className="w-1/3">VIN</p>
-            <p className="w-1/3">Location</p>
-            <p className="w-1/3">New Location</p>
-            <p className="w-1/3">Assigned By</p>
+            <p className="w-1/5">Asset</p>
+            <p className="w-1/5">VIN</p>
+            <p className="w-1/5">Previous Location</p>
+            <p className="w-1/5">Current Location</p>
+            <p className="w-1/5">Assigned By</p>
           </div>
 
           {filteredAssignments.length > 0 ? (
-  filteredAssignments.map((item, index) => (
-    <div
-      key={index}
-      className="flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200"
-    >
-      <img src={item.assetImage} alt="" className="w-10 h-10 rounded-full mr-3" />
-      <p className="w-1/3 mt-2 ">{item.assetName || "—"}</p>
-      <p className="w-1/3 mt-2">{item.assetId || "—"}</p>
-      <p className="w-1/3 mt-2">{item.assetLocation?.assetLocation || "—"}</p>
-      <p className="w-1/3 mt-2">{item.newLocation?.assetLocation || "—"}</p>
-      <p className="w-1/3 mt-2">{item.assignedBy?.userName || "—"}</p>
-    </div>
-  ))
-) : (
-  <div className="text-center text-sm text-gray-400 py-6">No assignments found.</div>
-)}
-
+            filteredAssignments.map((item, index) => (
+              <div
+                key={index}
+                className="flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200"
+              >
+                <div className="w-1/5 flex items-center">
+                  <img 
+                    src={item.assetImage} 
+                    alt={item.assetName} 
+                    className="w-10 h-10 rounded-full mr-3 object-cover" 
+                  />
+                  <p>{item.assetName || "—"}</p>
+                </div>
+                <p className="w-1/5 flex items-center">{item.assetId || "—"}</p>
+                <p className="w-1/5 flex items-center">
+                  {getPreviousLocation(item)}
+                  {hasLocationChange(item) && (
+                    <span className="ml-2 text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
+                      Changed
+                    </span>
+                  )}
+                </p>
+                <p className="w-1/5 flex items-center">
+                  {getCurrentLocation(item)}
+                  {hasLocationChange(item) && (
+                    <span className="ml-2 text-xs text-green-600">
+                      ✓ New
+                    </span>
+                  )}
+                </p>
+                <div className="w-1/5 flex items-center">
+                  {item.assignedBy ? (
+                    <div className="flex items-center">
+                      {item.assignedBy.profilePicture && (
+                        <img 
+                          src={item.assignedBy.profilePicture} 
+                          alt={item.assignedBy.userName}
+                          className="w-6 h-6 rounded-full mr-2 object-cover" 
+                        />
+                      )}
+                      <span>{item.assignedBy.userName}</span>
+                    </div>
+                  ) : (
+                    "—"
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center text-sm text-gray-400 py-6">
+              No assignments found.
+            </div>
+          )}
         </div>
       </div>
     </div>

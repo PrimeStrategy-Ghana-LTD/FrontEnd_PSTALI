@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
-import { apiGetLocations, apiGetOneAsset } from "../servicess/tali";
+import { apiGetLocations, apiGetOneAsset, apiUpdateAssetLocation } from "../servicess/tali";
 import { useParams, useNavigate } from "react-router-dom";
 import useLocationName from "../hooks/useLocationName";
 import { useEditAsset } from "../hooks/useEditAsset";
-
 
 const AssignLocationPage = () => {
   const { id } = useParams();
@@ -50,6 +49,7 @@ const AssignLocationPage = () => {
       try {
         setAssetError("");
         const data = await apiGetOneAsset(id);
+        console.log("Fetched asset:", data); // Debug log
         setAsset(data);
       } catch (error) {
         setAssetError("Failed to load asset details.");
@@ -68,6 +68,7 @@ const AssignLocationPage = () => {
       try {
         setLocationError("");
         const locationData = await apiGetLocations();
+        console.log("Fetched locations:", locationData); // Debug log
         setLocations(
           Array.isArray(locationData.locations) ? locationData.locations : []
         );
@@ -99,8 +100,30 @@ const AssignLocationPage = () => {
   });
 
   const handleAssign = async () => {
-    await handleSaveChanges(id, () => navigate("/dashboard/assets"));
+    console.log("Assigning asset:", id, "to location:", newLocation); // Debug log
+    
+    // Validate inputs
+    if (!newLocation) {
+      alert("Please select a location");
+      return;
+    }
+
+    // Use the updated handleSaveChanges with success callback
+    await handleSaveChanges(id, () => {
+      // Navigate back to assets after successful assignment
+      navigate("/dashboard/assets");
+    });
   };
+
+  // Debug: Log current state
+  useEffect(() => {
+    console.log("Current state:", {
+      asset,
+      newLocation,
+      justification,
+      locations: locations.length
+    });
+  }, [asset, newLocation, justification, locations]);
 
   return (
     <div className="p-6 bg-[#ffffff]">
@@ -122,7 +145,7 @@ const AssignLocationPage = () => {
             <img
               src={asset?.assetImage}
               alt={asset?.assetName || "Asset Image"}
-              className="w-[400px] h-64 object-contain  mb-6"
+              className="w-[400px] h-64 object-contain mb-6"
             />
           )}
 
@@ -162,23 +185,27 @@ const AssignLocationPage = () => {
               {assetLoading ? "Loading..." : asset?.year || "N/A"}
             </p>
             <p>
-              <span className="font-semibold">VIN:</span>{" "}
-              {assetLoading ? "Loading..." : asset?._id || "N/A"}
+              <span className="font-semibold">Asset ID:</span>{" "}
+              {assetLoading ? "Loading..." : asset?.assetId || asset?._id || "N/A"}
             </p>
           </div>
 
           <div className="space-y-4">
             <div>
               <label className="block text-md font-semibold text-gray-700">
-                New Location
+                New Location *
               </label>
               {locationError && (
                 <p className="text-sm text-red-600 mb-2">{locationError}</p>
               )}
               <select
                 value={newLocation}
-                onChange={(e) => setNewLocation(e.target.value)}
+                onChange={(e) => {
+                  console.log("Selected location:", e.target.value); // Debug log
+                  setNewLocation(e.target.value);
+                }}
                 className="w-[363px] mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               >
                 <option value="">Select Location</option>
                 {locationLoading ? (
@@ -198,7 +225,7 @@ const AssignLocationPage = () => {
                 htmlFor="justification"
                 className="text-md font-medium text-gray-700 mb-1"
               >
-                Justification
+                Justification (Optional)
               </label>
               <textarea
                 id="justification"
@@ -206,20 +233,28 @@ const AssignLocationPage = () => {
                 value={justification}
                 onChange={(e) => setJustification(e.target.value)}
                 className="border border-gray-300 rounded px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500 w-[363px]"
-                placeholder="Text"
+                placeholder="Reason for location change (optional)"
               />
+              <small className="text-gray-500 mt-1">
+                Note: Justification will be saved separately after location update
+              </small>
             </div>
 
             <div className="flex gap-4">
-              {/* <button className="px-5 py-2 border border-gray-400 text-gray-600 rounded hover:bg-gray-100 text-sm">
-                Save Draft
-              </button> */}
               <button
-                className="px-6 py-2 bg-[#0A2343] text-white rounded hover:opacity-90 text-sm"
+                className="px-6 py-2 bg-[#0A2343] text-white rounded hover:opacity-90 text-sm disabled:opacity-50"
                 onClick={handleAssign}
-                disabled={isUpdating}
+                disabled={isUpdating || !newLocation}
               >
                 {isUpdating ? "Assigning..." : "Assign"}
+              </button>
+              
+              <button
+                className="px-6 py-2 border border-gray-300 text-gray-600 rounded hover:bg-gray-50 text-sm"
+                onClick={() => navigate("/dashboard/assets")}
+                disabled={isUpdating}
+              >
+                Cancel
               </button>
             </div>
           </div>

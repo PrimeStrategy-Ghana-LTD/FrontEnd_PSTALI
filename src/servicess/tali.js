@@ -89,6 +89,36 @@ export const apiGetLocations = async () => {
     }
 };
 
+export const apiGetNewLocations = async (assetId) => {
+    try {
+        const response = await apiClient.get(`/assets/${assetId}/update-location`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching new locations:', error);
+        throw error;
+    }
+};
+
+export const apiGetLocationAssignments = async () => {
+    try {
+        const response = await apiClient.get('/assets/location-assignments');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching location assignments:', error);
+        throw error;
+    }
+};
+
+export const apiGetLocationStats = async () => {
+    try {
+        const response = await apiClient.get('/assets/location-stats');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching location stats:', error);
+        throw error;
+    }
+};
+
 export const apiFilterAssetsByLocations = async (locationId) => {
     try {
         const response = await apiClient.get(`/assets?assetLocation=${locationId}`);
@@ -127,6 +157,63 @@ export const apiGetOneLocation = async (id) => {
     console.error("Location retrieval failed:", error);
     throw error;
   }
+};
+
+// Updated API function in servicess/tali.js
+export const apiUpdateAssetLocation = async (assetId, updateData) => {
+    try {
+        // Match the exact API specification - only send newLocation
+        const payload = {
+            newLocation: updateData.newLocation || updateData.newLocationId || updateData.locationId
+        };
+
+        console.log('Sending payload:', payload); // Debug log
+        console.log('Asset ID:', assetId); // Debug log
+
+        const response = await apiClient.patch(`/assets/${assetId}/update-location`, payload);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating asset location:', error);
+        
+        // Log more details about the error
+        if (error.response) {
+            console.error('Error status:', error.response.status);
+            console.error('Error data:', error.response.data);
+        }
+        
+        throw error;
+    }
+};
+
+// Alternative function if you need to handle justification separately
+export const apiUpdateAssetLocationComplete = async (assetId, updateData) => {
+    try {
+        // Step 1: Update location
+        const locationPayload = {
+            newLocation: updateData.newLocation
+        };
+
+        const locationResponse = await apiClient.patch(`/assets/${assetId}/update-location`, locationPayload);
+        
+        // Step 2: If justification is needed, you might need a separate endpoint
+        // or update the asset with justification using the regular edit endpoint
+        if (updateData.justification) {
+            try {
+                const justificationPayload = {
+                    justification: updateData.justification
+                };
+                await apiClient.patch(`/assets/${assetId}`, justificationPayload);
+            } catch (justError) {
+                console.warn('Could not update justification:', justError);
+                // Don't throw here as the main location update succeeded
+            }
+        }
+
+        return locationResponse.data;
+    } catch (error) {
+        console.error('Error updating asset location:', error);
+        throw error;
+    }
 };
 
 export const apiGetUsers = async () => {
@@ -258,3 +345,49 @@ export const apiGetNotifications = async () => {
     return []; // return empty list if error
   }
 };
+
+// Add these functions to your servicess/tali.js file
+
+// API function to approve an asset
+export const apiApproveAsset = async (assetId) => {
+  try {
+    const response = await apiClient.patch(`/${assetId}/approve`);
+    return response.data;
+  } catch (error) {
+    console.error('Error approving asset:', error);
+    throw error;
+  }
+};
+
+// API function to reject an asset
+export const apiRejectAsset = async (assetId) => {
+  try {
+    const response = await apiClient.patch(`/${assetId}/reject`);
+    return response.data;
+  } catch (error) {
+    console.error('Error rejecting asset:', error);
+    throw error;
+  }
+};
+
+// API function to get unapproved assets
+export const apiGetUnapprovedAssets = async () => {
+  try {
+    const response = await apiClient.get('/assets/unapproved');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching unapproved assets:', error);
+    throw error;
+  }
+};
+
+// API function to get location stats
+// export const apiGetLocationStats = async () => {
+//   try {
+//     const response = await apiClient.get('/assets/location-stats');
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error fetching location stats:', error);
+//     throw error;
+//   }
+// };
