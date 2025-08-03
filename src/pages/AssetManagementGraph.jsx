@@ -117,42 +117,51 @@ const AssetManagementTable = () => {
         }`}
       >
         {loading ? (
-          <p className="text-gray-500 px-2">Loading...</p>
-        ) : error ? (
-          <p className="text-red-500 px-2">{error}</p>
-        ) : (
-          <table className="min-w-full text-sm text-left border-t border-gray-200">
-            <thead className="text-gray-600">
-              <tr>
-                <th className="py-2 px-4">Asset Name</th>
-                <th className="py-2 px-4">Location</th>
-                <th className="py-2 px-4">VIN</th>
-                <th className="py-2 px-4">Origin</th>
-                <th className="py-2 px-4">Date</th>
-                <th className="py-2 px-4">Inspected By</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-800">
-              {recentAssets.map((item, index) => (
-                <tr key={index} className="border-t border-gray-100">
-                  <td className="py-2 px-4">{item.assetName || "—"}</td>
-                  <td className="py-2 px-4">
-                    {getLocationDisplay(item.assetLocation)}
-                  </td>
-                  <td className="py-2 px-4">{item.assetId || "—"}</td>
-                  <td className="py-2 px-4">{item.origin || "—"}</td>
-                  <td className="py-2 px-4">{item.dateUploaded || "—"}</td>
-                  <td className="py-2 px-4">
-                    {item.approvedBy && typeof item.approvedBy === 'object' 
-                      ? item.approvedBy.userName || "—"
-                      : item.approvedBy || "—"
-                    }
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+  <p className="text-gray-500 px-2">Loading...</p>
+) : error ? (
+  <p className="text-red-500 px-2">{error}</p>
+) : recentAssets.length === 0 ? (
+  <div className="flex items-center justify-center h-full text-gray-500 px-2 text-md">
+    {selectedPeriod === "This Week"
+      ? "No recent assets found this week."
+      : selectedPeriod === "This Month"
+      ? "No recent assets found this month."
+      : "No recent assets found."}
+  </div>
+) : (
+  <table className="min-w-full text-sm text-left border-t border-gray-200">
+    <thead className="text-gray-600">
+      <tr>
+        <th className="py-2 px-4">Asset Name</th>
+        <th className="py-2 px-4">Location</th>
+        <th className="py-2 px-4">VIN</th>
+        <th className="py-2 px-4">Origin</th>
+        <th className="py-2 px-4">Date</th>
+        <th className="py-2 px-4">Inspected By</th>
+      </tr>
+    </thead>
+    <tbody className="text-gray-800">
+      {recentAssets.map((item, index) => (
+        <tr key={index} className="border-t border-gray-100">
+          <td className="py-2 px-4">{item.assetName || "—"}</td>
+          <td className="py-2 px-4">
+            {getLocationDisplay(item.assetLocation)}
+          </td>
+          <td className="py-2 px-4">{item.assetId || "—"}</td>
+          <td className="py-2 px-4">{item.origin || "—"}</td>
+          <td className="py-2 px-4">{item.dateUploaded || "—"}</td>
+          <td className="py-2 px-4">
+            {item.approvedBy && typeof item.approvedBy === 'object' 
+              ? item.approvedBy.userName || "—"
+              : item.approvedBy || "—"
+            }
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
       </div>
 
       {/* Footer */}
