@@ -13,6 +13,7 @@ import icon from "../assets/images/icon.png";
 import icon2 from "../assets/images/Icon2.png";
 import useLocationName from "../hooks/useLocationName";
 import AdvancedSearchModal from "./AdvancedSearchModal";
+import NotificationDropdown from "../components/NotificationDropdown";
 
 const SearchPage = () => {
   const [activeTab, setActiveTab] = useState("Assets");
@@ -431,7 +432,7 @@ const SearchPage = () => {
         <div className="fixed top-0 right-0 z-50 flex items-center gap-4 p-2 bg-[#051b34]">
           <div className="flex items-center gap-4">
             <div className="relative" ref={bellRef}>
-              <div
+              {/* <div
                 className="flex items-center gap-2 mr-2 bg-white p-2 lg:p-3 rounded-full shadow-sm hover:shadow transition-shadow cursor-pointer"
                 onClick={() => {
                   setNotificationDropdownOpen((prev) => !prev);
@@ -444,9 +445,10 @@ const SearchPage = () => {
                     {pendingApprovalsCount}
                   </span>
                 )}
-              </div>
+              </div> */}
+              <NotificationDropdown />
 
-              {notificationDropdownOpen && (
+              {/* {notificationDropdownOpen && (
                 <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw]">
                   <p className="text-gray-800 font-semibold mb-2 border-b-[0.5px] border-gray-200">
                     Notifications
@@ -473,7 +475,7 @@ const SearchPage = () => {
                     </li>
                   </ul>
                 </div>
-              )}
+              )} */}
             </div>
 
             <div className="flex items-center gap-2 relative" ref={profileRef}>
