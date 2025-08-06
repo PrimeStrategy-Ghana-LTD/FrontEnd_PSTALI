@@ -280,19 +280,19 @@ const AssignedPage = () => {
                 <p className="w-1/5 flex items-center">{item.assetId || "—"}</p>
                 <p className="w-1/5 flex items-center">
                   {getPreviousLocation(item)}
-                  {hasLocationChange(item) && (
+                  {/* {hasLocationChange(item) && (
                     <span className="ml-2 text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
                       Changed
                     </span>
-                  )}
+                  )} */}
                 </p>
                 <p className="w-1/5 flex items-center">
                   {getCurrentLocation(item)}
-                  {hasLocationChange(item) && (
+                  {/* {hasLocationChange(item) && (
                     <span className="ml-2 text-xs text-green-600">
                       ✓ New
                     </span>
-                  )}
+                  )} */}
                 </p>
                 <div className="w-1/5 flex items-center">
                   {item.assignedBy ? (

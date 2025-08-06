@@ -1,247 +1,153 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
+import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
+  LineElement,
   CategoryScale,
   LinearScale,
-  BarElement,
-  BarController,
+  PointElement,
   Tooltip,
   Legend,
 } from 'chart.js';
 
 ChartJS.register(
+  LineElement,
   CategoryScale,
   LinearScale,
-  BarElement,
-  BarController,
+  PointElement,
   Tooltip,
   Legend
 );
 
+import React from 'react';
+
+// Asset Summary Chart Component
 const AssetSummaryChart = () => {
-  const chartRef = useRef(null);
-  const chartInstanceRef = useRef(null);
-
-  const chartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Received',
-        data: [55000, 58000, 52000, 49000, 47000, 48000, 53000, 51000, 50000, 49000],
-        backgroundColor: (context) => {
-          const ctx = context.chart.ctx;
-          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, 'rgba(59, 130, 246, 0.9)');   // Blue top
-          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.3)');   // Blue bottom
-          return gradient;
-        },
-        borderRadius: 6,
-        borderSkipped: false,
-      },
-      {
-        label: 'Sent',
-        data: [48000, 50000, 46000, 44000, 43000, 42000, 47000, 46000, 45000, 44000],
-        backgroundColor: (context) => {
-          const ctx = context.chart.ctx;
-          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, 'rgba(34, 197, 94, 0.9)');   // Green top
-          gradient.addColorStop(1, 'rgba(34, 197, 94, 0.3)');   // Green bottom
-          return gradient;
-        },
-        borderRadius: 6,
-        borderSkipped: false,
-      }
-    ]
-  };
-
-  useEffect(() => {
-    const ctx = chartRef.current?.getContext('2d');
-
-    if (ctx) {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-
-      chartInstanceRef.current = new ChartJS(ctx, {
-        type: 'bar',
-        data: chartData,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                usePointStyle: true,
-                pointStyle: 'circle',
-                boxWidth: 6,
-                boxHeight: 6,
-                font: {
-                  size: 12
-                },
-                padding: 20
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: (context) => `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`
-              }
-            }
-          },
-          scales: {
-            x: {
-              grid: {
-                display: false
-              },
-              categoryPercentage: 0.4,
-              barPercentage: 0.5,
-              ticks: {
-                font: {
-                  size: 12
-                }
-              }
-            },
-            y: {
-              beginAtZero: true,
-              grid: {
-                color: 'rgba(0,0,0,0.05)'
-              },
-              ticks: {
-                callback: (value) => value.toLocaleString()
-              }
-            }
-          }
-        }
-      });
-    }
-
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, []);
+  const chartData = [
+    { x: 5, assetActivity: 160, assetManagement: 140 },
+    { x: 10, assetActivity: 180, assetManagement: 150 },
+    { x: 15, assetActivity: 200, assetManagement: 170 },
+    { x: 20, assetActivity: 230, assetManagement: 210 },
+    { x: 25, assetActivity: 220, assetManagement: 190 },
+  ];
 
   return (
-    <div className="border-2 bg-white border-white p-4 rounded-md shadow-sm">
-      <div className="flex flex-row justify-between mb-2">
-        <p className="font-semibold">Asset Summary Chart</p>
-        <p className="border-[0.05px] border-gray-400 py-1 px-5 rounded-sm text-[14px] text-gray-600">Weekly</p>
+    <div className="bg-white rounded-lg p-4 lg:p-6 shadow-sm border border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+        <h3 className="font-semibold text-gray-800 text-lg">Asset Summary</h3>
+        <div className="flex items-center gap-2 flex-wrap">
+          <select className="text-xs border border-gray-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option>Category</option>
+          </select>
+          <select className="text-xs border border-gray-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option>March 2020</option>
+          </select>
+        </div>
       </div>
-
-      <div className="relative h-56">
-        <canvas ref={chartRef} className="w-full h-full" />
+      
+      {/* Legend */}
+      <div className="flex items-center gap-6 mb-6">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-0.5 bg-purple-600 rounded"></div>
+          <span className="text-sm text-gray-600">Asset Activity</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-0.5 bg-gray-400 rounded"></div>
+          <span className="text-sm text-gray-600">Asset Management</span>
+        </div>
+      </div>
+      
+      {/* Chart Container */}
+      <div className="h-64 relative">
+        <div className="absolute top-4 left-12 bg-white px-2 py-1 rounded shadow-sm border text-xs text-gray-600">
+          May<br/>
+          <span className="font-semibold text-gray-800">220</span>
+        </div>
+        
+        <svg viewBox="0 0 480 240" className="w-full h-full">
+          {/* Grid lines */}
+          {[120, 140, 160, 180, 200, 220, 240].map((value, i) => (
+            <line
+              key={value}
+              x1="50"
+              y1={200 - (value - 120) * 1.25}
+              x2="450"
+              y2={200 - (value - 120) * 1.25}
+              stroke="#f3f4f6"
+              strokeWidth="1"
+            />
+          ))}
+          
+          {/* Y-axis labels */}
+          {[120, 140, 160, 180, 200, 220, 240].map((value) => (
+            <text
+              key={value}
+              x="40"
+              y={205 - (value - 120) * 1.25}
+              textAnchor="end"
+              className="text-xs fill-gray-500"
+              fontSize="11"
+            >
+              {value}
+            </text>
+          ))}
+          
+          {/* X-axis labels */}
+          {chartData.map((item, i) => (
+            <text
+              key={item.x}
+              x={70 + i * 90}
+              y="220"
+              textAnchor="middle"
+              className="text-xs fill-gray-500"
+              fontSize="11"
+            >
+              {item.x === 25 ? '25/3' : item.x}
+            </text>
+          ))}
+          
+          {/* Asset Activity Area Fill */}
+          <path
+            d={`M 70,${200 - (chartData[0].assetActivity - 120) * 1.25} ${chartData.map((item, i) => `L ${70 + i * 90},${200 - (item.assetActivity - 120) * 1.25}`).join(' ')} L 430,200 L 70,200 Z`}
+            fill="rgba(147, 51, 234, 0.1)"
+          />
+          
+          {/* Asset Management Area Fill */}
+          <path
+            d={`M 70,${200 - (chartData[0].assetManagement - 120) * 1.25} ${chartData.map((item, i) => `L ${70 + i * 90},${200 - (item.assetManagement - 120) * 1.25}`).join(' ')} L 430,200 L 70,200 Z`}
+            fill="rgba(156, 163, 175, 0.1)"
+          />
+          
+          {/* Asset Activity Line */}
+          <path
+            d={`M 70,${200 - (chartData[0].assetActivity - 120) * 1.25} ${chartData.map((item, i) => `L ${70 + i * 90},${200 - (item.assetActivity - 120) * 1.25}`).join(' ')}`}
+            fill="none"
+            stroke="#9333EA"
+            strokeWidth="3"
+          />
+          
+          {/* Asset Management Line */}
+          <path
+            d={`M 70,${200 - (chartData[0].assetManagement - 120) * 1.25} ${chartData.map((item, i) => `L ${70 + i * 90},${200 - (item.assetManagement - 120) * 1.25}`).join(' ')}`}
+            fill="none"
+            stroke="#9CA3AF"
+            strokeWidth="3"
+          />
+          
+          {/* Data points for Asset Activity */}
+          {chartData.map((item, i) => (
+            <circle
+              key={`activity-${i}`}
+              cx={70 + i * 90}
+              cy={200 - (item.assetActivity - 120) * 1.25}
+              r="4"
+              fill="#9333EA"
+              stroke="white"
+              strokeWidth="2"
+            />
+          ))}
+        </svg>
       </div>
     </div>
   );
 };
-
-export default AssetSummaryChart;
-
-
-// import React, { useEffect, useRef } from 'react';
-// import * as Chart from 'chart.js';
-// import {
-//   Chart as ChartJS,
-//   ArcElement,
-//   Tooltip,
-//   Legend,
-//   Title
-// } from 'chart.js';
-
-// ChartJS.register(
-//   ArcElement,
-//   Tooltip,
-//   Legend,
-//   Title
-// );
-
-// const AssetSummaryChart = () => {
-//   const chartRef = useRef(null);
-//   const chartInstanceRef = useRef(null);
-
-//   // Combine monthly values into total for each category
-//   const totalInStore = [45000, 48000, 52000, 49000, 55000, 58000, 60000, 57000, 62000, 65000].reduce((a, b) => a + b, 0);
-//   const totalShipped = [32000, 33000, 31500, 34000, 35000, 36000, 37000, 35500, 38000, 39000].reduce((a, b) => a + b, 0);
-
-//   const chartData = {
-//     labels: ['In Store', 'Shipped'],
-//     datasets: [
-//       {
-//         label: 'Asset Summary',
-//         data: [totalInStore, totalShipped],
-//         backgroundColor: ['rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)'],
-//         borderColor: ['rgb(59, 130, 246)', 'rgb(16, 185, 129)'],
-//         borderWidth: 1.5,
-//       }
-//     ]
-//   };
-
-//   useEffect(() => {
-//     const ctx = chartRef.current?.getContext('2d');
-
-//     if (ctx) {
-//       if (chartInstanceRef.current) {
-//         chartInstanceRef.current.destroy();
-//       }
-
-//       chartInstanceRef.current = new Chart.Chart(ctx, {
-//         type: 'pie',
-//         data: chartData,
-//         options: {
-//           responsive: true,
-//           maintainAspectRatio: false,
-//           plugins: {
-//             title: {
-//               display: false,
-//             },
-//             legend: {
-//               position: 'bottom',
-//               labels: {
-//                 padding: 10,
-//                 usePointStyle: true,
-//                 pointStyle: 'circle',
-//                 font: {
-//                   size: 12
-//                 }
-//               }
-//             },
-//             tooltip: {
-//               callbacks: {
-//                 label: function(context) {
-//                   const value = context.parsed;
-//                   const label = context.label;
-//                   return `${label}: ${value.toLocaleString()}`;
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       });
-//     }
-
-//     return () => {
-//       if (chartInstanceRef.current) {
-//         chartInstanceRef.current.destroy();
-//       }
-//     };
-//   }, []);
-
-//   return (
-//     <div className='border-2 bg-white border-white p-4 rounded-md shadow-sm'>
-//       <div className="flex flex-row justify-between mb-2">
-//         <p className="font-semibold">Asset Summary Chart</p>
-//         <p className="border-[0.05px] border-gray-400 py-1 px-5 rounded-sm text-[14px] text-gray-600">Monthly</p>
-//       </div>
-
-//       <div className="relative h-56">
-//         <canvas 
-//           ref={chartRef}
-//           className="w-full h-full"
-//         />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AssetSummaryChart;
