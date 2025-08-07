@@ -165,7 +165,7 @@ const AssignedPage = () => {
     if (hasLocationChange(item)) {
       return item.newLocation?.assetLocation || "—";
     }
-    return item.assetLocation?.assetLocation || "—";
+    return item.assetLocation?.newLocation || "—";
   };
 
   return (
@@ -259,7 +259,7 @@ const AssignedPage = () => {
             <p className="w-1/5">Asset</p>
             <p className="w-1/5">VIN</p>
             <p className="w-1/5">Previous Location</p>
-            <p className="w-1/5">Current Location</p>
+            <p className="w-1/5">New Location</p>
             <p className="w-1/5">Assigned By</p>
           </div>
 
