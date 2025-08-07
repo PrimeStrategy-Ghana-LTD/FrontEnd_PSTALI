@@ -31,6 +31,7 @@ import UnauthorizedPage from "./pages/UnauthorizedPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { getUserRole } from "./servicess/auth";
+import Integration from "./pages/Integration";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
     path: "/search-result",
     element: <SearchResult />,
     errorElement: <ErrorPage />,
+  },
+  {
+    path: "int",
+    element: <Integration />
   },
   {
     path: "/add-asset",
