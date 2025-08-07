@@ -26,11 +26,10 @@ export const apiUpdateProfile = async (updateData) => {
 export const apiAddUser = async(payload) => {
     return await apiClient.post("/users/register", payload, {
         headers: {
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "application/json"
         }
     });
 };
-console.log("Auth service loaded");
 
 
 export const apiChangePassword = async (updateData) => {

@@ -48,30 +48,35 @@ const AddUser = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value);
-      });
+  try {
+    const payload = {
+      userName: formData.userName,
+      email: formData.email,
+      password: formData.password,
+      storeLocation: formData.storeLocation,
+      phone: formData.phone,
+      role: formData.role,
+    };
 
-      if (profile_picture) {
-        formDataToSend.append("profile_picture", profile_picture);
-      }
-
-      await apiAddUser(formDataToSend);
-      toast.success("User Added Successfully");
-      navigate("/dashboard/users"); // Navigate back to users list
-    } catch (error) {
-      console.log("Error:", error);
-      toast.error(error.response?.data?.message || "Adding user failed.");
-    } finally {
-      setLoading(false);
+    // Only add profilePicture if a file is selected
+    if (profile_picture) {
+      payload.profilePicture = URL.createObjectURL(profile_picture);
     }
-  };
+
+    await apiAddUser(payload);
+    toast.success("User Added Successfully");
+    navigate("/dashboard/users");
+  } catch (error) {
+    console.log("Error:", error);
+    toast.error(error.response?.data?.message || "Adding user failed.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleCancel = () => {
     navigate("/dashboard/users");
