@@ -1,105 +1,149 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { PieChart, Pie, Cell } from 'recharts';
+import orange from "../assets/images/orange.svg";
+import blue from "../assets/images/blue.svg";
+import boxxx from "../assets/images/boxxx.svg";
+import axios from "axios";
+
+// Color map for pie chart
+const CATEGORY_COLORS = {
+  Vehicle: "#3B82F6",   // Blue
+  'Goods 1': "#F97316", // Orange
+  'Goods 2': "#10B981", // Green
+  'Goods 3': "#6366F1", // Indigo
+};
 
 const CategorySummary = () => {
+  const [categoryCounts, setCategoryCounts] = useState({
+    Vehicle: 0,
+    'Goods 1': 0,
+    'Goods 2': 0,
+    'Goods 3': 0,
+  });
+
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [chartData, setChartData] = useState([]);
+
   const categories = [
-    { name: 'Vehicle', count: 10, color: '#9333EA' },
-    { name: 'Goods 1', count: 10, color: '#FACC15' },
-    { name: 'Goods 2', count: 10, color: '#3B82F6' },
-    { name: 'Goods 3', count: 8, color: '#6B7280' },
+    {
+      name: 'Vehicle',
+      icon: <img src={orange} alt="" className="w-10 h-10" />,
+      description: "Cars, bikes"
+    },
+    {
+      name: 'Goods 1',
+      icon: <img src={blue} alt="" className="w-10 h-10" />,
+      description: "Machinery"
+    },
+    {
+      name: 'Goods 2',
+      icon: <img src={blue} alt="" className="w-10 h-10" />,
+      description: "Containers"
+    },
+    {
+      name: 'Goods 3',
+      icon: <img src={blue} alt="" className="w-10 h-10" />,
+      description: "Miscellaneous"
+    },
   ];
 
-  const totalAssets = categories.reduce((sum, category) => sum + category.count, 0);
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const res = await axios.get("https://backend-ps-tali.onrender.com/assets/stats/category");
+        const data = res.data?.stats || [];
+
+        const updatedCounts = {
+          Vehicle: 0,
+          'Goods 1': 0,
+          'Goods 2': 0,
+          'Goods 3': 0,
+        };
+
+        let total = 0;
+
+        data.forEach(item => {
+          const cat = item.category?.toLowerCase();
+
+          if (cat === "cars") {
+            updatedCounts["Vehicle"] = item.count;
+            total += item.count;
+          }
+          // Add other mappings here when the backend supports them
+        });
+
+        setCategoryCounts(updatedCounts);
+        setTotalAssets(total);
+
+        // Format chart data
+        const chartFormatted = Object.entries(updatedCounts)
+          .filter(([_, count]) => count > 0)
+          .map(([name, count]) => ({
+            name,
+            value: count,
+            color: CATEGORY_COLORS[name] || "#9CA3AF"
+          }));
+
+        setChartData(chartFormatted);
+      } catch (err) {
+        console.error("Error fetching category stats:", err);
+      }
+    };
+
+    fetchCounts();
+  }, []);
 
   return (
-    <div className="bg-white rounded-lg p-4 lg:p-6 shadow-sm border border-gray-200">
-      <div className="text-center mb-6">
-        <h3 className="font-semibold text-gray-800 mb-6 text-lg">Category</h3>
-        <div className="relative w-36 h-36 mx-auto mb-6">
-          {/* Donut Chart */}
-          <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 144 144">
-            <circle
-              cx="72"
-              cy="72"
-              r="60"
-              stroke="#f3f4f6"
-              strokeWidth="12"
-              fill="transparent"
-            />
-            
-            {/* Vehicle segment */}
-            <circle
-              cx="72"
-              cy="72"
-              r="60"
-              stroke="#9333EA"
-              strokeWidth="12"
-              fill="transparent"
-              strokeDasharray={`${(10 / totalAssets) * 377} 377`}
-              strokeDashoffset="0"
-            />
-            
-            {/* Goods 1 segment */}
-            <circle
-              cx="72"
-              cy="72"
-              r="60"
-              stroke="#FACC15"
-              strokeWidth="12"
-              fill="transparent"
-              strokeDasharray={`${(10 / totalAssets) * 377} 377`}
-              strokeDashoffset={`-${(10 / totalAssets) * 377}`}
-            />
-            
-            {/* Goods 2 segment */}
-            <circle
-              cx="72"
-              cy="72"
-              r="60"
-              stroke="#3B82F6"
-              strokeWidth="12"
-              fill="transparent"
-              strokeDasharray={`${(10 / totalAssets) * 377} 377`}
-              strokeDashoffset={`-${(20 / totalAssets) * 377}`}
-            />
-            
-            {/* Goods 3 segment */}
-            <circle
-              cx="72"
-              cy="72"
-              r="60"
-              stroke="#6B7280"
-              strokeWidth="12"
-              fill="transparent"
-              strokeDasharray={`${(8 / totalAssets) * 377} 377`}
-              strokeDashoffset={`-${(30 / totalAssets) * 377}`}
-            />
-          </svg>
-          
-          {/* Center text */}
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-50 h-[420px] flex flex-col p-2 lg:p-4 ml-[45%]">
+      <div className="text-center mb-">
+        <h3 className="font-semibold text-gray-800 text-lg mb-2">Category</h3>
+
+        {/* Donut chart with total assets in center */}
+        <div className="relative w-32 h-32 mx-auto mb-2">
+          <PieChart width={130} height={130}>
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={40}
+              outerRadius={60}
+              paddingAngle={2}
+              stroke="none"
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+          </PieChart>
+
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-4xl font-bold text-gray-800">{totalAssets}</div>
-            <div className="text-sm text-gray-500">Total Asset</div>
+            <div className="text-2xl font-bold text-gray-800">{totalAssets}</div>
+            <div className="text-xs text-gray-500">Total Asset</div>
           </div>
         </div>
       </div>
-      
-      <div className="space-y-4">
+
+      {/* Category breakdown list */}
+      <div className="flex-grow overflow-y-auto space-y-4">
         {categories.map((category, index) => (
           <div key={index} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div 
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: category.color }}
-              ></div>
-              <span className="text-sm text-gray-700">{category.name}</span>
+              {category.icon}
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-gray-800">{category.name}</span>
+                <p className='text-xs text-gray-500'>{category.description}</p>
+              </div>
             </div>
-            <span className="text-sm font-semibold text-gray-800">{category.count}</span>
+            <span className="text-sm font-semibold text-gray-800">
+              {categoryCounts[category.name] || 0}
+            </span>
           </div>
         ))}
       </div>
     </div>
   );
 };
-
 
 export default CategorySummary;
