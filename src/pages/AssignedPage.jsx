@@ -16,6 +16,8 @@ const AssignedPage = () => {
   const [filterLocation, setFilterLocation] = useState("");
   const [filterAsset, setFilterAsset] = useState("");
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [sortOption, setSortOption] = useState("recent");
   const [totalAssignedAssets, setTotalAssignedAssets] = useState(0);
 
  useEffect(() => {
@@ -51,22 +53,46 @@ const AssignedPage = () => {
     }
   };
 
-    // const fetchTotalAssignmentCount = async () => {
-    //   try {
-    //     const data = await apiGetLocationStats();
-    //     setTotalAssignedAssets(data.totalAssetsWithAssetLocation || 0);
-    //   } catch (error) {
-    //     console.error("Error fetching total assignment count:", error);
-    //   }
-    // };
-
     fetchAssignments();
     fetchLocations();
-    // fetchTotalAssignmentCount();
   }, []);
 
+  // Apply sorting to assignments
+  const applySorting = (assignmentsToSort) => {
+    if (!Array.isArray(assignmentsToSort)) {
+      return [];
+    }
+
+    let sortedAssignments = [...assignmentsToSort];
+
+    switch (sortOption) {
+      case "recent":
+        sortedAssignments.sort((a, b) => {
+          if (!a || !b) return 0;
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        });
+        break;
+      case "alphabetical":
+        sortedAssignments.sort((a, b) => {
+          if (!a || !b) return 0;
+          return (a.assetName || "").localeCompare(b.assetName || "");
+        });
+        break;
+      case "reverse":
+        sortedAssignments.sort((a, b) => {
+          if (!a || !b) return 0;
+          return (b.assetName || "").localeCompare(a.assetName || "");
+        });
+        break;
+      default:
+        break;
+    }
+
+    return sortedAssignments;
+  };
+
   const handleFilter = () => {
-    const filtered = assignments.filter((item) => {
+    let filtered = assignments.filter((item) => {
       const locationMatch = filterLocation
         ? item.assetLocation?.assetLocation === filterLocation ||
           item.newLocation?.assetLocation === filterLocation
@@ -76,14 +102,35 @@ const AssignedPage = () => {
         : true;
       return locationMatch && assetMatch;
     });
+
+    // Apply sorting to filtered results
+    filtered = applySorting(filtered);
     setFilteredAssignments(filtered);
   };
 
   const handleReset = () => {
     setFilterLocation("");
     setFilterAsset("");
-    setFilteredAssignments(assignments);
+    const sortedAssignments = applySorting(assignments);
+    setFilteredAssignments(sortedAssignments);
   };
+
+  const handleSortChange = (newSortOption) => {
+    setSortOption(newSortOption);
+    setShowSortDropdown(false);
+    
+    // Apply new sorting to current filtered assignments
+    const sortedAssignments = applySorting(filteredAssignments);
+    setFilteredAssignments(sortedAssignments);
+  };
+
+  // Re-apply sorting when sortOption changes or assignments are loaded
+  useEffect(() => {
+    if (assignments.length > 0) {
+      const sortedAssignments = applySorting(filteredAssignments);
+      setFilteredAssignments(sortedAssignments);
+    }
+  }, [sortOption]);
 
   const handleDownload = async () => {
     try {
@@ -148,6 +195,9 @@ const AssignedPage = () => {
       if (!event.target.closest(".download-dropdown")) {
         setShowDownloadOptions(false);
       }
+      if (!event.target.closest(".sort-dropdown")) {
+        setShowSortDropdown(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -199,6 +249,54 @@ const getCurrentLocation = (item) => {
               >
                 Filter
               </button>
+
+              <div className="relative sort-dropdown">
+                <button
+                  className="px-4 py-2 border border-gray-300 text-gray-600 rounded-sm hover:bg-gray-50 transition-colors"
+                  onClick={() => setShowSortDropdown((prev) => !prev)}
+                >
+                  Sort:{" "}
+                  {sortOption === "recent"
+                    ? "Recently Added"
+                    : sortOption === "alphabetical"
+                    ? "A-Z"
+                    : "Z-A"}
+                </button>
+                {showSortDropdown && (
+                  <div className="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-200 shadow-md rounded-sm text-sm">
+                    <button
+                      onClick={() => handleSortChange("recent")}
+                      className={`block px-4 py-2 text-left w-full hover:bg-gray-100 ${
+                        sortOption === "recent"
+                          ? "font-semibold text-[#051b34]"
+                          : ""
+                      }`}
+                    >
+                      Recently Added
+                    </button>
+                    <button
+                      onClick={() => handleSortChange("alphabetical")}
+                      className={`block px-4 py-2 text-left w-full hover:bg-gray-100 ${
+                        sortOption === "alphabetical"
+                          ? "font-semibold text-[#051b34]"
+                          : ""
+                      }`}
+                    >
+                      Alphabetical (A-Z)
+                    </button>
+                    <button
+                      onClick={() => handleSortChange("reverse")}
+                      className={`block px-4 py-2 text-left w-full hover:bg-gray-100 ${
+                        sortOption === "reverse"
+                          ? "font-semibold text-[#051b34]"
+                          : ""
+                      }`}
+                    >
+                      Alphabetical (Z-A)
+                    </button>
+                  </div>
+                )}
+              </div>
 
               <div className="relative">
                 <button
@@ -289,19 +387,9 @@ const getCurrentLocation = (item) => {
                 <p className="w-1/5 flex items-center">{item.assetId || "—"}</p>
                 <p className="w-1/5 flex items-center">
                   {getPreviousLocation(item)}
-                  {/* {hasLocationChange(item) && (
-                    <span className="ml-2 text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
-                      Changed
-                    </span>
-                  )} */}
                 </p>
                 <p className="w-1/5 flex items-center">
                   {getCurrentLocation(item)}
-                  {/* {hasLocationChange(item) && (
-                    <span className="ml-2 text-xs text-green-600">
-                      ✓ New
-                    </span>
-                  )} */}
                 </p>
                 <div className="w-1/5 flex items-center">
                   {item.assignedBy ? (

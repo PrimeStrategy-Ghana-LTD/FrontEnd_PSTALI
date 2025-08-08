@@ -102,9 +102,14 @@ const AssignLocationPage = () => {
   const handleAssign = async () => {
     console.log("Assigning asset:", id, "to location:", newLocation); // Debug log
     
-    // Validate inputs
+    // Validate inputs - UPDATED: Make justification required
     if (!newLocation) {
       alert("Please select a location");
+      return;
+    }
+
+    if (!justification || justification.trim() === "") {
+      alert("Please provide a justification for this location assignment");
       return;
     }
 
@@ -225,7 +230,7 @@ const AssignLocationPage = () => {
                 htmlFor="justification"
                 className="text-md font-medium text-gray-700 mb-1"
               >
-                Justification (Optional)
+                Justification *
               </label>
               <textarea
                 id="justification"
@@ -233,18 +238,21 @@ const AssignLocationPage = () => {
                 value={justification}
                 onChange={(e) => setJustification(e.target.value)}
                 className="border border-gray-300 rounded px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500 w-[363px]"
-                placeholder="Reason for location change (optional)"
+                placeholder="Please provide a reason for this location assignment"
+                required
               />
-              <small className="text-gray-500 mt-1">
-                Note: Justification will be saved separately after location update
-              </small>
+              {justification === "" && (
+                <p className="text-sm text-red-600 mt-1">
+                  Justification is required for location assignments
+                </p>
+              )}
             </div>
 
             <div className="flex gap-4">
               <button
                 className="px-6 py-2 bg-[#0A2343] text-white rounded hover:opacity-90 text-sm disabled:opacity-50"
                 onClick={handleAssign}
-                disabled={isUpdating || !newLocation}
+                disabled={isUpdating || !newLocation || !justification?.trim()}
               >
                 {isUpdating ? "Assigning..." : "Assign"}
               </button>
