@@ -63,19 +63,27 @@ const CategorySummary = () => {
         let total = 0;
 
         data.forEach(item => {
-          const cat = item.category?.toLowerCase();
+          const category = item.category;
+          const count = item.count;
 
-          if (cat === "cars") {
-            updatedCounts["Vehicle"] = item.count;
-            total += item.count;
+          // Map API categories to display categories
+          if (category === "Cars") {
+            updatedCounts["Vehicle"] = count;
+          } else if (category === "Goods 1") {
+            updatedCounts["Goods 1"] = count;
+          } else if (category === "Goods 2") {
+            updatedCounts["Goods 2"] = count;
+          } else if (category === "Goods 3") {
+            updatedCounts["Goods 3"] = count;
           }
-          // Add other mappings here when the backend supports them
+
+          total += count;
         });
 
         setCategoryCounts(updatedCounts);
         setTotalAssets(total);
 
-        // Format chart data
+        // Format chart data - only include categories with counts > 0
         const chartFormatted = Object.entries(updatedCounts)
           .filter(([_, count]) => count > 0)
           .map(([name, count]) => ({
@@ -95,7 +103,7 @@ const CategorySummary = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-50 h-[420px] flex flex-col p-2 lg:p-4 ml-[45%]">
-      <div className="text-center mb-">
+      <div className="text-center mb-4">
         <h3 className="font-semibold text-gray-800 text-lg mb-2">Category</h3>
 
         {/* Donut chart with total assets in center */}

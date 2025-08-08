@@ -18,42 +18,51 @@ const AssignedPage = () => {
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const [totalAssignedAssets, setTotalAssignedAssets] = useState(0);
 
-  useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        const data = await apiGetLocationAssignments();
-        console.log("Assignments data:", data); // Debug log
-        setAssignments(data.assets || data);
-        setFilteredAssignments(data.assets || data);
-      } catch (error) {
-        console.error("Error fetching assignments:", error);
+ useEffect(() => {
+  const fetchAssignments = async () => {
+    try {
+      const data = await apiGetLocationAssignments();
+      console.log("Assignments data:", data); // Debug log
+      setAssignments(data.assets || data);
+      setFilteredAssignments(data.assets || data);
+      
+      // ✅ Set the total count from the API response
+      if (data.count !== undefined) {
+        setTotalAssignedAssets(data.count);
+      } else if (data.assets) {
+        setTotalAssignedAssets(data.assets.length);
+      } else if (Array.isArray(data)) {
+        setTotalAssignedAssets(data.length);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching assignments:", error);
+    }
+  };
 
-    const fetchLocations = async () => {
-      try {
-        const response = await apiGetLocations();
-        const locs = Array.isArray(response)
-          ? response
-          : response.locations || [];
-        setLocations(locs);
-      } catch (error) {
-        console.error("Error fetching locations:", error);
-      }
-    };
+  const fetchLocations = async () => {
+    try {
+      const response = await apiGetLocations();
+      const locs = Array.isArray(response)
+        ? response
+        : response.locations || [];
+      setLocations(locs);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+    }
+  };
 
-    const fetchTotalAssignmentCount = async () => {
-      try {
-        const data = await apiGetLocationStats();
-        setTotalAssignedAssets(data.totalAssetsWithAssetLocation || 0);
-      } catch (error) {
-        console.error("Error fetching total assignment count:", error);
-      }
-    };
+    // const fetchTotalAssignmentCount = async () => {
+    //   try {
+    //     const data = await apiGetLocationStats();
+    //     setTotalAssignedAssets(data.totalAssetsWithAssetLocation || 0);
+    //   } catch (error) {
+    //     console.error("Error fetching total assignment count:", error);
+    //   }
+    // };
 
     fetchAssignments();
     fetchLocations();
-    fetchTotalAssignmentCount();
+    // fetchTotalAssignmentCount();
   }, []);
 
   const handleFilter = () => {
@@ -160,13 +169,13 @@ const AssignedPage = () => {
     return "—";
   };
 
-  // Helper function to get current location
-  const getCurrentLocation = (item) => {
-    if (hasLocationChange(item)) {
-      return item.newLocation?.assetLocation || "—";
-    }
-    return item.assetLocation?.newLocation || "—";
-  };
+  // Helper function to get current location - FIXED VERSION
+const getCurrentLocation = (item) => {
+  if (hasLocationChange(item)) {
+    return item.newLocation || "—"; // ✅ Direct access to string value
+  }
+  return item.assetLocation?.assetLocation || "—"; // ✅ Access the original location
+};
 
   return (
     <div className="flex w-full overflow-x-hidden">

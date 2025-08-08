@@ -53,21 +53,21 @@ const handleSubmit = async (e) => {
   setLoading(true);
 
   try {
-    const payload = {
-      userName: formData.userName,
-      email: formData.email,
-      password: formData.password,
-      storeLocation: formData.storeLocation,
-      phone: formData.phone,
-      role: formData.role,
-    };
-
-    // Only add profilePicture if a file is selected
+    // Create FormData for file upload
+    const formDataToSend = new FormData();
+    formDataToSend.append('userName', formData.userName);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('password', formData.password);
+    formDataToSend.append('storeLocation', formData.storeLocation);
+    formDataToSend.append('phone', formData.phone);
+    formDataToSend.append('role', formData.role);
+    
+    // Add profile picture file if selected
     if (profile_picture) {
-      payload.profilePicture = URL.createObjectURL(profile_picture);
+      formDataToSend.append('profilePicture', profile_picture);
     }
 
-    await apiAddUser(payload);
+    await apiAddUser(formDataToSend);
     toast.success("User Added Successfully");
     navigate("/dashboard/users");
   } catch (error) {
@@ -77,6 +77,8 @@ const handleSubmit = async (e) => {
     setLoading(false);
   }
 };
+
+
 
   const handleCancel = () => {
     navigate("/dashboard/users");

@@ -24,11 +24,14 @@ export const apiUpdateProfile = async (updateData) => {
 };
 
 export const apiAddUser = async(payload) => {
-    return await apiClient.post("/users/register", payload, {
-        headers: {
-            "Content-Type": "application/json"
-        }
-    });
+    const headers = {};
+    
+    // If payload is FormData, don't set Content-Type (let browser set it)
+    if (!(payload instanceof FormData)) {
+        headers["Content-Type"] = "application/json";
+    }
+    
+    return await apiClient.post("/users/register", payload, { headers });
 };
 
 
