@@ -134,7 +134,7 @@ const CategorySummary = () => {
       </div>
 
       {/* Category breakdown list */}
-      <div className="flex-grow overflow-y-auto space-y-4">
+      <div className="flex-grow overflow-y-hidden space-y-3">
         {categories.map((category, index) => (
           <div key={index} className="flex items-center justify-between">
             <div className="flex items-center gap-3">

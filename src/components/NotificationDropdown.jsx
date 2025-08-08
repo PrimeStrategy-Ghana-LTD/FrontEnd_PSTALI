@@ -9,47 +9,91 @@ const NotificationDropdown = () => {
   const token = localStorage.getItem("token");
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [actionType, setActionType] = useState(null);
+  const [targetId, setTargetId] = useState(null);
+
+  const openConfirmModal = (type, id = null) => {
+    setActionType(type);
+    setTargetId(id);
+    setShowConfirm(true);
+  };
+
+  const closeConfirmModal = () => {
+    setShowConfirm(false);
+    setActionType(null);
+    setTargetId(null);
+  };
+
+  const confirmAction = async () => {
+    try {
+      if (actionType === "markAll") {
+        await axios.patch(
+          "https://backend-ps-tali.onrender.com/notifications/mark-all-read",
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setNotifications((prev) =>
+          prev.map((notif) => ({ ...notif, isRead: true }))
+        );
+        setUnreadCount(0);
+      } else if (actionType === "deleteAll") {
+        await axios.delete("https://backend-ps-tali.onrender.com/notifications", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setNotifications([]);
+        setUnreadCount(0);
+      } else if (actionType === "deleteOne" && targetId) {
+        await axios.delete(
+          `https://backend-ps-tali.onrender.com/notifications/${targetId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setNotifications((prev) => prev.filter((n) => n.id !== targetId));
+        const deletedNotif = notifications.find((n) => n.id === targetId);
+        if (deletedNotif && !deletedNotif.isRead) {
+          setUnreadCount((prev) => (prev > 0 ? prev - 1 : 0));
+        }
+      }
+    } catch (error) {
+      console.error("Action failed:", error);
+    } finally {
+      closeConfirmModal();
+    }
+  };
+
   // Fetch notifications
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const res = await axios.get(
           "https://backend-ps-tali.onrender.com/notifications/me",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-        const notifs = Array.isArray(res.data?.data) ? res.data.data : [];
-        setNotifications(notifs);
+        setNotifications(Array.isArray(res.data?.data) ? res.data.data : []);
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
         setNotifications([]);
       }
     };
-
     fetchNotifications();
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdown on outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch unread count
   const fetchUnreadCount = async () => {
     try {
       const res = await axios.get(
         "https://backend-ps-tali.onrender.com/notifications/unread-count",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setUnreadCount(res.data?.count || 0);
     } catch (error) {
@@ -63,67 +107,8 @@ const NotificationDropdown = () => {
   }, []);
 
   useEffect(() => {
-    if (open) {
-      fetchUnreadCount();
-    }
+    if (open) fetchUnreadCount();
   }, [open]);
-
-  // Mark all as read
-  const handleMarkAllAsRead = async () => {
-    try {
-      await axios.patch(
-        "https://backend-ps-tali.onrender.com/notifications/mark-all-read",
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      // Update local state
-      setNotifications((prev) =>
-        prev.map((notif) => ({ ...notif, isRead: true }))
-      );
-      setUnreadCount(0);
-    } catch (error) {
-      console.error("Failed to mark all as read:", error);
-    }
-  };
-
-  const handleDeleteNotification = async (id) => {
-    try {
-      await axios.delete(
-        `https://backend-ps-tali.onrender.com/notifications/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      // Remove from UI
-      setNotifications((prev) => prev.filter((notif) => notif.id !== id));
-
-      // Adjust unread count if needed
-      const deletedNotif = notifications.find((n) => n.id === id);
-      if (deletedNotif && !deletedNotif.isRead) {
-        setUnreadCount((prev) => (prev > 0 ? prev - 1 : 0));
-      }
-    } catch (error) {
-      console.error("Failed to delete notification:", error);
-    }
-  };
-
-  const handleDeleteAllNotifications = async () => {
-    try {
-      await axios.delete("https://backend-ps-tali.onrender.com/notifications", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Clear local notifications and unread count
-      setNotifications([]);
-      setUnreadCount(0);
-    } catch (error) {
-      console.error("Failed to delete all notifications:", error);
-    }
-  };
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -146,7 +131,7 @@ const NotificationDropdown = () => {
             <div className="flex flex-col items-end space-y-1">
               {unreadCount > 0 && (
                 <button
-                  onClick={handleMarkAllAsRead}
+                  onClick={() => openConfirmModal("markAll")}
                   className="text-xs text-blue-600 hover:underline"
                 >
                   Mark all as read
@@ -154,7 +139,7 @@ const NotificationDropdown = () => {
               )}
               {notifications.length > 0 && (
                 <button
-                  onClick={handleDeleteAllNotifications}
+                  onClick={() => openConfirmModal("deleteAll")}
                   className="text-xs text-red-600 hover:underline"
                 >
                   Delete all
@@ -162,6 +147,7 @@ const NotificationDropdown = () => {
               )}
             </div>
           </div>
+
           {notifications.length === 0 ? (
             <div className="p-4 text-sm text-gray-500">No notifications</div>
           ) : (
@@ -184,7 +170,6 @@ const NotificationDropdown = () => {
                             },
                           }
                         );
-
                         setNotifications((prev) =>
                           prev.map((notif) =>
                             notif.id === n.id
@@ -194,22 +179,17 @@ const NotificationDropdown = () => {
                         );
                         setUnreadCount((prev) => (prev > 0 ? prev - 1 : 0));
                       } catch (err) {
-                        console.error(
-                          "Error marking notification as read:",
-                          err
-                        );
+                        console.error("Error marking notification as read:", err);
                       }
                     }
                   }}
                 >
                   <div className="font-medium">{n.title}</div>
                   <div className="text-gray-600">{n.message}</div>
-
-                  {/* 🗑️ Delete icon */}
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // prevent triggering read
-                      handleDeleteNotification(n.id);
+                      e.stopPropagation();
+                      openConfirmModal("deleteOne", n.id);
                     }}
                     className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-600"
                     title="Delete notification"
@@ -220,6 +200,33 @@ const NotificationDropdown = () => {
               ))}
             </ul>
           )}
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 bg-opacity-10 backdrop-blur flex items-center justify-center z-[9999]">
+          <div className="bg-black text-white p-6 rounded shadow-lg max-w-sm w-full">
+            <p className="text-sm mb-4">
+              {actionType === "markAll" && "Are you sure you want to mark all notifications as read?"}
+              {actionType === "deleteAll" && "Are you sure you want to delete all notifications?"}
+              {actionType === "deleteOne" && "Are you sure you want to delete this notification?"}
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={closeConfirmModal}
+                className="text-sm px-3 py-1 border rounded hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAction}
+                className="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
