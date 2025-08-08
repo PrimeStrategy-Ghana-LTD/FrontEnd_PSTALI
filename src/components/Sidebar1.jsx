@@ -11,19 +11,37 @@ import Manage from "../assets/images/Manage.png";
 import Users from "../assets/images/Users.png";
 import Order from "../assets/images/Order.png";
 import Search from "../assets/images/Search.png";
+import { getUserRole } from "../servicess/auth"; // Import the getUserRole function
 
 const topItems = [
   { label: "Dashboard", icon: Home, path: "/dashboard", exact: true },
   { label: "Assets", icon: Assets, path: "/dashboard/assets" },
   { label: "Reports", icon: Report, path: "/dashboard/reports" },
-  { label: "Users", icon: Users, path: "/dashboard/users" },
+  { 
+    label: "Users", 
+    icon: Users, 
+    path: "/dashboard/users",
+    allowedRoles: ["administrator"] // Only administrators can see this
+  },
   { label: "Asset Assignment", icon: Order, path: "/dashboard/assigned" },
-  { label: "Approvals", icon: Order, path: "/dashboard/approvals" },
-  { label: "Locations", icon: Manage, path: "/dashboard/manage-location" },
+  { 
+    label: "Approvals", 
+    icon: Order, 
+    path: "/dashboard/approvals",
+    allowedRoles: ["administrator"] // Only administrators can see this
+  },
+  { 
+    label: "Locations", 
+    icon: Manage, 
+    path: "/dashboard/manage-location",
+    allowedRoles: ["administrator", "assetManager"] // Administrators and asset managers can see this
+  },
   { label: "Search", icon: Search, path: "/search" },
 ];
 
 const Sidebar1 = ({ setSidebarOpen }) => {
+  const userRole = getUserRole(); // Get the current user's role
+
   const handleNavClick = () => {
     if (setSidebarOpen) {
       setSidebarOpen(false);
@@ -37,6 +55,16 @@ const Sidebar1 = ({ setSidebarOpen }) => {
     // Redirect to login
     window.location.href = "/";
   };
+
+  // Filter items based on user role
+  const visibleTopItems = topItems.filter(item => {
+    // If item has no allowedRoles restriction, show it to everyone
+    if (!item.allowedRoles) {
+      return true;
+    }
+    // If item has allowedRoles restriction, check if user's role is included
+    return item.allowedRoles.includes(userRole);
+  });
 
   return (
     <div className="flex flex-col h-full w-64 bg-[#051b34] border-r border-gray-200">
@@ -59,7 +87,7 @@ const Sidebar1 = ({ setSidebarOpen }) => {
       <nav className="flex-1 flex flex-col justify-between px-4 pb-4">
         {/* Top navigation items */}
         <div className="space-y-2 mt-8">
-          {topItems.map((item, index) => (
+          {visibleTopItems.map((item, index) => (
             <NavLink
               key={index}
               to={item.path}
