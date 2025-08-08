@@ -47,23 +47,17 @@ export const useEditAsset = (asset) => {
       return;
     }
 
-    // Note: Commenting out justification requirement since API doesn't accept it
-    // if (!justification.trim()) {
-    //   toast.error("Please provide a justification");
-    //   return;
-    // }
-
     try {
       setIsUpdating(true);
 
-      // Match the exact API specification from documentation
+      // Send both newLocation and justification (justification is optional)
       const updateData = {
-        newLocation: newLocation  // Only send newLocation as per API docs
+        newLocation: newLocation,
+        justification: justification || "" // Send justification, empty string if not provided
       };
 
       console.log('Updating asset:', assetId, 'with data:', updateData);
 
-      // Use the API function that matches the documentation
       const updatedAsset = await apiUpdateAssetLocation(assetId, updateData);
 
       const selectedLocation = locations.find(
@@ -85,7 +79,8 @@ export const useEditAsset = (asset) => {
 
       // Handle specific error cases
       if (error.response?.status === 422) {
-        toast.error("Invalid data format. Please check your input.");
+        const errorDetails = error.response.data?.details || error.response.data?.message || "Validation failed";
+        toast.error(`Validation Error: ${errorDetails}`);
         console.error("422 Error details:", error.response.data);
       } else if (error.response?.status === 404) {
         toast.error("Asset not found");

@@ -160,11 +160,39 @@ export const apiGetOneLocation = async (id) => {
 };
 
 // Updated API function in servicess/tali.js
+// export const apiUpdateAssetLocation = async (assetId, updateData) => {
+//     try {
+//         // Ensure both fields are always included
+//         const payload = {
+//             newLocation: updateData.newLocation || updateData.newLocationId || updateData.locationId,
+//             justification: updateData.justification || '' // Always send justification, even if empty
+//         };
+
+//         console.log('Sending payload:', payload); // Debug log
+//         console.log('Asset ID:', assetId); // Debug log
+
+//         const response = await apiClient.patch(`/assets/${assetId}/update-location`, payload);
+//         return response.data;
+//     } catch (error) {
+//         console.error('Error updating asset location:', error);
+        
+//         // Log more details about the error
+//         if (error.response) {
+//             console.error('Error status:', error.response.status);
+//             console.error('Error data:', error.response.data);
+//         }
+        
+//         throw error;
+//     }
+// };
+
+// Updated API function in servicess/tali.js
 export const apiUpdateAssetLocation = async (assetId, updateData) => {
     try {
-        // Match the exact API specification - only send newLocation
+        // Ensure both fields are always included
         const payload = {
-            newLocation: updateData.newLocation || updateData.newLocationId || updateData.locationId
+            newLocation: updateData.newLocation || updateData.newLocationId || updateData.locationId,
+            justification: updateData.justification || '' // Always send justification, even if empty
         };
 
         console.log('Sending payload:', payload); // Debug log
@@ -181,37 +209,6 @@ export const apiUpdateAssetLocation = async (assetId, updateData) => {
             console.error('Error data:', error.response.data);
         }
         
-        throw error;
-    }
-};
-
-// Alternative function if you need to handle justification separately
-export const apiUpdateAssetLocationComplete = async (assetId, updateData) => {
-    try {
-        // Step 1: Update location
-        const locationPayload = {
-            newLocation: updateData.newLocation
-        };
-
-        const locationResponse = await apiClient.patch(`/assets/${assetId}/update-location`, locationPayload);
-        
-        // Step 2: If justification is needed, you might need a separate endpoint
-        // or update the asset with justification using the regular edit endpoint
-        if (updateData.justification) {
-            try {
-                const justificationPayload = {
-                    justification: updateData.justification
-                };
-                await apiClient.patch(`/assets/${assetId}`, justificationPayload);
-            } catch (justError) {
-                console.warn('Could not update justification:', justError);
-                // Don't throw here as the main location update succeeded
-            }
-        }
-
-        return locationResponse.data;
-    } catch (error) {
-        console.error('Error updating asset location:', error);
         throw error;
     }
 };
