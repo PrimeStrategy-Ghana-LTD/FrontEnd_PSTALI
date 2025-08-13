@@ -947,7 +947,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity mt-[30%]">
+    <div className="absolute sm:top-[180px] md:top-[250px] lg:top-[350px] xl:top-[400px] 2xl:top-[450px] fixed inset-0 z-50 flex items-center justify-center bg-opacity">
       <div className="w-full max-w-4xl rounded-xl bg-transparent p-6 text-white shadow-lg">
         <div className="flex justify-end">
           <button onClick={onClose} className="text-gray-300 hover:text-white">
@@ -955,10 +955,10 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
           {/* Make Select */}
           <div className="flex flex-col">
-            <label htmlFor="make" className="mb-1 text-sm font-medium">
+            <label htmlFor="make" className=" text-sm font-medium">
               Make
             </label>
             <select
@@ -966,7 +966,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
               value={filters.make}
               onChange={handleChange}
               disabled={isLoadingMakes}
-              className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
+              className="rounded-md bg-white px-1 py-1 text-sm text-gray-500"
             >
               <option value="">
                 {isLoadingMakes ? "Loading makes..." : "Select Make"}
@@ -981,7 +981,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
 
           {/* Location Select */}
           <div className="flex flex-col">
-            <label htmlFor="assetLocation" className="mb-1 text-sm font-medium">
+            <label htmlFor="assetLocation" className=" text-sm font-medium">
               Location
             </label>
             <select
@@ -989,7 +989,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
               value={filters.assetLocation}
               onChange={handleChange}
               disabled={isLoadingLocations}
-              className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
+              className="rounded-md bg-white px-1 py-1 text-sm text-gray-500"
             >
               <option value="">
                 {isLoadingLocations ? "Loading locations..." : "Location"}
@@ -1013,14 +1013,14 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
 
           {/* Category Select */}
           <div className="flex flex-col">
-            <label htmlFor="category" className="mb-1 text-sm font-medium">
+            <label htmlFor="category" className=" text-sm font-medium">
               Category
             </label>
             <select
               name="category"
               value={filters.category}
               onChange={handleChange}
-              className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
+              className="rounded-md bg-white px-1 py-1 text-sm text-gray-500"
             >
               <option value="">Asset Category</option>
               <option value="Cars">Cars</option>
@@ -1032,7 +1032,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
 
           {/* Model Select */}
           <div className="flex flex-col">
-            <label htmlFor="model" className="mb-1 text-sm font-medium">
+            <label htmlFor="model" className=" text-sm font-medium">
               Model
             </label>
             <select
@@ -1040,7 +1040,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
               value={filters.model}
               onChange={handleChange}
               disabled={!filters.make || isLoadingModels}
-              className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
+              className="rounded-md bg-white px-1 py-1 text-sm text-gray-500"
             >
               <option value="">
                 {isLoadingModels
@@ -1059,7 +1059,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
 
           {/* Origin Select */}
           <div className="flex flex-col">
-            <label htmlFor="origin" className="mb-1 text-sm font-medium">
+            <label htmlFor="origin" className=" text-sm font-medium">
               Origin
             </label>
             <select
@@ -1067,7 +1067,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
               value={filters.origin}
               onChange={handleChange}
               disabled={isLoadingOrigins}
-              className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
+              className="rounded-md bg-white px-1 py-1 text-sm text-gray-500"
             >
               <option value="">
                 {isLoadingOrigins ? "Loading origins..." : "Select Origin"}
@@ -1082,7 +1082,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
 
           {/* Date Range */}
           <div className="flex flex-col">
-            <label className="mb-1 text-sm font-medium">Date</label>
+            <label className=" text-sm font-medium">Date</label>
             <div className="flex space-x-2">
               <div className="relative w-1/2">
                 <input
@@ -1091,7 +1091,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
                   name="from"
                   value={filters.from}
                   onChange={handleChange}
-                  className="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-500"
+                  className="w-full rounded-md bg-white px-1 py-1 text-sm text-gray-500"
                 />
                 <CalendarDays
                   className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer"
@@ -1105,7 +1105,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
                   name="to"
                   value={filters.to}
                   onChange={handleChange}
-                  className="w-full rounded-md bg-white px-3 py-2 text-sm text-gray-500"
+                  className="w-full rounded-md bg-white px-1 py-1 text-sm text-gray-500"
                 />
                 <CalendarDays
                   className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer"
@@ -1117,7 +1117,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
 
           {/* Inspected By */}
           <div className="flex flex-col">
-            <label htmlFor="inspectedBy" className="mb-1 text-sm font-medium">
+            <label htmlFor="inspectedBy" className=" text-sm font-medium">
               Inspected By
             </label>
             <select
@@ -1125,7 +1125,7 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
               value={filters.inspectedBy}
               onChange={handleChange}
               disabled={isLoadingUsers}
-              className="rounded-md bg-white px-3 py-2 text-sm text-gray-500"
+              className="rounded-md bg-white px-1 py-1 text-sm text-gray-500"
             >
               <option value="">
                 {isLoadingUsers ? "Loading users..." : "Select User"}
@@ -1146,17 +1146,17 @@ const AdvancedSearchModal = ({ onClose, searchTerm, setSearchTerm }) => {
         </div>
 
         {/* Buttons */}
-        <div className="mt-6 flex justify-start gap-4">
+        <div className="mt-2 flex justify-start gap-4">
           <button
             onClick={handleSearch}
-            className="flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+            className="flex items-center gap-2 rounded-md bg-green-600 px-1 py-1 text-sm font-medium text-white hover:bg-green-700"
           >
             <Search size={16} />
             Search
           </button>
           <button
             onClick={handleReset}
-            className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800"
+            className="rounded-md bg-blue-700 px-1 py-1 text-sm font-medium text-white hover:bg-blue-800"
           >
             Reset Filters
           </button>

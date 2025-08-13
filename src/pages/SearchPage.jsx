@@ -425,69 +425,28 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="p-5 lg:px-8 xl:px-12 2xl:px-16 min-h-screen bg-[#051b34]">
+    <div className="p-4 sm:p-5 md:p-6 lg:px-8 xl:px-12 2xl:px-16 min-h-screen bg-[#051b34]">
       {/* Container for max width on very large screens */}
       <div className="mx-auto max-w-7xl">
         {/* User and Notification Icons */}
-        <div className="fixed top-0 right-0 z-50 flex items-center gap-4 p-2 bg-[#051b34]">
-          <div className="flex items-center gap-4">
+        <div className="fixed top-0 right-0 z-50 flex items-center gap-2 sm:gap-3 md:gap-4 p-2 sm:p-3 md:p-4 bg-[#051b34]">
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Notification Dropdown */}
             <div className="relative" ref={bellRef}>
-              {/* <div
-                className="flex items-center gap-2 mr-2 bg-white p-2 lg:p-3 rounded-full shadow-sm hover:shadow transition-shadow cursor-pointer"
-                onClick={() => {
-                  setNotificationDropdownOpen((prev) => !prev);
-                  setProfileDropdownOpen(false); // close profile if open
-                }}
-              >
-                <Bell className="text-gray-500" size={20} />
-                {pendingApprovalsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                    {pendingApprovalsCount}
-                  </span>
-                )}
-              </div> */}
               <NotificationDropdown />
-
-              {/* {notificationDropdownOpen && (
-                <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[40vh] w-[15vw]">
-                  <p className="text-gray-800 font-semibold mb-2 border-b-[0.5px] border-gray-200">
-                    Notifications
-                  </p>
-                  <ul className="text-md text-gray-700 space-y-2 ">
-                    <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
-                      <img src={icon} alt="" />
-                      <Link to="/dashboard/approvals" className="relative flex items-center gap-2 text-black">
-                        Pending Approvals
-                        {unreadApprovalCount > 0 && (
-                          <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
-                            {unreadApprovalCount}
-                          </span>
-                        )}
-                      </Link>
-                    </li>
-                    <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
-                      <img src={icon} alt="" />
-                      <span>Asset Update</span>
-                    </li>
-                    <li className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded">
-                      <img src={icon2} alt="" />
-                      <span>Profile Update</span>
-                    </li>
-                  </ul>
-                </div>
-              )} */}
             </div>
 
+            {/* Profile Dropdown */}
             <div className="flex items-center gap-2 relative" ref={profileRef}>
               <div
-                className="relative h-10 w-10 lg:h-12 lg:w-12 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="relative h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => {
                   setProfileDropdownOpen((prev) => !prev);
                   setNotificationDropdownOpen(false);
                 }}
               >
                 {profileLoading ? (
-                  <div className="h-full w-full flex items-center justify-center text-xs text-gray-400">
+                  <div className="h-full w-full flex items-center justify-center text-[10px] sm:text-xs text-gray-400">
                     ...
                   </div>
                 ) : profilePicture ? (
@@ -498,58 +457,73 @@ const SearchPage = () => {
                   />
                 ) : (
                   <UserCircle
-                    size={32}
-                    className="text-gray-500 mx-auto mt-[5px]"
+                    size={28} // default icon size for xs
+                    className="text-gray-500 mx-auto mt-[4px] sm:mt-[5px] sm:w-8 sm:h-8 lg:w-10 lg:h-10"
                   />
                 )}
               </div>
 
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-76 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 h-[43vh] w-[15vw] space-y-1.5">
+                <div
+                  className="absolute right-0 mt-[1200%] sm:mt-[900%] md:mt-[750%] lg:mt-[720%] xl:mt-[700%] 2xl:mt-[680%] bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-3 sm:p-4 
+  h-[45vh]  
+  w-[60vw] sm:w-[40vw] md:w-[25vw] lg:w-[20vw] xl:w-[15vw] 
+  space-y-1.5
+"
+                >
                   {userInfo ? (
                     <>
-                      <div className=" text-gray-800 font-bold">
+                      {/* Name */}
+                      <div className="text-gray-800 font-bold text-sm sm:text-base">
                         {userInfo.userName}
                       </div>
-                      <div className="text-sm text-gray-600 border-b-[0.5px] border-gray-300">
+
+                      {/* Role */}
+                      <div className="text-xs sm:text-sm text-gray-600 border-b border-gray-300">
                         {userInfo.role}
                       </div>
 
-                      <p className="flex items-center gap-1 text-sm">
+                      {/* Contact info */}
+                      <p className="flex items-center gap-1 text-xs sm:text-xm">
                         <MdOutlineEmail /> {userInfo.email}
                       </p>
-                      <p className="flex items-center gap-1 text-sm">
+                      <p className="flex items-center gap-1 text-xs sm:text-sm">
                         <MdOutlineContactPage /> {userInfo.phone}
                       </p>
-                      <p className="flex items-center gap-1 text-sm">
+                      <p className="flex items-center gap-1 text-xs sm:text-sm">
                         <MdOutlineLocationOn />{" "}
                         {getLocationName(userInfo.storeLocation)}
                       </p>
 
-                      <p className="border-b-[0.5px] border-gray-300"></p>
-                      <div className="flex text-sm gap-1">
+                      <p className="border-b border-gray-300"></p>
+
+                      {/* Links */}
+                      <div className="flex text-xs sm:text-sm gap-1">
                         <p className="mt-1">
                           <VscAccount />
                         </p>
                         <Link>Account</Link>
                       </div>
-                      <div className="flex text-sm gap-1">
+                      <div className="flex text-xs sm:text-sm gap-1">
                         <p className="mt-1">
                           <MdOutlineSettings />
                         </p>
                         <Link to="/dashboard/settings">Settings</Link>
                       </div>
-                      <p className="border-b-[0.5px] border-gray-300"></p>
+
+                      <p className="border-b border-gray-300"></p>
+
+                      {/* Logout */}
                       <button
                         onClick={handleLogout}
-                        className=" w-full text-red-500 hover:text-red-600  px-4 py-2 rounded-md text-sm transition-colors"
+                        className="w-full text-red-500 hover:text-red-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm transition-colors"
                       >
                         <LuLogIn className="inline-block mr-1" />
                         Logout
                       </button>
                     </>
                   ) : (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600">
                       User info not available
                     </p>
                   )}
@@ -571,8 +545,8 @@ const SearchPage = () => {
           </div>
 
           {/* Search Bar - Better responsive behavior */}
-          <div className="relative flex justify-center mb-8 lg:mb-12 mt-8 lg:mt-12">
-            <div className="border-2 border-white w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl h-12 lg:h-14 xl:h-16 rounded-4xl flex flex-row items-center px-4 lg:px-6 gap-2 lg:gap-3 focus-within:shadow-md transition-all bg-white relative z-10">
+          <div className="relative flex justify-center mb-5 lg:mb-5 xl:mb-7 2xl:mb-10 mt-8 lg:mt-12 xl:mt-16 2xl:mt-20">
+            <div className="border-2 border-white w-full max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl h-12 lg:h-14 xl:h-16 2xl:h-20 rounded-4xl flex flex-row items-center px-4 lg:px-6 xlg:px-8 2xl:px-10 gap-2 lg:gap-3 xlg:gap-4 2xl:gap-5 focus-within:shadow-md transition-all bg-white relative z-10">
               <Search className="text-gray-400" size={20} />
               <input
                 type="text"
@@ -646,8 +620,8 @@ const SearchPage = () => {
           {/* Tabs - Better spacing on larger screens */}
           <>
             {/* Tab Section */}
-            <div className="flex justify-center mb-8 lg:mb-10">
-              <div className="flex space-x-8 lg:space-x-16 xl:space-x-20">
+            <div className="relative w-full flex justify-center items-center">
+              <div className="flex space-x-8 lg:space-x-16 xl:space-x-20 2xl:space-x-24 ">
                 {["Assets", "Advanced Search"].map((tab) => (
                   <p
                     key={tab}
