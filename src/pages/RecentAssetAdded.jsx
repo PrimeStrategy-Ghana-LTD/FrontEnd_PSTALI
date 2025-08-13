@@ -16,7 +16,7 @@ const RecentAssetAdded = () => {
 
       const sortedAssets = allAssets
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 5); // Get only 5 most recent
+        .slice(0, 5);
 
       setAssets(sortedAssets);
     } catch (err) {
@@ -38,8 +38,17 @@ const RecentAssetAdded = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 w-50 ml-[45%]">
-      <h3 className="font-semibold text-gray-800 mb-4 text-lg">Recent Asset Added</h3>
+    <div
+      className="
+        bg-white rounded-lg shadow-sm border border-gray-200
+        p-4 sm:p-5 md:p-6
+        w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl
+        mx-auto
+      "
+    >
+      <h3 className="font-semibold text-gray-800 mb-4 text-base sm:text-lg md:text-xl">
+        Recent Asset Added
+      </h3>
 
       {loading ? (
         <p className="text-gray-500 text-sm">Loading...</p>
@@ -50,7 +59,10 @@ const RecentAssetAdded = () => {
       ) : (
         <div className="space-y-4">
           {assets.map((asset, index) => (
-            <div key={index} className="flex items-center gap-3">
+            <div
+              key={index}
+              className="flex items-center gap-3 flex-wrap sm:flex-nowrap"
+            >
               <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center border border-gray-200 flex-shrink-0 overflow-hidden">
                 {asset.assetImage ? (
                   <img
@@ -70,8 +82,12 @@ const RecentAssetAdded = () => {
                 )}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-800">{asset.assetName || "—"}</span>
-                <span className="text-sm font-medium text-gray-400">{formatYear(asset.createdAt)}</span>
+                <span className="text-sm sm:text-base font-medium text-gray-800">
+                  {asset.assetName || "—"}
+                </span>
+                <span className="text-xs sm:text-sm font-medium text-gray-400">
+                  {formatYear(asset.createdAt)}
+                </span>
               </div>
             </div>
           ))}
