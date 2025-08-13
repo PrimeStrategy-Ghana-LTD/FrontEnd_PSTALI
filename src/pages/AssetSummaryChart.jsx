@@ -9,11 +9,19 @@ const AssetSummaryChart = () => {
     { x: 25, assetAdded: 200, assetAssigned: 170 },
   ];
 
+  const svgWidth = 1000; // matches viewBox width
+  const svgHeight = 240; // matches viewBox height
+  const chartHeight = 200;
+  const chartStartX = 70;
+  const chartEndX = 950;
+
   // Function to create smooth curve path
   const createSmoothPath = (key) => {
     const points = chartData.map((item, i) => ({
-      x: 70 + i * ((window.innerWidth - 140) / (chartData.length - 1)),
-      y: 200 - (item[key] - 140) * 1.25,
+      x:
+        chartStartX +
+        i * ((chartEndX - chartStartX) / (chartData.length - 1)),
+      y: chartHeight - (item[key] - 140) * 1.25,
     }));
 
     let d = `M ${points[0].x},${points[0].y} `;
@@ -22,7 +30,6 @@ const AssetSummaryChart = () => {
       const p0 = points[i];
       const p1 = points[i + 1];
       const cpX = (p0.x + p1.x) / 2;
-
       d += `C ${cpX},${p0.y} ${cpX},${p1.y} ${p1.x},${p1.y} `;
     }
 
@@ -30,13 +37,15 @@ const AssetSummaryChart = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 w-[123%]">
-      {/* Title & Dropdowns */}
-      <div className="flex items-center justify-between mb-6 gap-6 whitespace-nowrap">
-        <h3 className="font-bold text-xl text-gray-900">Asset Summary</h3>
+    <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 w-full max-w-full">
+      {/* Title & Controls */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 sm:gap-6 flex-wrap">
+        <h3 className="font-bold text-lg sm:text-xl text-gray-900">
+          Asset Summary
+        </h3>
 
         {/* Legend */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2">
             <div className="w-4 h-0.5 bg-purple-700 rounded"></div>
             <span className="text-sm text-gray-600">Asset Added</span>
@@ -48,24 +57,23 @@ const AssetSummaryChart = () => {
         </div>
 
         {/* Dropdowns */}
-        <div className="flex items-center gap-1">
-          <div className="flex items-center">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1">
             <div className="w-4 h-0.5 bg-gray-300 rounded"></div>
-            <select className="text-sm px-2 text-gray-600 py-1 rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <select className="text-sm px-2 text-gray-600 py-1 rounded-full bg-white border focus:outline-none focus:ring-2 focus:ring-purple-500">
               <option>Category</option>
             </select>
           </div>
-
-          <select className="text-xs border border-gray-300 rounded- py-1 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <select className="text-xs border border-gray-300 rounded py-1 px-2 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
             <option>March 2020</option>
           </select>
         </div>
       </div>
 
       {/* Chart */}
-      <div className="h-80 relative w-full">
+      <div className="h-64 sm:h-72 lg:h-80 w-full">
         <svg
-          viewBox="0 0 1000 240"
+          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
           preserveAspectRatio="none"
           className="w-full h-full"
         >
@@ -73,10 +81,10 @@ const AssetSummaryChart = () => {
           {[140, 180, 220, 260].map((value) => (
             <line
               key={value}
-              x1="50"
-              y1={200 - (value - 140) * 1.25}
-              x2="950"
-              y2={200 - (value - 140) * 1.25}
+              x1={chartStartX - 20}
+              y1={chartHeight - (value - 140) * 1.25}
+              x2={chartEndX}
+              y2={chartHeight - (value - 140) * 1.25}
               stroke="#f3f4f6"
               strokeWidth="1"
             />
@@ -86,8 +94,8 @@ const AssetSummaryChart = () => {
           {[140, 180, 220, 260].map((value) => (
             <text
               key={value}
-              x="40"
-              y={205 - (value - 140) * 1.25}
+              x={chartStartX - 30}
+              y={chartHeight + 5 - (value - 140) * 1.25}
               textAnchor="end"
               className="text-xs fill-gray-400"
               fontSize="11"
@@ -100,7 +108,10 @@ const AssetSummaryChart = () => {
           {chartData.map((item, i) => (
             <text
               key={item.x}
-              x={70 + i * 185}
+              x={
+                chartStartX +
+                i * ((chartEndX - chartStartX) / (chartData.length - 1))
+              }
               y="220"
               textAnchor="middle"
               className="text-xs fill-gray-400"
@@ -112,13 +123,13 @@ const AssetSummaryChart = () => {
 
           {/* Asset Added Area */}
           <path
-            d={`${createSmoothPath("assetAdded")} L 950,200 L 70,200 Z`}
+            d={`${createSmoothPath("assetAdded")} L ${chartEndX},${chartHeight} L ${chartStartX},${chartHeight} Z`}
             fill="rgba(147, 51, 234, 0.08)"
           />
 
           {/* Asset Assigned Area */}
           <path
-            d={`${createSmoothPath("assetAssigned")} L 950,200 L 70,200 Z`}
+            d={`${createSmoothPath("assetAssigned")} L ${chartEndX},${chartHeight} L ${chartStartX},${chartHeight} Z`}
             fill="rgba(156, 163, 175, 0.1)"
           />
 
