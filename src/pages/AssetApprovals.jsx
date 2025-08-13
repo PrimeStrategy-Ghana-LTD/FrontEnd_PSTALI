@@ -216,7 +216,7 @@ const AssetApprovals = () => {
             <p>Asset</p>
             <p>VIN</p>
             <p>Current Location</p>
-            <p>New Location</p>
+            <p>Origin</p>
             <p>Assigned By</p>
             <p>Actions</p>
           </div>
@@ -250,7 +250,7 @@ const AssetApprovals = () => {
                 </div>
                 <p>{item.assetId || "—"}</p>
                 <p>{getLocationDisplayName(item.assetLocation)}</p>
-                <p>{getLocationDisplayName(item.newLocation)}</p>
+                <p>{getLocationDisplayName(item.origin)}</p>
                 <p>{item.inspectedBy?.userName || item.inspectedBy || "—"}</p>
                 <div className="flex gap-2">
                   <button
