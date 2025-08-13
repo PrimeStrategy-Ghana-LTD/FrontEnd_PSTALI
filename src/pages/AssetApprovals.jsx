@@ -10,6 +10,7 @@ import {
   apiGetLocationStats 
 } from "../servicess/tali";
 import useLocationName from "../hooks/useLocationName";
+import { Link } from "react-router-dom";
 
 const AssetApprovals = () => {
   const [assignments, setAssignments] = useState([]);
@@ -231,6 +232,8 @@ const AssetApprovals = () => {
                 className="grid grid-cols-6 items-center text-[13px] text-gray-600 py-3 border-b border-gray-200"
               >
                 <div className="flex items-center gap-2">
+                  <Link 
+                                      to={`/dashboard/approvals/${item._id || item.assignmentId}`}>
                   <img
                     src={item.assetImage || "/default-asset.png"}
                     alt=""
@@ -239,7 +242,11 @@ const AssetApprovals = () => {
                       e.target.src = "/default-asset.png";
                     }}
                   />
+                  </Link>
+                    <Link 
+                                      to={`/dashboard/approvals/${item._id || item.assignmentId}`} className="hover:text-blue-600 transition-colors cursor-pointer">
                   <span>{item.assetName || "—"}</span>
+                  </Link>
                 </div>
                 <p>{item.assetId || "—"}</p>
                 <p>{getLocationDisplayName(item.assetLocation)}</p>

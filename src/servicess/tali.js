@@ -20,17 +20,6 @@ export const apiGetOneUser = async (userId) => {
   }
 };
 
-// PATCH update user by ID
-// export const apiUpdateUser = async (userId, data) => {
-//   try {
-//     const response = await apiClient.patch(`/users/${userId}`, data);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error updating user:', error);
-//     throw error;
-//   }
-// };
-
 export const apiUpdateUser = async (id, data) => {
   try {
     const response = await apiClient.patch(`/users/${id}`, data, {
@@ -296,15 +285,6 @@ export const apiEditAsset = async (id, updateData) => {
   }
 };
 
-const fetchDataForPeriod = async (period, chartType) => {
-  try {
-    const response = await fetch(`/api/${chartType}?period=${period}`);
-    const data = await response.json();
-    // Update your state with the fetched data
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-};
 
 export const updateAssetLocation = async (assetId, newLocationId) => {
   const token = localStorage.getItem('token');
@@ -388,3 +368,23 @@ export const apiGetUnapprovedAssets = async () => {
 //     throw error;
 //   }
 // };
+
+export const apiGetOneAssignment = async (id) => {
+  try {
+    const response = await apiClient.get(`/assigned/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Assignment retrieval failed:", error);
+    throw error;
+  }
+};
+
+export const apiGetOneUnapprovedAsset = async (id) => {
+  try {
+    const response = await apiClient.get(`/unapproved/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Unapproved asset retrieval failed:", error);
+    throw error;
+  }
+};
