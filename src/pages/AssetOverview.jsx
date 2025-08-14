@@ -15,12 +15,16 @@ const AssetOverview = () => {
           </div>
         </div>
 
-        {/* Main Grid Layout - Responsive */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <AssetSummaryChart />
-          <CategorySummary />
-          <RecentActivityLog />
-          <RecentAssetAdded />
+        {/* Main Layout */}
+        <div className="space-y-4">
+          <div className="flex flex-col md:flex-row gap-5">
+            <AssetSummaryChart className="flex-1" />
+            <CategorySummary className="flex-1" />
+          </div>
+          <div className="flex flex-col md:flex-row gap-5">
+            <RecentActivityLog className="flex-1" />
+            <RecentAssetAdded className="flex-1" />
+          </div>
         </div>
       </div>
     </div>

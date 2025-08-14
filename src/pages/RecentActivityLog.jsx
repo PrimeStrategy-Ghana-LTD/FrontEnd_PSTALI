@@ -37,7 +37,7 @@ const RecentActivityLog = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full max-w-full h-full flex flex-col p-3 sm:p-4 lg:p-5 xl:p-6 2xl:p-7">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col p-3 sm:p-4 lg:p-5 xl:p-6 2xl:p-7">
       <h3 className="font-semibold text-gray-800 mb-3 text-sm sm:text-base">
         Recent Activity Log
       </h3>
@@ -48,9 +48,9 @@ const RecentActivityLog = () => {
           {/* Table header */}
           <div className="flex justify-between font-semibold text-[11px] sm:text-[13px] text-gray-700 pb-1 border-b border-gray-200">
             <p className="w-1/5">Asset</p>
-            <p className="w-1/5">VIN</p>
-            <p className="w-1/5">New Location</p>
-            <p className="w-1/5">Assigned By</p>
+            <p className="w-1/5">Location</p>
+            <p className="w-1/5">Date&Time</p>
+            <p className="w-1/5">Approved By</p>
           </div>
 
           {/* Table rows */}
@@ -72,13 +72,16 @@ const RecentActivityLog = () => {
 
                 {/* VIN */}
                 <p className="w-1/5 flex items-center min-w-[80px]">
-                  {item.asset || '—'}
+                  {item.newLocation || '—'}
+                </p>
+                <p className="w-1/5 flex items-center min-w-[80px]">
+                  {item.date || '—'}
                 </p>
 
                 {/* Current Location */}
-                <p className="w-1/5 flex items-center min-w-[120px]">
+                {/* <p className="w-1/5 flex items-center min-w-[120px]">
                   {getCurrentLocation(item)}
-                </p>
+                </p> */}
 
                 {/* Assigned By */}
                 <div className="w-1/5 flex items-center min-w-[120px]">
@@ -91,7 +94,7 @@ const RecentActivityLog = () => {
                           className="w-4 h-4 sm:w-5 sm:h-5 rounded-full mr-1 object-cover"
                         />
                       )}
-                      <span className="truncate">{item.assignedBy.userName}</span>
+                      <span className="truncate">{item.approvedBy.userName}</span>
                     </div>
                   ) : (
                     '—'

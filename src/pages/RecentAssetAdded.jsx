@@ -40,11 +40,12 @@ const RecentAssetAdded = () => {
   return (
     <div
       className="
-        bg-white rounded-lg shadow-sm border border-gray-200
-        p-4 sm:p-5 md:p-6
-        w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl
-        mx-auto
-      "
+  bg-white rounded-lg shadow-sm border border-gray-200
+  p-4 sm:p-5 md:p-6
+  w-full sm:w-[90%] md:w-[70%] lg:w-[50%] xl:max-w-2xl
+  mx-auto
+"
+
     >
       <h3 className="font-semibold text-gray-800 mb-4 text-base sm:text-lg md:text-xl">
         Recent Asset Added
