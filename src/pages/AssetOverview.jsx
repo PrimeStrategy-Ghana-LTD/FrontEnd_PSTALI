@@ -1,14 +1,12 @@
-
 import React from 'react';
 import AssetSummaryChart from './AssetSummaryChart';
 import CategorySummary from './CategorySummary';
 import RecentActivityLog from './RecentActivityLog';
 import RecentAssetAdded from './RecentAssetAdded';
 
-
 const AssetOverview = () => {
   return (
-    <div className=" bg-gray-50 p-4 lg:p-6">
+    <div className="bg-gray-50 p-4 lg:p-6 w-full">
       <div className="max-w-7xl mx-auto">
         {/* Dashboard Header */}
         <div className="mb-1">
@@ -17,24 +15,15 @@ const AssetOverview = () => {
           </div>
         </div>
 
-        {/* Main Grid Layout - Responsive */}
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-          {/* Top Row */}
-          <div className="xl:col-span-8">
-            <AssetSummaryChart />
+        {/* Main Layout */}
+        <div className="space-y-4">
+          <div className="flex flex-col md:flex-row gap-5">
+            <AssetSummaryChart className="flex-1" />
+            <CategorySummary className="flex-1" />
           </div>
-          
-          <div className="xl:col-span-4">
-            <CategorySummary />
-          </div>
-
-          {/* Bottom Row */}
-          <div className="xl:col-span-8">
-            <RecentActivityLog />
-          </div>
-          
-          <div className="xl:col-span-4">
-            <RecentAssetAdded />
+          <div className="flex flex-col md:flex-row gap-5">
+            <RecentActivityLog className="flex-1" />
+            <RecentAssetAdded className="flex-1" />
           </div>
         </div>
       </div>

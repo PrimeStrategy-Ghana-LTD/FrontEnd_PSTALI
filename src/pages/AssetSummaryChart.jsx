@@ -37,7 +37,7 @@ const AssetSummaryChart = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 w-full max-w-full">
+    <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200">
       {/* Title & Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 sm:gap-6 flex-wrap">
         <h3 className="font-bold text-lg sm:text-xl text-gray-900">

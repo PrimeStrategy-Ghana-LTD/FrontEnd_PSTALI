@@ -67,7 +67,8 @@ const CategorySummary = () => {
   }, []);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl p-4 sm:p-6 mx-auto flex flex-col">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full sm:w-[90%] md:w-[70%] lg:w-[50%] xl:max-w-2xl
+  mx-auto p-4 sm:p-6 mx-auto flex flex-col">
       {/* Title */}
       <div className="text-center mb-4">
         <h3 className="font-semibold text-gray-800 text-base sm:text-lg mb-2">Category</h3>
