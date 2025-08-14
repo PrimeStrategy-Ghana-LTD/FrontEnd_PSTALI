@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
+import { Link } from "react-router-dom"; // Add this import
 import Sidebar1 from "../components/Sidebar1";
 import Searchbar from "../components/Searchbar";
 import { 
@@ -377,12 +378,24 @@ const getCurrentLocation = (item) => {
                 className="flex justify-between text-[13px] text-gray-600 py-3 border-b border-gray-200"
               >
                 <div className="w-1/5 flex items-center">
-                  <img 
-                    src={item.assetImage} 
-                    alt={item.assetName} 
-                    className="w-10 h-10 rounded-full mr-3 object-cover" 
-                  />
-                  <p>{item.assetName || "—"}</p>
+                  {/* Updated: Link the image to ViewAssignment */}
+                  <Link to={`/dashboard/assigned/${item._id || item.assignmentId}`}>
+                    <img 
+                      src={item.assetImage || "/default-asset.png"} 
+                      alt={item.assetName} 
+                      className="w-10 h-10 rounded-full mr-3 object-cover hover:opacity-80 transition-opacity cursor-pointer" 
+                      onError={(e) => {
+                        e.target.src = "/default-asset.png";
+                      }}
+                    />
+                  </Link>
+                  {/* Updated: Link the asset name to ViewAssignment */}
+                  <Link 
+                    to={`/dashboard/assigned/${item._id || item.assignmentId}`}
+                    className="hover:text-blue-600 transition-colors cursor-pointer"
+                  >
+                    {item.assetName || "—"}
+                  </Link>
                 </div>
                 <p className="w-1/5 flex items-center">{item.assetId || "—"}</p>
                 <p className="w-1/5 flex items-center">

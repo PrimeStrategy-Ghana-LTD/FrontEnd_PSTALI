@@ -32,6 +32,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { getUserRole } from "./servicess/auth";
 import Integration from "./pages/Integration";
+import ViewAssignment from "./pages/ViewAssignment";
+import ViewOneUnapproved from "./pages/ViewOneUnapproved";
 
 // Define all your routes here
 const router = createBrowserRouter([
@@ -178,6 +180,14 @@ const router = createBrowserRouter([
         )
       },
       {
+        path: "approvals/:id",
+        element: (
+          <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
+            <ViewOneUnapproved />
+          </ProtectedRoute>
+        )
+      },
+      {
         path: "users/add-user",
         element: (
           <ProtectedRoute>
@@ -190,6 +200,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <AssignedPage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "assigned/:id",
+        element: (
+          <ProtectedRoute>
+            <ViewAssignment />
           </ProtectedRoute>
         )
       },
