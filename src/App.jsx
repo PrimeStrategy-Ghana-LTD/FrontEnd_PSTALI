@@ -86,10 +86,10 @@ const router = createBrowserRouter([
     path: "/error",
     element: <ErrorPage />,
   },
-  {
-    path: "/unauthorized",
-    element: <UnauthorizedPage />,
-  },
+  // {
+  //   path: "/unauthorized",
+  //   element: <UnauthorizedPage />,
+  // },
   {
     path: "/dashboard",
     element: (
@@ -150,7 +150,8 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: (
-          <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
+          // <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
+           <ProtectedRoute>
             <AllUsers />
           </ProtectedRoute>
         ),
@@ -174,7 +175,8 @@ const router = createBrowserRouter([
       {
         path: "approvals",
         element: (
-          <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
+          // <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
+             <ProtectedRoute>
             <AssetApprovals />
           </ProtectedRoute>
         )
@@ -182,7 +184,8 @@ const router = createBrowserRouter([
       {
         path: "approvals/:id",
         element: (
-          <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
+          // <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
+             <ProtectedRoute>
             <ViewOneUnapproved />
           </ProtectedRoute>
         )
@@ -214,7 +217,8 @@ const router = createBrowserRouter([
       { 
         path: "manage-location",
         element: (
-          <ProtectedRoute allowedRoles={["administrator", "assetManager"]} userRole={getUserRole()}>
+          // <ProtectedRoute allowedRoles={["administrator", "assetManager"]} userRole={getUserRole()}>
+             <ProtectedRoute>
             <ManageStore />
           </ProtectedRoute>
         ) 
