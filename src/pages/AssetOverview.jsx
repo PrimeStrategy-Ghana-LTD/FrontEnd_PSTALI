@@ -3,6 +3,7 @@ import AssetSummaryChart from './AssetSummaryChart';
 import CategorySummary from './CategorySummary';
 import RecentActivityLog from './RecentActivityLog';
 import RecentAssetAdded from './RecentAssetAdded';
+import Again from './Again';
 
 const AssetOverview = () => {
   return (
@@ -18,12 +19,13 @@ const AssetOverview = () => {
         {/* Main Layout */}
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row gap-5">
-            <AssetSummaryChart className="flex-1" />
-            <CategorySummary className="flex-1" />
+            <AssetSummaryChart className="flex-[2]" />
+            <CategorySummary className="flex-[1]" />
           </div>
           <div className="flex flex-col md:flex-row gap-5">
-            <RecentActivityLog className="flex-1" />
-            <RecentAssetAdded className="flex-1" />
+            <RecentActivityLog className="flex-[2]" />
+            {/* <Again /> */}
+            <RecentAssetAdded className="flex-[1]" />
           </div>
         </div>
       </div>
