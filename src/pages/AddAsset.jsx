@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiAddAsset, apiGetLocations } from "../servicess/tali";
 import { IoArrowBack } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 const AddAsset = () => {
   const navigate = useNavigate();
@@ -19,6 +20,14 @@ const AddAsset = () => {
       } catch (error) {
         console.error("Failed to fetch locations", error);
         setError("Failed to load locations");
+        
+        // SweetAlert for location fetch error
+        Swal.fire({
+          icon: 'error',
+          title: 'Error Loading Locations',
+          text: 'Failed to load locations. Please refresh the page and try again.',
+          confirmButtonColor: '#051b34'
+        });
       }
     };
 
@@ -28,6 +37,30 @@ const AddAsset = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Check file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        Swal.fire({
+          icon: 'error',
+          title: 'File Too Large',
+          text: 'Please select an image smaller than 10MB.',
+          confirmButtonColor: '#051b34'
+        });
+        e.target.value = ''; // Clear the input
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid File Type',
+          text: 'Please select a valid image file (PNG, JPG, GIF).',
+          confirmButtonColor: '#051b34'
+        });
+        e.target.value = ''; // Clear the input
+        return;
+      }
+
       setSelectedImageName(file.name);
       setImagePreview(URL.createObjectURL(file));
     } else {
@@ -41,21 +74,78 @@ const AddAsset = () => {
     setLoading(true);
     setError("");
 
+    // Show loading alert
+    Swal.fire({
+      title: 'Adding Asset',
+      text: 'Please wait while we add your asset...',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     try {
       const form = event.target;
       const formData = new FormData(form);
       await apiAddAsset(formData);
-      navigate("/dashboard/assets");
+      
+      // Success alert
+      Swal.fire({
+        icon: 'success',
+        title: 'Asset Added Successfully!',
+        text: 'The asset has been added to the system.',
+        confirmButtonColor: '#051b34',
+        timer: 2000,
+        showConfirmButton: false
+      }).then(() => {
+        navigate("/dashboard/assets");
+      });
+      
     } catch (error) {
       console.error("Error adding asset:", error);
-      setError(error.response?.data?.message || "Failed to add asset.");
+      const errorMessage = error.response?.data?.message || "Failed to add asset. Please try again.";
+      setError(errorMessage);
+      
+      // Error alert
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to Add Asset',
+        text: errorMessage,
+        confirmButtonColor: '#051b34'
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    navigate("/dashboard/assets");
+    // Confirmation alert before canceling
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Any unsaved changes will be lost.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#051b34',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, leave',
+      cancelButtonText: 'Stay'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate("/dashboard/assets");
+      }
+    });
+  };
+
+  const handleSaveDraft = () => {
+    // You can implement save draft functionality here
+    Swal.fire({
+      icon: 'info',
+      title: 'Save Draft',
+      text: 'Draft functionality will be implemented soon.',
+      confirmButtonColor: '#051b34'
+    });
   };
 
   const renderInputRow = ({ label, name, type = "text", placeholder }) => {
@@ -84,18 +174,18 @@ const AddAsset = () => {
 
     return (
       <div key={name} className="flex items-center mb-3 gap-4">
-    <label className="w-40 text-sm font-medium text-gray-700">{label}</label>
-    <input
-      name={name}
-      type={type}
-      required
-      placeholder={placeholder}
-      className={`w-[250px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${
-        name === "mileage" ? "remove-spinner" : ""
-      }`}
-      inputMode={name === "mileage" ? "numeric" : undefined}
-    />
-  </div>
+        <label className="w-40 text-sm font-medium text-gray-700">{label}</label>
+        <input
+          name={name}
+          type={type}
+          required
+          placeholder={placeholder}
+          className={`w-[250px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${
+            name === "mileage" ? "remove-spinner" : ""
+          }`}
+          inputMode={name === "mileage" ? "numeric" : undefined}
+        />
+      </div>
     );
   };
 
@@ -114,11 +204,7 @@ const AddAsset = () => {
           </p>
         </div>
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
+        {/* Remove the error div since we're using SweetAlert now */}
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -238,7 +324,7 @@ const AddAsset = () => {
             <button
               type="button"
               className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm font-medium"
-              onClick={handleCancel}
+              onClick={handleSaveDraft}
               disabled={loading}
             >
               Save Draft
