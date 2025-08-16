@@ -37,14 +37,18 @@ const RecentActivityLog = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col p-3 sm:p-4 lg:p-5 xl:p-6 2xl:p-7">
+    <div className="
+  bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col 
+  p-3 sm:p-4 lg:p-5 xl:p-6 2xl:p-7 
+  w-full sm:w-[110%] md:w-[120%] lg:w-[138%] xl:w-[140%] 2xl:w-[145%]
+">
       <h3 className="font-semibold text-gray-800 mb-3 text-sm sm:text-base">
         Recent Activity Log
       </h3>
 
       {/* Make table horizontally scrollable on small screens */}
-      <div className="overflow-x-auto">
-        <div className="min-w-[600px]">
+      <div className="">
+        <div className="">
           {/* Table header */}
           <div className="flex justify-between font-semibold text-[11px] sm:text-[13px] text-gray-700 pb-1 border-b border-gray-200">
             <p className="w-1/5">Asset</p>
