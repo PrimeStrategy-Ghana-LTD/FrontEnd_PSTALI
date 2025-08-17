@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import logo from "../assets/images/tali-logo.png";
 import { useNavigate } from 'react-router-dom';
-import { apiSignin } from '../servicess/auth';
+import { apiSignin, getUserRole } from '../servicess/auth';
 import { toast } from 'react-toastify';
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
@@ -21,13 +21,37 @@ const LoginPage = () => {
       const response = await apiSignin({ email, password });
 
       if (response.status === 200) {
+        // Store the token first
         localStorage.setItem("token", response.data.accessToken);
+        
+        // Get user role from the token or response
+        let userRole = null;
+        
+        // Try to get role from response first
+        if (response.data.user && response.data.user.role) {
+          userRole = response.data.user.role;
+        } else if (response.data.role) {
+          userRole = response.data.role;
+        } else {
+          // If not in response, try to decode from token
+          userRole = getUserRole();
+        }
+
         toast.success("Login successful!", { position: "top-right", autoClose: 2000 });
-        navigate("/search");
+        
+        // Role-based redirection
+        if (userRole === 'administrator') {
+          // Admin and Asset Manager go to dashboard
+          navigate("/dashboard");
+        } else {
+          // Asset manager and users (viewer or any other role) go to search page
+          navigate("/search");
+        }
       } else {
         toast.error("Login failed. Please try again.");
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast.error("Incorrect email or password.");
     } finally {
       setLoading(false);
@@ -113,3 +137,45 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+// Also update your App.jsx to include the unauthorized route:
+/*
+Add this route in your router configuration in App.jsx:
+
+{
+  path: "/unauthorized",
+  element: <UnauthorizedPage />,
+},
+
+And update your ProtectedRoute component calls to properly check roles:
+
+// For routes that should only be accessible to admins
+{
+  path: "users",
+  element: (
+    <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
+      <AllUsers />
+    </ProtectedRoute>
+  ),
+},
+
+// For routes that should be accessible to admins and asset managers
+{
+  path: "manage-location",
+  element: (
+    <ProtectedRoute allowedRoles={["administrator", "assetManager"]} userRole={getUserRole()}>
+      <ManageStore />
+    </ProtectedRoute>
+  ),
+},
+
+// For routes accessible to all authenticated users
+{
+  path: "assets",
+  element: (
+    <ProtectedRoute>
+      <AllAssets />
+    </ProtectedRoute>
+  )
+},
+*/

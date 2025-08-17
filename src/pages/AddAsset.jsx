@@ -236,7 +236,7 @@ const AddAsset = () => {
                       />
                     </svg>
                     <p className="text-sm text-blue-600 font-medium">Click to upload or drag and drop</p>
-                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
+                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, up to 10MB</p>
                     {selectedImageName && (
                       <p className="text-xs text-gray-600 mt-2 font-medium">Selected: {selectedImageName}</p>
                     )}
@@ -257,15 +257,15 @@ const AddAsset = () => {
                 </h3>
                 <div>
                   {[
-                    { label: "Asset Name", name: "assetName", placeholder: "Enter asset name" },
-                    { label: "Asset ID/VIN", name: "assetId", placeholder: "Enter asset ID or VIN" },
-                    { label: "Category", name: "category", placeholder: "Enter category" },
-                    { label: "Make", name: "make", placeholder: "Enter make" },
-                    { label: "Model", name: "model", placeholder: "Enter model" },
-                    { label: "Origin", name: "origin", placeholder: "Enter origin" },
+                    { label: "Asset Name", name: "assetName", placeholder: "Eg: Kia Sportage" },
+                    { label: "Asset ID/VIN", name: "assetId", placeholder: "Eg: 1XGCM2AH5AB123478" },
+                    { label: "Category", name: "category", placeholder: "Eg: Cars, Goods 1" },
+                    { label: "Make", name: "make", placeholder: "Eg: Kia" },
+                    { label: "Model", name: "model", placeholder: "Eg: Sportage" },
+                    { label: "Origin", name: "origin", placeholder: "Eg: Japan" },
                     { label: "Year", name: "year" },
-                    { label: "Mileage", name: "mileage", type: "number", placeholder: "Enter mileage" },
-                    { label: "Exterior Colour", name: "exteriorColour", placeholder: "Enter exterior colour" },
+                    { label: "Mileage", name: "mileage", type: "number", placeholder: "Eg: 30000" },
+                    { label: "Exterior Colour", name: "exteriorColour", placeholder: "Eg: Silver" },
                   ].map(renderInputRow)}
                 </div>
               </div>
@@ -279,13 +279,13 @@ const AddAsset = () => {
                 </h3>
                 <div>
                   {[
-                    { label: "Variant", name: "variant", placeholder: "Enter variant" },
-                    { label: "Body Type", name: "bodyType", placeholder: "Enter body type" },
-                    { label: "Fuel Type", name: "fuelType", placeholder: "Enter fuel type" },
-                    { label: "Drivetrain", name: "drivetrain", placeholder: "Enter drivetrain" },
-                    { label: "Door Count", name: "doorCount", placeholder: "Enter number of doors" },
-                    { label: "Seating Capacity", name: "seatingCapacity", placeholder: "Enter seating capacity" },
-                    { label: "Condition", name: "condition", placeholder: "Enter overall condition" },
+                    { label: "Variant", name: "variant", placeholder: "Eg: EX" },
+                    { label: "Body Type", name: "bodyType", placeholder: "Eg: SUV" },
+                    { label: "Fuel Type", name: "fuelType", placeholder: "Eg: Diesel" },
+                    { label: "Drivetrain", name: "drivetrain", placeholder: "Eg: 4WD" },
+                    { label: "Door Count", name: "doorCount", placeholder: "Eg: 4" },
+                    { label: "Seating Capacity", name: "seatingCapacity", placeholder: "Eg: 10" },
+                    { label: "Condition", name: "condition", placeholder: "Eg: Excellent" },
                   ].map(renderInputRow)}
 
                   <div className="flex items-center gap-4 mb-3">
@@ -312,7 +312,7 @@ const AddAsset = () => {
                   name="justification"
                   rows="4"
                   required
-                  placeholder="Enter justification for adding this asset..."
+                  placeholder="Justification must be at least 10 characters. Eg: Assigned to field operations team."
                   className="w-[428px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
                 ></textarea>
               </div>

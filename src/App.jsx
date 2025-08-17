@@ -86,10 +86,11 @@ const router = createBrowserRouter([
     path: "/error",
     element: <ErrorPage />,
   },
-  // {
-  //   path: "/unauthorized",
-  //   element: <UnauthorizedPage />,
-  // },
+  // Unauthorized page route
+  {
+    path: "/unauthorized",
+    element: <UnauthorizedPage />,
+  },
   {
     path: "/dashboard",
     element: (
@@ -150,8 +151,7 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: (
-          // <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
-           <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
             <AllUsers />
           </ProtectedRoute>
         ),
@@ -175,8 +175,7 @@ const router = createBrowserRouter([
       {
         path: "approvals",
         element: (
-          // <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
-             <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
             <AssetApprovals />
           </ProtectedRoute>
         )
@@ -184,8 +183,7 @@ const router = createBrowserRouter([
       {
         path: "approvals/:id",
         element: (
-          // <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
-             <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
             <ViewOneUnapproved />
           </ProtectedRoute>
         )
@@ -193,7 +191,7 @@ const router = createBrowserRouter([
       {
         path: "users/add-user",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["administrator"]} userRole={getUserRole()}>
             <AddUser />
           </ProtectedRoute>
         )
@@ -217,8 +215,7 @@ const router = createBrowserRouter([
       { 
         path: "manage-location",
         element: (
-          // <ProtectedRoute allowedRoles={["administrator", "assetManager"]} userRole={getUserRole()}>
-             <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["administrator", "assetManager"]} userRole={getUserRole()}>
             <ManageStore />
           </ProtectedRoute>
         ) 
