@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import orange from "../assets/images/orange.svg";
 import blue from "../assets/images/blue.svg";
+
 import axios from "axios";
 
 const CATEGORY_COLORS = {

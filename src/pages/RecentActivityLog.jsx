@@ -79,7 +79,7 @@ const RecentActivityLog = () => {
                   {item.newLocation || '—'}
                 </p>
                 <p className="w-1/5 flex items-center min-w-[80px]">
-                  {item.date || '—'}
+                  {item.dateUpdated || '—'}
                 </p>
 
                 {/* Current Location */}
