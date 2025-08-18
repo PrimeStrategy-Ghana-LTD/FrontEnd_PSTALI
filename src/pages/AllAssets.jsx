@@ -35,7 +35,7 @@ const AllAssets = () => {
   const [sortOption, setSortOption] = useState("recent");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  
+
   // Get user role
   const userRole = getUserRole();
 
@@ -71,18 +71,18 @@ const AllAssets = () => {
   // Helper function to get location name by ID
   const getLocationName = (locationId) => {
     if (!locationId) return "—";
-    
+
     // Handle populated location object
-    if (typeof locationId === 'object' && locationId.assetLocation) {
+    if (typeof locationId === "object" && locationId.assetLocation) {
       return locationId.assetLocation;
     }
-    
+
     // Handle location ID string
-    if (typeof locationId === 'string') {
+    if (typeof locationId === "string") {
       const location = locations.find((loc) => loc._id === locationId);
       return location ? location.assetLocation : locationId;
     }
-    
+
     return "—";
   };
 
@@ -103,31 +103,27 @@ const AllAssets = () => {
     }
 
     if (locationFilter) {
-      filteredAssets = filteredAssets.filter(
-        (asset) => {
-          if (!asset) return false;
-          const locationName = getLocationName(asset.assetLocation);
-          return locationName === locationFilter;
-        }
-      );
+      filteredAssets = filteredAssets.filter((asset) => {
+        if (!asset) return false;
+        const locationName = getLocationName(asset.assetLocation);
+        return locationName === locationFilter;
+      });
     }
 
     // 2. Advanced Search filters
     if (advancedFilters.search && advancedFilters.search.trim()) {
       const term = advancedFilters.search.toLowerCase();
-      filteredAssets = filteredAssets.filter(
-        (asset) => {
-          if (!asset) return false;
-          return (
-            (asset.assetName && asset.assetName.toLowerCase().includes(term)) ||
-            (asset.assetId && asset.assetId.toLowerCase().includes(term)) ||
-            (asset.category && asset.category.toLowerCase().includes(term)) ||
-            (asset.make && asset.make.toLowerCase().includes(term)) ||
-            (asset.model && asset.model.toLowerCase().includes(term)) ||
-            getLocationName(asset.assetLocation).toLowerCase().includes(term)
-          );
-        }
-      );
+      filteredAssets = filteredAssets.filter((asset) => {
+        if (!asset) return false;
+        return (
+          (asset.assetName && asset.assetName.toLowerCase().includes(term)) ||
+          (asset.assetId && asset.assetId.toLowerCase().includes(term)) ||
+          (asset.category && asset.category.toLowerCase().includes(term)) ||
+          (asset.make && asset.make.toLowerCase().includes(term)) ||
+          (asset.model && asset.model.toLowerCase().includes(term)) ||
+          getLocationName(asset.assetLocation).toLowerCase().includes(term)
+        );
+      });
     }
 
     if (advancedFilters.category) {
@@ -137,24 +133,28 @@ const AllAssets = () => {
     }
 
     if (advancedFilters.assetLocation) {
-      filteredAssets = filteredAssets.filter(
-        (asset) => {
-          if (!asset) return false;
-          return getLocationName(asset.assetLocation) === advancedFilters.assetLocation;
-        }
-      );
+      filteredAssets = filteredAssets.filter((asset) => {
+        if (!asset) return false;
+        return (
+          getLocationName(asset.assetLocation) === advancedFilters.assetLocation
+        );
+      });
     }
 
     if (advancedFilters.model) {
       filteredAssets = filteredAssets.filter(
-        (asset) => asset && asset.model && 
+        (asset) =>
+          asset &&
+          asset.model &&
           asset.model.toLowerCase() === advancedFilters.model.toLowerCase()
       );
     }
 
     if (advancedFilters.origin) {
       filteredAssets = filteredAssets.filter(
-        (asset) => asset && asset.origin && 
+        (asset) =>
+          asset &&
+          asset.origin &&
           asset.origin.toLowerCase() === advancedFilters.origin.toLowerCase()
       );
     }
@@ -167,14 +167,18 @@ const AllAssets = () => {
 
     if (advancedFilters.from) {
       filteredAssets = filteredAssets.filter(
-        (asset) => asset && asset.createdAt && 
+        (asset) =>
+          asset &&
+          asset.createdAt &&
           new Date(asset.createdAt) >= new Date(advancedFilters.from)
       );
     }
 
     if (advancedFilters.to) {
       filteredAssets = filteredAssets.filter(
-        (asset) => asset && asset.createdAt && 
+        (asset) =>
+          asset &&
+          asset.createdAt &&
           new Date(asset.createdAt) <= new Date(advancedFilters.to)
       );
     }
@@ -203,7 +207,9 @@ const AllAssets = () => {
         break;
     }
 
-    return filteredAssets.filter(asset => asset !== null && asset !== undefined);
+    return filteredAssets.filter(
+      (asset) => asset !== null && asset !== undefined
+    );
   };
 
   // Paginate filtered assets
@@ -241,7 +247,7 @@ const AllAssets = () => {
       console.log("API Response:", response);
 
       let assetsData = [];
-      
+
       // Handle different response structures
       if (response && response.data) {
         if (Array.isArray(response.data.assets)) {
@@ -256,8 +262,8 @@ const AllAssets = () => {
       }
 
       // Ensure we have valid assets
-      const validAssets = assetsData.filter(asset => 
-        asset && typeof asset === 'object' && asset._id
+      const validAssets = assetsData.filter(
+        (asset) => asset && typeof asset === "object" && asset._id
       );
 
       setAllAssets(validAssets);
@@ -295,7 +301,9 @@ const AllAssets = () => {
   const getLocations = async () => {
     try {
       const response = await apiGetLocations();
-      const locationsData = Array.isArray(response) ? response : response.locations || [];
+      const locationsData = Array.isArray(response)
+        ? response
+        : response.locations || [];
       setLocations(locationsData);
     } catch (error) {
       console.error("Error fetching locations:", error);
@@ -643,7 +651,7 @@ const ListView = ({ assets, getLocationName }) => {
 
       {assets.map((item, index) => {
         if (!item || !item._id) return null;
-        
+
         return (
           <div
             key={item._id}
@@ -720,7 +728,9 @@ const ListView = ({ assets, getLocationName }) => {
                 </div>
               </div>
               <div className="flex-[2] truncate">{item.assetId || "—"}</div>
-              <div className="flex-[1.5] font-semibold">{item.origin || "—"}</div>
+              <div className="flex-[1.5] font-semibold">
+                {item.origin || "—"}
+              </div>
               <div className="flex-[1.5]">
                 {getLocationName(item.assetLocation)}
               </div>
@@ -750,11 +760,20 @@ const GridView = ({ assets, getLocationName }) => {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xlg:grid-cols-3 gap-4 mt-9 ml-20">
       {assets.map((item, index) => {
         if (!item || !item._id) return null;
-        
+
         return (
           <div
             key={item._id}
-            className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow h-[243px] w-[348px]"
+            className="
+    bg-white 
+    border border-gray-200 
+    rounded-lg 
+    p-4 
+    shadow-sm hover:shadow-md 
+    transition-shadow 
+    h-[243px] 
+    w-full sm:w-[300px] md:w-[320px] lg:w-[348px] xl:w-[360px] 2xl:w-[380px]
+  "
           >
             <Link
               to={`/dashboard/assign-location/${item._id}`}

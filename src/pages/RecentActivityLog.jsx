@@ -22,31 +22,29 @@ const RecentActivityLog = () => {
     fetchRecentAssignments();
   }, []);
 
-  const getPreviousLocation = (item) => {
-    if (item.newLocation && item.assignedBy) {
-      return item.assetLocation?.assetLocation || '—';
-    }
-    return '—';
-  };
+  const formatDate = (dateString) => {
+    if (!dateString) return '—';
+    const date = new Date(dateString);
 
-  const getCurrentLocation = (item) => {
-    if (item.newLocation && item.assignedBy) {
-      return item.newLocation || '—';
-    }
-    return item.assetLocation?.assetLocation || '—';
+    return date.toLocaleString('en-US', {
+      month: 'short',  // Aug
+      day: 'numeric',  // 4
+      hour: 'numeric', // 10
+      minute: '2-digit', // 15
+      hour12: true,    // AM/PM
+    });
   };
 
   return (
     <div className="
-  bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col 
-  p-3 sm:p-4 lg:p-5 xl:p-6 2xl:p-7 
-  w-full sm:w-[110%] md:w-[120%] lg:w-[138%] xl:w-[140%] 2xl:w-[145%]
-">
+      bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col 
+      p-3 sm:p-4 lg:p-5 xl:p-6 2xl:p-7 
+      w-full sm:w-[110%] md:w-[120%] lg:w-[138%] xl:w-[140%] 2xl:w-[145%]
+    ">
       <h3 className="font-semibold text-gray-800 mb-3 text-sm sm:text-base">
         Recent Activity Log
       </h3>
 
-      {/* Make table horizontally scrollable on small screens */}
       <div className="">
         <div className="">
           {/* Table header */}
@@ -74,20 +72,17 @@ const RecentActivityLog = () => {
                   <p className="truncate">{item.assetName || '—'}</p>
                 </div>
 
-                {/* VIN */}
+                {/* Location */}
                 <p className="w-1/5 flex items-center min-w-[80px]">
                   {item.newLocation || '—'}
                 </p>
+
+                {/* Date formatted */}
                 <p className="w-1/5 flex items-center min-w-[80px]">
-                  {item.date || '—'}
+                  {formatDate(item.dateUpdated)}
                 </p>
 
-                {/* Current Location */}
-                {/* <p className="w-1/5 flex items-center min-w-[120px]">
-                  {getCurrentLocation(item)}
-                </p> */}
-
-                {/* Assigned By */}
+                {/* Approved By */}
                 <div className="w-1/5 flex items-center min-w-[120px]">
                   {item.assignedBy ? (
                     <div className="flex items-center">
@@ -98,7 +93,7 @@ const RecentActivityLog = () => {
                           className="w-4 h-4 sm:w-5 sm:h-5 rounded-full mr-1 object-cover"
                         />
                       )}
-                      <span className="truncate">{item.approvedBy.userName}</span>
+                      <span className="truncate">{item.approvedBy?.userName || '—'}</span>
                     </div>
                   ) : (
                     '—'

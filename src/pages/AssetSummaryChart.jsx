@@ -1,6 +1,26 @@
 import React from "react";
+import  { useState } from "react";
+
 
 const AssetSummaryChart = () => {
+const [selectedMonth, setSelectedMonth] = useState("March 2020");
+
+const months = [
+  "January 2020",
+  "February 2020",
+  "March 2020",
+  "April 2020",
+  "May 2020",
+  "June 2020",
+  "July 2020",
+  "August 2020",
+  "September 2020",
+  "October 2020",
+  "November 2020",
+  "December 2020",
+];
+
+
   const chartData = [
     { x: 5, assetAdded: 160, assetAssigned: 140 },
     { x: 10, assetAdded: 220, assetAssigned: 200 },
@@ -60,7 +80,8 @@ const AssetSummaryChart = () => {
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1">
             <div className="w-4 h-0.5 bg-gray-300 rounded"></div>
-            <select className="text-sm px-2 text-gray-600 py-1 rounded-full bg-white border focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <select className="text-sm px-2 text-gray-600 py-1 rounded-full bg-white border focus:outline-none focus:ring-2 focus:ring-purple-500"  value={selectedMonth}  onChange={(e) => setSelectedMonth(e.target.value)}>
+              
               <option>Category</option>
             </select>
           </div>
