@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import orange from "../assets/images/orange.svg";
-import blue from "../assets/images/blue.svg";
+import yellow from "../assets/images/blue.svg";
+import blue from "../assets/images/blue-goods.svg";
+import gray from "../assets/images/gray-goods.svg";
 import axios from "axios";
 
 const CATEGORY_COLORS = {
@@ -24,9 +26,9 @@ const CategorySummary = () => {
 
   const categories = [
     { name: 'Vehicle', icon: <img src={orange} alt="" className="w-8 sm:w-10 h-8 sm:h-10" />, description: "Cars, bikes" },
-    { name: 'Goods 1', icon: <img src={blue} alt="" className="w-8 sm:w-10 h-8 sm:h-10" />, description: "Machinery" },
+    { name: 'Goods 1', icon: <img src={yellow} alt="" className="w-8 sm:w-10 h-8 sm:h-10" />, description: "Machinery" },
     { name: 'Goods 2', icon: <img src={blue} alt="" className="w-8 sm:w-10 h-8 sm:h-10" />, description: "Containers" },
-    { name: 'Goods 3', icon: <img src={blue} alt="" className="w-8 sm:w-10 h-8 sm:h-10" />, description: "Miscellaneous" },
+    { name: 'Goods 3', icon: <img src={gray} alt="" className="w-8 sm:w-10 h-8 sm:h-10" />, description: "Miscellaneous" },
   ];
 
   useEffect(() => {
